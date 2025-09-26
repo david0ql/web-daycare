@@ -3,20 +3,41 @@ import { useLogin } from "@refinedev/core";
 import { Form, Input, Button, Card, Typography, Space, Alert, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { colors } from "../styles/colors";
+import { AuthApi } from "../domains/auth";
 
 const { Title, Text } = Typography;
 
 export const Login: React.FC = () => {
-  const { mutate: login, isLoading, error } = useLogin();
+  const { mutate: login, isPending, error } = useLogin();
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onFinish = (values: { email: string; password: string }) => {
+  const onFinish = async (values: { email: string; password: string }) => {
     setLoginError(null);
-    login(values, {
-      onError: (error: any) => {
-        setLoginError(error?.message || "Error al iniciar sesión");
-      },
-    });
+    setIsLoading(true);
+    console.log("🚀 Login form submitted with:", { email: values.email });
+    
+    try {
+      // Usar AuthApi directamente para evitar problemas con useLogin
+      console.log("📡 Calling AuthApi.login() directly...");
+      const data = await AuthApi.login(values);
+      console.log("✅ AuthApi.login() success:", data);
+      
+      // Guardar token y usuario
+      localStorage.setItem("refine-auth", data.accessToken);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      
+      console.log("💾 Token and user saved, redirecting...");
+      
+      // Redirigir al dashboard
+      window.location.href = "/";
+      
+    } catch (error: any) {
+      console.error("❌ Login error:", error);
+      setLoginError(error.response?.data?.message || error.message || "Error al iniciar sesión");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

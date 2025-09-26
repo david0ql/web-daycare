@@ -5,24 +5,51 @@ import { LoginCredentials, AuthResult, AuthCheckResult } from '../types/auth.typ
 
 export class AuthProviderService implements AuthProvider {
   async login({ email, password }: LoginCredentials): Promise<AuthResult> {
+    console.log("🔐 AuthProvider.login() called with:", { email });
     try {
+      console.log("📡 Calling AuthApi.login()...");
       const data = await AuthApi.login({ email, password });
+      console.log("✅ AuthApi.login() returned:", data);
       
+      if (!data || !data.accessToken || !data.user) {
+        console.error("❌ Invalid response from AuthApi.login():", data);
+        return {
+          success: false,
+          error: {
+            name: "LoginError",
+            message: "Invalid response from server",
+          },
+        };
+      }
+      
+      console.log("💾 Setting token and user...");
       AuthUtils.setToken(data.accessToken);
       AuthUtils.setUser(data.user);
+      console.log("✅ Token and user set successfully");
       
-      return {
+      const result = {
         success: true,
         redirectTo: "/",
       };
+      console.log("🎉 AuthProvider.login() returning success:", result);
+      return result;
     } catch (error: any) {
-      return {
+      console.error("❌ AuthProvider.login() error:", error);
+      console.error("❌ Error details:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+      
+      const result = {
         success: false,
         error: {
           name: "LoginError",
-          message: error.response?.data?.message || "Invalid credentials",
+          message: error.response?.data?.message || error.message || "Invalid credentials",
         },
       };
+      console.log("🚫 AuthProvider.login() returning error:", result);
+      return result;
     }
   }
 

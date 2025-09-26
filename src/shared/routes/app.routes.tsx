@@ -37,13 +37,18 @@ const AuthDebug: React.FC = () => {
     return <div>Verificando autenticación...</div>;
   }
   
+  // Verificar que isAuthenticated sea verdadero
+  const isActuallyAuthenticated = Boolean(isAuthenticated);
+  console.log("🔍 AuthDebug - isActuallyAuthenticated:", isActuallyAuthenticated);
+  
   // Si no hay token en localStorage, forzar login
   if (!token) {
     console.log("❌ AuthDebug - No token in localStorage, redirecting to login");
     return <Login />;
   }
   
-  if (!isAuthenticated) {
+  // Si Refine dice que no está autenticado, forzar login
+  if (!isActuallyAuthenticated) {
     console.log("❌ AuthDebug - No autenticado según Refine, debería redirigir a login");
     return <Login />;
   }
