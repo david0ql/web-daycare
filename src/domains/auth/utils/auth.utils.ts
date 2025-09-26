@@ -32,6 +32,18 @@ export class AuthUtils {
   static clearAuth(): void {
     this.removeToken();
     this.removeUser();
+    
+    // Limpiar sessionStorage
+    sessionStorage.clear();
+    
+    // Limpiar cualquier cache de la aplicación
+    if (typeof window !== 'undefined' && window.caches) {
+      caches.keys().then(names => {
+        names.forEach(name => {
+          caches.delete(name);
+        });
+      });
+    }
   }
 
   static isTokenExpired(token: string): boolean {

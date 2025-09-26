@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Layout, Menu, Avatar, Typography, Space, Badge, Tooltip, Button, Divider } from "antd";
+import { Layout, Menu, Avatar, Typography, Space, Button } from "antd";
 import { 
   UserOutlined, 
   TeamOutlined, 
@@ -11,8 +11,6 @@ import {
   BarChartOutlined,
   DashboardOutlined,
   LogoutOutlined,
-  BellOutlined,
-  SettingOutlined,
   HomeOutlined,
   BookOutlined,
   SafetyOutlined
@@ -48,7 +46,6 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   const { navigateTo } = useAppNavigation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [notifications] = useState(3);
 
 
 
@@ -337,28 +334,6 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
               )}
             </Space>
             
-            {!collapsed && (
-              <Space style={{ width: "100%", justifyContent: "space-between" }}>
-                <Tooltip title="Notificaciones">
-                  <Badge count={notifications} size="small">
-                    <Button
-                      type="text"
-                      size="small"
-                      icon={<BellOutlined />}
-                      style={{ color: colors.text.secondary }}
-                    />
-                  </Badge>
-                </Tooltip>
-                <Tooltip title="Configuración">
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<SettingOutlined />}
-                    style={{ color: colors.text.secondary }}
-                  />
-                </Tooltip>
-              </Space>
-            )}
           </Space>
         </div>
 

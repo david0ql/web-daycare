@@ -45,21 +45,41 @@ export const authProvider: AuthProvider = {
 
   logout: async () => {
     const token = localStorage.getItem(TOKEN_KEY);
+    
+    // Intentar hacer logout en el servidor
     if (token) {
       try {
-        await fetch(`${API_URL}/auth/logout`, {
+        const response = await fetch(`${API_URL}/auth/logout`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
+        
+        if (!response.ok) {
+          console.warn("Server logout failed, but continuing with local cleanup");
+        }
       } catch (error) {
         console.error("Logout error:", error);
+        // Continuar con la limpieza local aunque falle el servidor
       }
     }
     
+    // Limpiar todos los datos de autenticación
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem("user");
+    sessionStorage.clear();
+    
+    // Limpiar cualquier cache de la aplicación
+    if (typeof window !== 'undefined' && window.caches) {
+      caches.keys().then(names => {
+        names.forEach(name => {
+          caches.delete(name);
+        });
+      });
+    }
+    
     return {
       success: true,
       redirectTo: "/login",
@@ -84,6 +104,7 @@ export const authProvider: AuthProvider = {
       
       if (tokenPayload.exp && tokenPayload.exp < currentTime) {
         // Token expirado, limpiar localStorage
+        console.log("Token expired, clearing authentication");
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem("user");
         return {
@@ -93,6 +114,7 @@ export const authProvider: AuthProvider = {
       }
     } catch (error) {
       // Token inválido, limpiar localStorage
+      console.log("Invalid token format, clearing authentication");
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem("user");
       return {
@@ -117,6 +139,7 @@ export const authProvider: AuthProvider = {
         };
       } else {
         // Token inválido en el servidor, limpiar localStorage
+        console.log("Server rejected token, clearing authentication");
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem("user");
         return {
@@ -154,6 +177,9 @@ export const authProvider: AuthProvider = {
   onError: async (error) => {
     console.error(error);
     if (error.status === 401) {
+      // Limpiar autenticación en caso de error 401
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem("user");
       return {
         logout: true,
       };

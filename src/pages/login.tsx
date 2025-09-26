@@ -108,12 +108,6 @@ export const Login: React.FC = () => {
             </Button>
           </Form.Item>
         </Form>
-
-        <div style={{ textAlign: "center", marginTop: "16px" }}>
-          <Text type="secondary" style={{ color: colors.text.secondary }}>
-            Contacta al administrador para obtener acceso
-          </Text>
-        </div>
       </Card>
     </div>
   );

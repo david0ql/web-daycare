@@ -27,17 +27,25 @@ export class AuthProviderService implements AuthProvider {
   }
 
   async logout(): Promise<AuthResult> {
+    console.log("🚪 AuthProvider.logout() called");
     const token = AuthUtils.getToken();
+    console.log("🔑 Token exists for logout:", !!token);
     
     if (token) {
       try {
+        console.log("🌐 Calling server logout...");
         await AuthApi.logout();
+        console.log("✅ Server logout successful");
       } catch (error) {
-        console.error("Logout error:", error);
+        console.error("❌ Server logout error:", error);
+        // Continuar con la limpieza local aunque falle el servidor
       }
     }
     
+    // Limpiar autenticación local
+    console.log("🧹 Clearing local authentication...");
     AuthUtils.clearAuth();
+    console.log("✅ Local authentication cleared");
     
     return {
       success: true,
@@ -46,9 +54,12 @@ export class AuthProviderService implements AuthProvider {
   }
 
   async check(): Promise<AuthCheckResult> {
+    console.log("🔍 AuthProvider.check() called");
     const token = AuthUtils.getToken();
+    console.log("🔑 Token found:", !!token);
     
     if (!token) {
+      console.log("❌ No token found, redirecting to login");
       return {
         authenticated: false,
         redirectTo: "/login",
@@ -56,6 +67,7 @@ export class AuthProviderService implements AuthProvider {
     }
 
     if (AuthUtils.isTokenExpired(token)) {
+      console.log("⏰ Token expired, clearing authentication");
       AuthUtils.clearAuth();
       return {
         authenticated: false,
@@ -64,14 +76,17 @@ export class AuthProviderService implements AuthProvider {
     }
 
     try {
+      console.log("🌐 Checking token with server...");
       const user = await AuthApi.getProfile();
       AuthUtils.setUser(user);
+      console.log("✅ Authentication check successful");
       
       return {
         authenticated: true,
       };
     } catch (error) {
-      console.error("Auth check error:", error);
+      console.error("❌ Auth check error:", error);
+      console.log("🚫 Server rejected token, clearing authentication");
       AuthUtils.clearAuth();
       
       return {
@@ -90,9 +105,11 @@ export class AuthProviderService implements AuthProvider {
   }
 
   async onError(error: any): Promise<any> {
-    console.error(error);
+    console.error("Auth error:", error);
     
     if (error.status === 401) {
+      console.log("401 error detected, clearing authentication");
+      AuthUtils.clearAuth();
       return {
         logout: true,
       };

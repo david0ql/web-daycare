@@ -14,13 +14,6 @@ import "@ant-design/v5-patch-for-react-19";
 import "@refinedev/antd/dist/reset.css";
 
 import { authProvider } from "./domains/auth";
-import { customDataProvider } from "./dataProvider";
-import { alternativeDataProvider } from "./dataProvider-alternative";
-import { simpleDataProvider } from "./dataProvider-simple";
-import { fixedDataProvider } from "./dataProvider-fixed";
-import { stableDataProvider } from "./dataProvider-stable";
-import { authAwareDataProvider } from "./dataProvider-auth-aware";
-import { correctDataProvider } from "./dataProvider-correct";
 import { stableFixedDataProvider } from "./dataProvider-stable-fixed";
 import { appResources, AppRoutes } from "./shared";
 

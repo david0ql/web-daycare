@@ -1,0 +1,36 @@
+/* Navbar responsive styles */
+.navbar-title {
+  transition: all 0.3s ease;
+}
+
+/* Hide title on small screens */
+@media (max-width: 768px) {
+  .navbar-title {
+    display: none !important;
+  }
+}
+
+/* Adjust max width for medium screens */
+@media (max-width: 1024px) {
+  .navbar-title {
+    max-width: 200px !important;
+  }
+}
+
+/* Adjust max width for small screens */
+@media (max-width: 480px) {
+  .navbar-title {
+    max-width: 150px !important;
+  }
+}
+
+/* Ensure navbar header is responsive */
+.navbar-header {
+  min-width: 0;
+  flex: 1;
+}
+
+/* Ensure user menu doesn't overflow */
+.navbar-user-menu {
+  flex-shrink: 0;
+}

@@ -1,18 +1,16 @@
 import React, { useState } from "react";
-import { Layout, Avatar, Dropdown, Space, Typography, Button, Badge, Tooltip } from "antd";
+import { Layout, Avatar, Dropdown, Space, Typography, Button } from "antd";
 import { 
   UserOutlined, 
   LogoutOutlined, 
   SettingOutlined, 
-  BellOutlined,
   MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  HomeOutlined,
-  DashboardOutlined
+  MenuUnfoldOutlined
 } from "@ant-design/icons";
 import { colors } from "../styles/colors.styles";
 import { EnhancedSidebar } from "./enhanced-sidebar.component";
 import { useAuth } from "../hooks/use-auth.hook";
+import "../styles/navbar.styles.css";
 
 const { Text } = Typography;
 
@@ -52,23 +50,6 @@ export const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
     },
   ];
 
-  const notificationItems = [
-    {
-      key: "1",
-      label: "Nuevo niño registrado",
-      description: "María García se ha registrado",
-    },
-    {
-      key: "2",
-      label: "Recordatorio de pago",
-      description: "3 pagos pendientes",
-    },
-    {
-      key: "3",
-      label: "Incidente reportado",
-      description: "Se reportó un incidente menor",
-    },
-  ];
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -96,7 +77,7 @@ export const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
           top: 0,
           zIndex: 100,
         }}>
-          <Space>
+          <Space className="navbar-header">
             <Button
               type="text"
               icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -104,46 +85,35 @@ export const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
               style={{ 
                 color: colors.text.primary,
                 border: "none",
-                boxShadow: "none"
+                boxShadow: "none",
+                flexShrink: 0
               }}
             />
-            <Text strong style={{ 
-              fontSize: "18px", 
-              color: colors.text.primary 
-            }}>
+            <Text 
+              strong 
+              style={{ 
+                fontSize: "18px", 
+                color: colors.text.primary,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "300px",
+                display: "block"
+              }}
+              className="navbar-title"
+            >
               The Children's World
             </Text>
           </Space>
 
-          <Space size="middle">
-            {/* Notifications */}
-            <Dropdown
-              menu={{ items: notificationItems }}
-              placement="bottomRight"
-              trigger={["click"]}
-            >
-              <Tooltip title="Notificaciones">
-                <Badge count={3} size="small">
-                  <Button
-                    type="text"
-                    icon={<BellOutlined />}
-                    style={{ 
-                      color: colors.text.primary,
-                      border: "none",
-                      boxShadow: "none"
-                    }}
-                  />
-                </Badge>
-              </Tooltip>
-            </Dropdown>
-
+          <Space size="middle" className="navbar-user-menu">
             {/* User Menu */}
             <Dropdown
               menu={{ items: userMenuItems }}
               placement="bottomRight"
               trigger={["click"]}
             >
-              <Space style={{ cursor: "pointer" }}>
+              <Space style={{ cursor: "pointer", maxWidth: "200px" }}>
                 <Avatar
                   size="small"
                   icon={<UserOutlined />}
@@ -152,12 +122,32 @@ export const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
                     color: "white"
                   }}
                 />
-                <div style={{ textAlign: "left" }}>
-                  <Text strong style={{ color: colors.text.primary, fontSize: "14px" }}>
+                <div style={{ textAlign: "left", minWidth: 0 }}>
+                  <Text 
+                    strong 
+                    style={{ 
+                      color: colors.text.primary, 
+                      fontSize: "14px",
+                      display: "block",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      maxWidth: "120px"
+                    }}
+                  >
                     {getUserFullName()}
                   </Text>
-                  <br />
-                  <Text type="secondary" style={{ fontSize: "12px" }}>
+                  <Text 
+                    type="secondary" 
+                    style={{ 
+                      fontSize: "12px",
+                      display: "block",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      maxWidth: "120px"
+                    }}
+                  >
                     {getUserRoleLabel()}
                   </Text>
                 </div>

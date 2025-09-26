@@ -38,14 +38,14 @@ export const useAuth = () => {
     try {
       if (login) {
         await login(credentials);
-        openNotification({
+        openNotification?.({
           type: "success",
           message: "Inicio de sesión exitoso",
           description: `Bienvenido, ${user?.firstName || "Usuario"}`,
         });
       }
     } catch (error) {
-      openNotification({
+      openNotification?.({
         type: "error",
         message: "Error al iniciar sesión",
         description: "Credenciales inválidas",
@@ -60,20 +60,50 @@ export const useAuth = () => {
   const handleLogout = async () => {
     try {
       if (logout) {
-        await logout();
-        openNotification({
-          type: "success",
-          message: "Sesión cerrada",
-          description: "Has cerrado sesión correctamente",
+        // Llamar al logout de Refine usando mutate en lugar de await
+        logout(undefined, {
+          onSuccess: () => {
+            openNotification?.({
+              type: "success",
+              message: "Sesión cerrada",
+              description: "Has cerrado sesión correctamente",
+            });
+          },
+          onError: (error) => {
+            console.error("Logout error:", error);
+            
+            // Forzar limpieza local en caso de error
+            localStorage.removeItem("refine-auth");
+            localStorage.removeItem("user");
+            sessionStorage.clear();
+            
+            openNotification?.({
+              type: "error",
+              message: "Error al cerrar sesión",
+              description: "Se ha cerrado la sesión localmente",
+            });
+            
+            // Redirigir manualmente si es necesario
+            window.location.href = "/login";
+          }
         });
       }
     } catch (error) {
-      openNotification({
+      console.error("Logout error:", error);
+      
+      // Forzar limpieza local en caso de error
+      localStorage.removeItem("refine-auth");
+      localStorage.removeItem("user");
+      sessionStorage.clear();
+      
+      openNotification?.({
         type: "error",
         message: "Error al cerrar sesión",
-        description: "Ocurrió un error inesperado",
+        description: "Se ha cerrado la sesión localmente",
       });
-      throw error;
+      
+      // Redirigir manualmente si es necesario
+      window.location.href = "/login";
     }
   };
 
@@ -84,14 +114,14 @@ export const useAuth = () => {
     try {
       if (register) {
         await register(userData);
-        openNotification({
+        openNotification?.({
           type: "success",
           message: "Registro exitoso",
           description: "Usuario registrado correctamente",
         });
       }
     } catch (error) {
-      openNotification({
+      openNotification?.({
         type: "error",
         message: "Error en el registro",
         description: "No se pudo registrar el usuario",
@@ -107,14 +137,14 @@ export const useAuth = () => {
     try {
       if (forgotPassword) {
         await forgotPassword({ email });
-        openNotification({
+        openNotification?.({
           type: "success",
           message: "Email enviado",
           description: "Se ha enviado un enlace de recuperación a tu email",
         });
       }
     } catch (error) {
-      openNotification({
+      openNotification?.({
         type: "error",
         message: "Error al enviar email",
         description: "No se pudo enviar el email de recuperación",
@@ -130,14 +160,14 @@ export const useAuth = () => {
     try {
       if (updatePassword) {
         await updatePassword(passwordData);
-        openNotification({
+        openNotification?.({
           type: "success",
           message: "Contraseña actualizada",
           description: "Tu contraseña ha sido actualizada correctamente",
         });
       }
     } catch (error) {
-      openNotification({
+      openNotification?.({
         type: "error",
         message: "Error al actualizar contraseña",
         description: "No se pudo actualizar la contraseña",

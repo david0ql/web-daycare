@@ -1,11 +1,12 @@
 import React from "react";
 import { Routes, Route, Outlet } from "react-router";
-import { Authenticated, ErrorComponent } from "@refinedev/core";
+import { Authenticated, ErrorComponent, useIsAuthenticated } from "@refinedev/core";
 import { CustomLayout } from "../components/custom-layout.component";
 
 // Import pages
 import { Dashboard } from "../../pages/dashboard";
 import { Login } from "../../pages/login";
+import { Error404 } from "../../pages/error-404";
 
 // Import domain components
 import { UserList } from "../../domains/users";
@@ -21,15 +22,51 @@ import { DocumentList, DocumentCreate, DocumentShow } from "../../pages/document
 import { MessageList, MessageCreate, MessageShow } from "../../pages/messaging";
 import { ReportList } from "../../pages/reports";
 
+// Componente de debug para verificar autenticación
+const AuthDebug: React.FC = () => {
+  const { data: isAuthenticated, isLoading } = useIsAuthenticated();
+  
+  console.log("🔍 AuthDebug - isAuthenticated:", isAuthenticated);
+  console.log("🔍 AuthDebug - isLoading:", isLoading);
+  
+  // Verificación adicional del token en localStorage
+  const token = localStorage.getItem("refine-auth");
+  console.log("🔑 AuthDebug - Token in localStorage:", !!token);
+  
+  if (isLoading) {
+    return <div>Verificando autenticación...</div>;
+  }
+  
+  // Si no hay token en localStorage, forzar login
+  if (!token) {
+    console.log("❌ AuthDebug - No token in localStorage, redirecting to login");
+    return <Login />;
+  }
+  
+  if (!isAuthenticated) {
+    console.log("❌ AuthDebug - No autenticado según Refine, debería redirigir a login");
+    return <Login />;
+  }
+  
+  console.log("✅ AuthDebug - Autenticado, mostrando layout");
+  return (
+    <CustomLayout>
+      <Outlet />
+    </CustomLayout>
+  );
+};
+
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
+      {/* Ruta de login - accesible sin autenticación */}
+      <Route element={<Login />} path="/login" />
+      
+      {/* Rutas protegidas - requieren autenticación */}
       <Route
         element={
           <Authenticated key="authenticated-layout" fallback={<Login />}>
-            <CustomLayout>
-              <Outlet />
-            </CustomLayout>
+            <AuthDebug />
           </Authenticated>
         }
       >
@@ -91,11 +128,10 @@ export const AppRoutes: React.FC = () => {
         <Route path="/reports">
           <Route index element={<ReportList />} />
         </Route>
-
-        <Route path="*" element={<ErrorComponent />} />
       </Route>
       
-      <Route element={<Login />} path="/login" />
+      {/* Ruta catch-all para rutas no encontradas - debe estar al final */}
+      <Route path="*" element={<Error404 />} />
     </Routes>
   );
 };
