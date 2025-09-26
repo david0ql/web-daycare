@@ -34,6 +34,7 @@ export interface AuthResult {
   success: boolean;
   error?: AuthError;
   redirectTo?: string;
+  [key: string]: any;
 }
 
 export interface AuthCheckResult {

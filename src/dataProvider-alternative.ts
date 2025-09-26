@@ -1,35 +1,43 @@
 import { DataProvider } from "@refinedev/core";
 import { axiosInstance } from "./shared";
 
-export const customDataProvider: DataProvider = {
+/**
+ * Data Provider alternativo que maneja mejor los parámetros de consulta
+ * para APIs que esperan un formato específico
+ */
+export const alternativeDataProvider: DataProvider = {
   getList: async ({ resource, pagination, sorters, filters, meta }) => {
     const params: any = {};
 
     // Add pagination
     if (pagination) {
       params.page = (pagination as any).current || 1;
-      params.take = pagination.pageSize || 10;
+      params.pageSize = pagination.pageSize || 10;
     }
 
-    // Add sorting - simplified format
+    // Add sorting - format that matches your API
     if (sorters && sorters.length > 0) {
       const sorter = sorters[0];
       if (sorter.field) {
-        params.sortBy = sorter.field;
-        params.order = sorter.order === "asc" ? "ASC" : "DESC";
+        params[`sorters[0][field]`] = sorter.field;
+        params[`sorters[0][order]`] = sorter.order || "desc";
       }
     }
 
-    // Add filters - simplified format
+    // Add filters
     if (filters && filters.length > 0) {
-      filters.forEach((filter) => {
+      filters.forEach((filter, index) => {
         if (filter.field && filter.value !== undefined) {
-          params[filter.field] = filter.value;
+          params[`filters[${index}][field]`] = filter.field;
+          params[`filters[${index}][operator]`] = filter.operator || "eq";
+          params[`filters[${index}][value]`] = filter.value;
         }
       });
     }
 
-    console.log('API Request:', { resource, params }); // Debug log
+    console.log('Alternative API Request:', { resource, params });
+    console.log('Full URL:', `${axiosInstance.defaults.baseURL}/${resource}`);
+    console.log('Query String:', new URLSearchParams(params).toString());
 
     try {
       const response = await axiosInstance.get(`/${resource}`, { params });
@@ -40,7 +48,7 @@ export const customDataProvider: DataProvider = {
         total: data.meta?.total || data.length,
       };
     } catch (error) {
-      console.error('DataProvider Error:', error);
+      console.error('Alternative DataProvider Error:', error);
       throw error;
     }
   },
@@ -52,7 +60,6 @@ export const customDataProvider: DataProvider = {
   },
 
   create: async ({ resource, variables, meta }) => {
-    // Transform isActive to boolean if it exists
     const transformedVariables = { ...variables } as any;
     if (transformedVariables.isActive !== undefined) {
       transformedVariables.isActive = Boolean(transformedVariables.isActive);
@@ -64,7 +71,6 @@ export const customDataProvider: DataProvider = {
   },
 
   update: async ({ resource, id, variables, meta }) => {
-    // Transform isActive to boolean if it exists
     const transformedVariables = { ...variables } as any;
     if (transformedVariables.isActive !== undefined) {
       transformedVariables.isActive = Boolean(transformedVariables.isActive);

@@ -99,7 +99,7 @@ export const Dashboard: React.FC = () => {
       {/* Main Stats */}
       <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
+          <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
               title="Total de Niños"
               value={stats.totalChildren}
@@ -112,17 +112,20 @@ export const Dashboard: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
+          <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
               title="Usuarios del Sistema"
               value={stats.totalUsers}
               prefix={<UserOutlined />}
               valueStyle={{ color: "#52c41a" }}
             />
+            <Text type="secondary">
+              Registrados en el sistema
+            </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
+          <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
               title="Asistencia Hoy"
               value={stats.todayAttendance}
@@ -135,13 +138,16 @@ export const Dashboard: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
+          <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
               title="Alertas de Pago"
               value={stats.paymentAlerts}
               prefix={<WarningOutlined />}
               valueStyle={{ color: stats.paymentAlerts > 0 ? "#ff4d4f" : "#52c41a" }}
             />
+            <Text type="secondary">
+              {stats.paymentAlerts > 0 ? "Requieren atención" : "Todo al día"}
+            </Text>
           </Card>
         </Col>
       </Row>
