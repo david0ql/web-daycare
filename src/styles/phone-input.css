@@ -1,0 +1,153 @@
+/* Estilos personalizados para el selector de teléfono */
+.custom-phone-input {
+  width: 100%;
+}
+
+.custom-phone-input .PhoneInput {
+  width: 100%;
+  height: 40px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 0;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.custom-phone-input .PhoneInput:hover {
+  border-color: #40a9ff;
+}
+
+.custom-phone-input .PhoneInput:focus-within {
+  border-color: #1f2937;
+  box-shadow: 0 0 0 2px rgba(31, 41, 55, 0.1);
+  outline: 0;
+}
+
+.custom-phone-input .PhoneInputCountry {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border-right: 1px solid #f0f0f0;
+  background: #fafafa;
+  border-radius: 6px 0 0 6px;
+  min-width: 80px;
+}
+
+.custom-phone-input .PhoneInputCountrySelect {
+  border: none !important;
+  outline: none !important;
+  background: transparent;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.custom-phone-input .PhoneInputCountryIcon {
+  width: 18px;
+  height: 14px;
+  margin-right: 6px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.custom-phone-input .PhoneInputCountrySelectArrow {
+  color: #8c8c8c;
+  margin-left: 4px;
+  font-size: 12px;
+  transition: color 0.3s;
+}
+
+.custom-phone-input .PhoneInputCountrySelect:hover .PhoneInputCountrySelectArrow {
+  color: #1f2937;
+}
+
+.custom-phone-input .PhoneInputInput {
+  border: none !important;
+  outline: none !important;
+  font-size: 16px;
+  padding: 8px 12px;
+  flex: 1;
+  background: transparent;
+  color: #262626;
+}
+
+.custom-phone-input .PhoneInputInput::placeholder {
+  color: #bfbfbf;
+  font-size: 16px;
+}
+
+/* Estilo para el dropdown de países */
+.custom-phone-input .PhoneInputCountrySelectDropdown {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  background: #ffffff;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.custom-phone-input .PhoneInputCountryOption {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.custom-phone-input .PhoneInputCountryOption:hover {
+  background-color: #f5f5f5;
+}
+
+.custom-phone-input .PhoneInputCountryOption--selected {
+  background-color: #e6f7ff;
+  color: #1f2937;
+}
+
+/* Mejoras adicionales para mejor integración */
+.custom-phone-input .PhoneInputCountrySelect:focus {
+  outline: none;
+}
+
+.custom-phone-input .PhoneInputInput:focus {
+  outline: none;
+}
+
+/* Estilo para cuando está deshabilitado */
+.custom-phone-input .PhoneInput--disabled {
+  background-color: #f5f5f5;
+  border-color: #d9d9d9;
+  cursor: not-allowed;
+}
+
+.custom-phone-input .PhoneInput--disabled .PhoneInputInput {
+  background-color: #f5f5f5;
+  color: #bfbfbf;
+  cursor: not-allowed;
+}
+
+.custom-phone-input .PhoneInput--disabled .PhoneInputCountry {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* Animación suave para el hover */
+.custom-phone-input .PhoneInputCountrySelect:hover {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+/* Mejorar el espaciado interno */
+.custom-phone-input .PhoneInputCountry {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
