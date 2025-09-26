@@ -7,18 +7,19 @@ import { UserOutlined, UploadOutlined } from "@ant-design/icons";
 interface UserRole {
   id: number;
   name: string;
-  displayName: string;
+  description: string;
+  createdAt: string;
 }
 
 export const UserCreate: React.FC = () => {
   const { formProps, saveButtonProps } = useForm();
 
   // Fetch user roles for the select
-  const { data: rolesData } = useList<UserRole>({
-    resource: "user-roles",
+  const rolesQuery = useList<UserRole>({
+    resource: "roles",
   });
 
-  const roles = rolesData?.data || [];
+  const roles = rolesQuery.result?.data || [];
 
   return (
     <Create saveButtonProps={saveButtonProps}>
@@ -75,8 +76,8 @@ export const UserCreate: React.FC = () => {
         >
           <Select
             placeholder="Seleccione un rol"
-            options={roles.map((role) => ({
-              label: role.displayName,
+            options={roles.map((role: UserRole) => ({
+              label: role.name.charAt(0).toUpperCase() + role.name.slice(1),
               value: role.id,
             }))}
           />
