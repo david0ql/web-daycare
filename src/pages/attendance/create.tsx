@@ -27,27 +27,13 @@ export const AttendanceCreate: React.FC = () => {
   // Get children for selection
   const { data: childrenData } = useList<Child>({
     resource: "children",
-    pagination: { pageSize: 1000 },
-    filters: [
-      {
-        field: "isActive",
-        operator: "eq",
-        value: true,
-      },
-    ],
+    pagination: { pageSize: 150 },
   });
 
   // Get users for delivered/picked up by selection
   const { data: usersData } = useList<User>({
     resource: "users",
-    pagination: { pageSize: 1000 },
-    filters: [
-      {
-        field: "isActive",
-        operator: "eq",
-        value: true,
-      },
-    ],
+    pagination: { pageSize: 150 },
   });
 
   // Check-in mutation
@@ -82,8 +68,9 @@ export const AttendanceCreate: React.FC = () => {
     },
   });
 
-  const children = childrenData?.data || [];
-  const users = usersData?.data || [];
+  // Filter active children and users on the frontend since API doesn't support these filters
+  const children = (childrenData?.data || []).filter((child: any) => child.isActive === true);
+  const users = (usersData?.data || []).filter((user: any) => user.isActive === true);
 
   const handleCheckIn = (values: any) => {
     checkIn({

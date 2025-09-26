@@ -54,7 +54,7 @@ export const AttendanceList: React.FC = () => {
   // Get children for filter
   const { data: childrenData } = useList({
     resource: "children",
-    pagination: { pageSize: 1000 },
+    pagination: { pageSize: 150 },
   });
 
   const { tableProps } = useTable<AttendanceRecord>({

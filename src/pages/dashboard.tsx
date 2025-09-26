@@ -41,40 +41,29 @@ interface AttendanceRecord {
 }
 
 export const Dashboard: React.FC = () => {
-  // Get basic stats
-  const { data: childrenData } = useList({
+  // Get basic stats - using maximum allowed pageSize of 150
+  const childrenQuery = useList({
     resource: "children",
-    pagination: { pageSize: 1000 },
+    pagination: { pageSize: 150 },
   });
 
-  const { data: usersData } = useList({
+  const usersQuery = useList({
     resource: "users",
-    pagination: { pageSize: 1000 },
+    pagination: { pageSize: 150 },
   });
 
   // Get today's attendance
-  const { data: todayAttendance } = useCustom({
+  const attendanceQuery = useCustom({
     url: "http://localhost:30000/api/attendance/today",
     method: "get",
   });
 
-  // Get children with payment alerts
-  const { data: paymentAlertsData } = useList({
-    resource: "children",
-    filters: [
-      {
-        field: "hasPaymentAlert",
-        operator: "eq",
-        value: true,
-      },
-    ],
-    pagination: { pageSize: 10 },
-  });
-
-  const children = childrenData?.data || [];
-  const users = usersData?.data || [];
-  const attendanceRecords = todayAttendance?.data || [];
-  const paymentAlerts = paymentAlertsData?.data || [];
+  const children = childrenQuery.result?.data || [];
+  const users = usersQuery.result?.data || [];
+  const attendanceRecords = (attendanceQuery as any)?.data || [];
+  
+  // Filter children with payment alerts on the frontend since API doesn't support this filter
+  const paymentAlerts = children.filter((child: any) => child.hasPaymentAlert === true);
 
   const stats = {
     totalChildren: children.length,
@@ -217,7 +206,7 @@ export const Dashboard: React.FC = () => {
           >
             <AntList
               dataSource={paymentAlerts.slice(0, 5)}
-              renderItem={(child: Child) => (
+              renderItem={(child: any) => (
                 <AntList.Item>
                   <AntList.Item.Meta
                     avatar={

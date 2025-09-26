@@ -19,7 +19,13 @@ export const stableFixedDataProvider: DataProvider = {
     // Paginación - usando los nombres exactos que espera la API
     if (pagination) {
       params.page = (pagination as any).current || 1;
-      params.take = pagination.pageSize || 10;
+      // Limitar take a máximo 150 según la validación del backend
+      const requestedTake = pagination.pageSize || 10;
+      params.take = Math.min(requestedTake, 150);
+      
+      if (requestedTake > 150) {
+        console.warn(`Requested pageSize ${requestedTake} exceeds maximum of 150, using 150 instead`);
+      }
     }
 
     // Sorting - formato que espera la API
@@ -30,11 +36,17 @@ export const stableFixedDataProvider: DataProvider = {
       }
     }
 
-    // Filters - formato simple
+    // Filters - solo parámetros válidos para la API
+    const validApiParams = ['page', 'take', 'order'];
     if (filters && filters.length > 0) {
       filters.forEach((filter) => {
         if ('field' in filter && filter.field && 'value' in filter && filter.value !== undefined) {
-          params[filter.field] = filter.value;
+          // Solo agregar filtros que sean parámetros válidos de la API
+          if (validApiParams.includes(filter.field)) {
+            params[filter.field] = filter.value;
+          } else {
+            console.warn(`Filter '${filter.field}' is not a valid API parameter, skipping...`);
+          }
         }
       });
     }
