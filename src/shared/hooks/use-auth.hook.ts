@@ -29,6 +29,14 @@ export const useAuth = () => {
   const { mutate: updatePassword } = useUpdatePassword();
   const { open: openNotification } = useNotification();
 
+  // ===== LOGS DE DEBUG =====
+  console.log("🔍 useAuth - user:", user);
+  console.log("🔍 useAuth - permissions:", permissions);
+  console.log("🔍 useAuth - isAuthenticated:", isAuthenticated);
+  console.log("🔍 useAuth - userLoading:", userLoading);
+  console.log("🔍 useAuth - permissionsLoading:", permissionsLoading);
+  console.log("🔍 useAuth - authCheckLoading:", authCheckLoading);
+
   // ===== FUNCIONES DE AUTENTICACIÓN =====
   
   /**
@@ -221,35 +229,90 @@ export const useAuth = () => {
    * Obtiene el nombre completo del usuario
    */
   const getUserFullName = (): string => {
-    if (!user) return "Usuario";
-    return `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Usuario";
+    console.log("🔍 getUserFullName - User:", user);
+    
+    // Fallback: obtener datos directamente del localStorage si user es undefined
+    let currentUser = user;
+    if (!currentUser) {
+      const userFromStorage = localStorage.getItem("user");
+      if (userFromStorage) {
+        try {
+          currentUser = JSON.parse(userFromStorage);
+          console.log("🔍 getUserFullName - Fallback from localStorage:", currentUser);
+        } catch (error) {
+          console.error("Error parsing user from localStorage:", error);
+        }
+      }
+    }
+    
+    if (!currentUser) return "Usuario";
+    const fullName = `${currentUser.firstName || ""} ${currentUser.lastName || ""}`.trim() || "Usuario";
+    console.log("🔍 getUserFullName - Full name:", fullName);
+    return fullName;
   };
 
   /**
    * Obtiene el rol del usuario en formato legible
    */
   const getUserRoleLabel = (): string => {
-    if (!permissions) return "Usuario";
+    console.log("🔍 getUserRoleLabel - Permissions:", permissions);
     
-    switch (permissions) {
-      case "administrator":
-        return "Administrador";
-      case "educator":
-        return "Educador";
-      case "parent":
-        return "Padre/Madre";
-      default:
-        return "Usuario";
+    // Fallback: obtener permisos directamente del localStorage si permissions es undefined
+    let currentPermissions = permissions;
+    if (!currentPermissions) {
+      const userFromStorage = localStorage.getItem("user");
+      if (userFromStorage) {
+        try {
+          const userData = JSON.parse(userFromStorage);
+          currentPermissions = userData.role?.name;
+          console.log("🔍 getUserRoleLabel - Fallback from localStorage:", currentPermissions);
+        } catch (error) {
+          console.error("Error parsing user from localStorage:", error);
+        }
+      }
     }
+    
+    if (!currentPermissions) return "Usuario";
+    
+    let roleLabel = "Usuario";
+    switch (currentPermissions) {
+      case "administrator":
+        roleLabel = "Administrador";
+        break;
+      case "educator":
+        roleLabel = "Educador";
+        break;
+      case "parent":
+        roleLabel = "Padre/Madre";
+        break;
+      default:
+        roleLabel = "Usuario";
+    }
+    console.log("🔍 getUserRoleLabel - Role label:", roleLabel);
+    return roleLabel;
   };
 
   /**
    * Obtiene el color del rol del usuario
    */
   const getUserRoleColor = (): string => {
-    if (!permissions) return "#8c8c8c";
+    // Fallback: obtener permisos directamente del localStorage si permissions es undefined
+    let currentPermissions = permissions;
+    if (!currentPermissions) {
+      const userFromStorage = localStorage.getItem("user");
+      if (userFromStorage) {
+        try {
+          const userData = JSON.parse(userFromStorage);
+          currentPermissions = userData.role?.name;
+        } catch (error) {
+          console.error("Error parsing user from localStorage:", error);
+        }
+      }
+    }
     
-    switch (permissions) {
+    if (!currentPermissions) return "#8c8c8c";
+    
+    switch (currentPermissions) {
       case "administrator":
         return "#ff4d4f";
       case "educator":

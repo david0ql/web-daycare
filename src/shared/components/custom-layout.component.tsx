@@ -30,19 +30,6 @@ export const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
 
   const userMenuItems = [
     {
-      key: "profile",
-      icon: <UserOutlined />,
-      label: "Perfil",
-    },
-    {
-      key: "settings",
-      icon: <SettingOutlined />,
-      label: "Configuración",
-    },
-    {
-      type: "divider" as const,
-    },
-    {
       key: "logout",
       icon: <LogoutOutlined />,
       label: "Cerrar Sesión",
@@ -118,8 +105,9 @@ export const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
                   size="small"
                   icon={<UserOutlined />}
                   style={{ 
-                    backgroundColor: colors.primary.main,
-                    color: "white"
+                    backgroundColor: colors.accent.main,
+                    color: "white",
+                    boxShadow: colors.shadows.sm
                   }}
                 />
                 <div style={{ textAlign: "left", minWidth: 0 }}>
@@ -145,7 +133,8 @@ export const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
-                      maxWidth: "120px"
+                      maxWidth: "120px",
+                      color: colors.accent.main
                     }}
                   >
                     {getUserRoleLabel()}

@@ -258,7 +258,7 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
       collapsed={collapsed}
       width={280}
       style={{
-        background: colors.background.primary,
+        background: colors.gradients.background,
         borderRight: `1px solid ${colors.border.light}`,
         boxShadow: colors.shadows.lg,
         height: "100vh",
@@ -278,7 +278,7 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         <div style={{ 
           padding: "20px 16px",
           borderBottom: `1px solid ${colors.border.light}`,
-          background: `linear-gradient(135deg, ${colors.primary.main} 0%, ${colors.primary.light} 100%)`,
+          background: colors.gradients.primary,
           color: "white",
           textAlign: "center"
         }}>
@@ -299,7 +299,7 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         <div style={{
           padding: "16px",
           borderBottom: `1px solid ${colors.border.light}`,
-          background: colors.background.secondary,
+          background: colors.background.primary,
         }}>
           <Space direction="vertical" size="small" style={{ width: "100%" }}>
             <Space>
@@ -307,8 +307,9 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   size={collapsed ? "small" : "default"}
                   icon={<UserOutlined />}
                   style={{ 
-                    backgroundColor: getUserRoleColor(),
-                    color: "white"
+                    backgroundColor: colors.accent.main,
+                    color: "white",
+                    boxShadow: colors.shadows.md
                   }}
                 />
               {!collapsed && (
@@ -325,7 +326,7 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                   </div>
                   <div style={{ 
                     fontSize: "12px", 
-                    color: getUserRoleColor(),
+                    color: colors.accent.main,
                     fontWeight: 500
                   }}>
                     {getUserRoleLabel()}
@@ -360,7 +361,7 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         <div style={{
           padding: "16px",
           borderTop: `1px solid ${colors.border.light}`,
-          background: colors.background.secondary,
+          background: colors.background.primary,
         }}>
           {!collapsed && (
             <div style={{ 
@@ -381,6 +382,16 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
               color: colors.text.secondary,
               border: "none",
               height: "36px",
+              borderRadius: "8px",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.background.secondary;
+              e.currentTarget.style.color = colors.text.primary;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = colors.text.secondary;
             }}
           >
             {!collapsed && "Cerrar Sesión"}

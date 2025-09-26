@@ -16,6 +16,8 @@ export const authProvider: AuthProvider = {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("🔐 Login successful - User data:", data.user);
+        console.log("🔐 User role:", data.user?.role);
         localStorage.setItem(TOKEN_KEY, data.accessToken);
         localStorage.setItem("user", JSON.stringify(data.user));
         return {
@@ -133,6 +135,8 @@ export const authProvider: AuthProvider = {
 
       if (response.ok) {
         const user = await response.json();
+        console.log("🔐 Auth check - User data:", user);
+        console.log("🔐 Auth check - User role:", user?.role);
         localStorage.setItem("user", JSON.stringify(user));
         return {
           authenticated: true,
@@ -161,6 +165,8 @@ export const authProvider: AuthProvider = {
     const user = localStorage.getItem("user");
     if (user) {
       const userData = JSON.parse(user);
+      console.log("🔐 getPermissions - User data:", userData);
+      console.log("🔐 getPermissions - Role:", userData.role?.name);
       return userData.role?.name || null;
     }
     return null;
@@ -169,7 +175,9 @@ export const authProvider: AuthProvider = {
   getIdentity: async () => {
     const user = localStorage.getItem("user");
     if (user) {
-      return JSON.parse(user);
+      const userData = JSON.parse(user);
+      console.log("🔐 getIdentity - User data:", userData);
+      return userData;
     }
     return null;
   },
