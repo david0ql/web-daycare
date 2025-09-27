@@ -6,6 +6,7 @@ import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../styles/phone-input.css';
 import { colors } from "../styles/colors";
+import { axiosInstance } from "../shared";
 
 const { Title, Text } = Typography;
 
@@ -26,23 +27,11 @@ export const Register: React.FC = () => {
     };
     
     try {
-      const response = await fetch("http://localhost:30000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        message.success("Cuenta creada exitosamente. Ahora puedes iniciar sesión.");
-        navigate("/login");
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Error al crear la cuenta");
-      }
-    } catch (err) {
-      setError("Error de conexión. Verifica que la API esté funcionando.");
+      const response = await axiosInstance.post("/auth/register", formData);
+      message.success("Cuenta creada exitosamente. Ahora puedes iniciar sesión.");
+      navigate("/login");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Error de conexión. Verifica que la API esté funcionando.");
     } finally {
       setIsLoading(false);
     }

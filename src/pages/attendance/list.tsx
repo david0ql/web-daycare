@@ -47,7 +47,7 @@ export const AttendanceList: React.FC = () => {
 
   // Get today's attendance for quick view
   const { data: todayAttendance } = useCustom({
-    url: "http://localhost:30000/api/attendance/today",
+    url: "/attendance/today",
     method: "get",
   });
 

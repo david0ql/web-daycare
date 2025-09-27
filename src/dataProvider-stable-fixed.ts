@@ -6,6 +6,7 @@ const requestCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 30000; // 30 segundos
 
 
+
 /**
  * Data Provider estable que evita bucles infinitos
  * Usa cache y manejo robusto de errores
@@ -121,15 +122,19 @@ export const stableFixedDataProvider: DataProvider = {
     // Verificar cache
     const cached = requestCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      console.log('Using cached data for getOne:', resource, id);
       return cached.data;
     }
 
     try {
+      console.log('Fetching getOne data for:', resource, id);
       const response = await axiosInstance.get(`/${resource}/${id}`, {
         timeout: 10000
       });
       const data = response.data;
       const result = { data };
+
+      console.log('getOne response data:', data);
 
       // Guardar en cache
       requestCache.set(cacheKey, {
@@ -139,6 +144,7 @@ export const stableFixedDataProvider: DataProvider = {
 
       return result;
     } catch (error: any) {
+      console.error('getOne error:', error);
       if (error.response?.status === 401 || error.response?.status === 400) {
         return { data: null };
       }
@@ -148,7 +154,9 @@ export const stableFixedDataProvider: DataProvider = {
 
   create: async ({ resource, variables, meta }) => {
     try {
-      const response = await axiosInstance.post(`/${resource}`, variables, {
+      // Use the new endpoint for children with relations
+      const url = resource === 'children' ? `/${resource}/with-relations` : `/${resource}`;
+      const response = await axiosInstance.post(url, variables, {
         timeout: 10000
       });
       const data = response.data;
@@ -167,6 +175,7 @@ export const stableFixedDataProvider: DataProvider = {
 
   update: async ({ resource, id, variables, meta }) => {
     try {
+      console.log('Updating resource:', resource, id, variables);
       const response = await axiosInstance.patch(`/${resource}/${id}`, variables, {
         timeout: 10000
       });
@@ -177,6 +186,7 @@ export const stableFixedDataProvider: DataProvider = {
       
       return { data };
     } catch (error: any) {
+      console.error('Update error:', error);
       if (error.response?.status === 401) {
         throw new Error('Authentication required');
       }
@@ -202,12 +212,13 @@ export const stableFixedDataProvider: DataProvider = {
     }
   },
 
-  getApiUrl: () => "http://localhost:30000/api",
+  getApiUrl: () => axiosInstance.defaults.baseURL || "http://localhost:30000/api",
 
   custom: async ({ url, method, payload, meta }) => {
     let requestUrl = url;
-    if (url.startsWith('http://localhost:30000/api')) {
-      requestUrl = url.replace('http://localhost:30000/api', '');
+    const baseURL = axiosInstance.defaults.baseURL || "http://localhost:30000/api";
+    if (url.startsWith(baseURL)) {
+      requestUrl = url.replace(baseURL, '');
     }
     
     const config: any = {
@@ -241,11 +252,12 @@ export const stableFixedDataProvider: DataProvider = {
 function clearResourceCache(resource: string) {
   const keysToDelete: string[] = [];
   requestCache.forEach((_, key) => {
-    if (key.startsWith(resource)) {
+    if (key.startsWith(`${resource}-`)) {
       keysToDelete.push(key);
     }
   });
   keysToDelete.forEach(key => requestCache.delete(key));
+  console.log(`Cleared cache for resource: ${resource}`);
 }
 
 // Limpiar cache periódicamente

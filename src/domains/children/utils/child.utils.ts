@@ -1,22 +1,43 @@
-import * as moment from 'moment';
-import { Child } from '../types/child.types';
+import { Child } from "../types/child.types";
 
 export class ChildUtils {
+  /**
+   * Get full name of the child
+   */
   static getFullName(child: Child): string {
-    return `${child.firstName} ${child.lastName}`.trim();
+    return `${child.firstName} ${child.lastName}`;
   }
 
+  /**
+   * Get initials of the child
+   */
   static getInitials(child: Child): string {
-    const firstName = child.firstName?.charAt(0) || '';
-    const lastName = child.lastName?.charAt(0) || '';
-    return `${firstName}${lastName}`.toUpperCase();
+    return `${child.firstName.charAt(0)}${child.lastName.charAt(0)}`.toUpperCase();
   }
 
-  static calculateAge(birthDate: string): string {
-    const birth = moment(birthDate);
-    const now = moment();
-    const years = now.diff(birth, "years");
-    const months = now.diff(birth, "months") % 12;
+  /**
+   * Calculate age in years and months
+   */
+  static calculateAge(birthDate: string): { years: number; months: number } {
+    const birth = new Date(birthDate);
+    const today = new Date();
+    
+    let years = today.getFullYear() - birth.getFullYear();
+    let months = today.getMonth() - birth.getMonth();
+    
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    
+    return { years, months };
+  }
+
+  /**
+   * Get age display string
+   */
+  static getAgeDisplay(birthDate: string): string {
+    const { years, months } = this.calculateAge(birthDate);
     
     if (years > 0) {
       return `${years}a ${months}m`;
@@ -24,92 +45,57 @@ export class ChildUtils {
     return `${months} meses`;
   }
 
-  static getAgeInMonths(birthDate: string): number {
-    const birth = moment(birthDate);
-    const now = moment();
-    return now.diff(birth, "months");
-  }
-
-  static getAgeInYears(birthDate: string): number {
-    const birth = moment(birthDate);
-    const now = moment();
-    return now.diff(birth, "years");
-  }
-
+  /**
+   * Format birth date for display
+   */
   static formatBirthDate(birthDate: string): string {
-    return moment(birthDate).format('DD/MM/YYYY');
+    return new Date(birthDate).toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   }
 
-  static getBirthdayStatus(birthDate: string): { isToday: boolean; daysUntil: number } {
-    const birth = moment(birthDate);
-    const now = moment();
-    const thisYearBirthday = moment(birth).year(now.year());
-    
-    if (thisYearBirthday.isSame(now, 'day')) {
-      return { isToday: true, daysUntil: 0 };
-    }
-    
-    if (thisYearBirthday.isBefore(now)) {
-      const nextYearBirthday = moment(birth).year(now.year() + 1);
-      return { isToday: false, daysUntil: nextYearBirthday.diff(now, 'days') };
-    }
-    
-    return { isToday: false, daysUntil: thisYearBirthday.diff(now, 'days') };
+  /**
+   * Get status color for payment alert
+   */
+  static getPaymentAlertColor(hasPaymentAlert: boolean): string {
+    return hasPaymentAlert ? "red" : "green";
   }
 
-  static isActiveChild(child: Child): boolean {
-    return child.isActive;
+  /**
+   * Get status text for payment alert
+   */
+  static getPaymentAlertText(hasPaymentAlert: boolean): string {
+    return hasPaymentAlert ? "Alerta de Pago" : "Al Día";
   }
 
-  static hasPaymentAlert(child: Child): boolean {
-    return child.hasPaymentAlert;
+  /**
+   * Get status color for active status
+   */
+  static getActiveStatusColor(isActive: boolean): string {
+    return isActive ? "green" : "red";
   }
 
-  static getParentDisplayName(child: Child): string {
-    if (!child.parent) return "No asignado";
-    return `${child.parent.firstName} ${child.parent.lastName}`;
+  /**
+   * Get status text for active status
+   */
+  static getActiveStatusText(isActive: boolean): string {
+    return isActive ? "Activo" : "Inactivo";
   }
 
-  static getCategoryDisplayName(child: Child): string {
-    if (!child.category) return "Sin categoría";
-    return child.category.name;
-  }
-
+  /**
+   * Format address for display
+   */
   static formatAddress(address?: string): string {
-    if (!address) return "No especificada";
-    return address;
+    if (!address) return "No especificado";
+    return address.length > 50 ? `${address.substring(0, 50)}...` : address;
   }
 
+  /**
+   * Format birth city for display
+   */
   static formatBirthCity(birthCity?: string): string {
-    if (!birthCity) return "No especificada";
-    return birthCity;
-  }
-
-  static validateBirthDate(birthDate: string): { isValid: boolean; error?: string } {
-    const birth = moment(birthDate);
-    const now = moment();
-    
-    if (birth.isAfter(now)) {
-      return { isValid: false, error: "La fecha de nacimiento no puede ser futura" };
-    }
-    
-    const ageInYears = now.diff(birth, 'years');
-    if (ageInYears > 18) {
-      return { isValid: false, error: "La edad no puede ser mayor a 18 años" };
-    }
-    
-    return { isValid: true };
-  }
-
-  static getStatusColor(child: Child): string {
-    if (!child.isActive) return "red";
-    if (child.hasPaymentAlert) return "orange";
-    return "green";
-  }
-
-  static getStatusText(child: Child): string {
-    if (!child.isActive) return "Inactivo";
-    if (child.hasPaymentAlert) return "Alerta de Pago";
-    return "Activo";
+    return birthCity || "No especificado";
   }
 }

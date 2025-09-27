@@ -1,3 +1,51 @@
+export interface ParentChildRelationship {
+  id: number;
+  parentId: number;
+  childId: number;
+  relationshipType: 'father' | 'mother' | 'guardian' | 'other';
+  isPrimary: boolean;
+  parent?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  };
+}
+
+export interface EmergencyContact {
+  id: number;
+  childId: number;
+  name: string;
+  relationship: string;
+  phone: string;
+  email?: string;
+  isPrimary: boolean;
+}
+
+export interface AuthorizedPickupPerson {
+  id: number;
+  childId: number;
+  name: string;
+  relationship: string;
+  phone: string;
+  email?: string;
+  photo?: string;
+  idDocument?: string;
+}
+
+export interface MedicalInformation {
+  id: number;
+  childId: number;
+  allergies?: string;
+  medications?: string;
+  insuranceCompany?: string;
+  insuranceNumber?: string;
+  pediatricianName?: string;
+  pediatricianPhone?: string;
+  additionalNotes?: string;
+}
+
 export interface Child {
   id: number;
   firstName: string;
@@ -10,59 +58,59 @@ export interface Child {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  parent?: ChildParent;
-  category?: ChildCategory;
+  parentChildRelationships?: ParentChildRelationship[];
+  emergencyContacts?: EmergencyContact[];
+  authorizedPickupPersons?: AuthorizedPickupPerson[];
+  medicalInformation?: MedicalInformation;
 }
 
-export interface ChildParent {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-}
-
-export interface ChildCategory {
-  id: number;
-  name: string;
-  description?: string;
-  ageRange: string;
-}
-
-export interface CreateChildRequest {
+export interface CreateChildData {
   firstName: string;
   lastName: string;
   birthDate: string;
   birthCity?: string;
+  profilePicture?: string;
   address?: string;
-  parentId?: number;
-  categoryId?: number;
+  hasPaymentAlert?: boolean;
   isActive?: boolean;
-}
-
-export interface UpdateChildRequest {
-  firstName?: string;
-  lastName?: string;
-  birthDate?: string;
-  birthCity?: string;
-  address?: string;
-  parentId?: number;
-  categoryId?: number;
-  isActive?: boolean;
-}
-
-export interface ChildListResponse {
-  data: Child[];
-  meta: {
-    total: number;
-    page: number;
-    take: number;
+  parentRelationships?: {
+    parentId: number;
+    relationshipType: 'father' | 'mother' | 'guardian' | 'other';
+    isPrimary?: boolean;
+  }[];
+  emergencyContacts?: {
+    name: string;
+    relationship: string;
+    phone: string;
+    email?: string;
+    isPrimary?: boolean;
+  }[];
+  authorizedPickupPersons?: {
+    name: string;
+    relationship: string;
+    phone: string;
+    email?: string;
+    photo?: string;
+    idDocument?: string;
+  }[];
+  medicalInformation?: {
+    allergies?: string;
+    medications?: string;
+    insuranceCompany?: string;
+    insuranceNumber?: string;
+    pediatricianName?: string;
+    pediatricianPhone?: string;
+    additionalNotes?: string;
   };
 }
 
-export interface ChildFilters {
-  category?: string;
-  isActive?: boolean;
-  hasPaymentAlert?: boolean;
-  search?: string;
+export interface UpdateChildData extends Partial<CreateChildData> {
+  id: number;
+}
+
+export interface AvailableParent {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
 }

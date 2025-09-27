@@ -10,6 +10,7 @@ import {
   ClockCircleOutlined 
 } from "@ant-design/icons";
 import moment from "moment";
+import { axiosInstance } from "../shared";
 
 const { Title, Text } = Typography;
 
@@ -54,7 +55,7 @@ export const Dashboard: React.FC = () => {
 
   // Get today's attendance
   const attendanceQuery = useCustom({
-    url: "http://localhost:30000/api/attendance/today",
+    url: "/attendance/today",
     method: "get",
   });
 

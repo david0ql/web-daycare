@@ -1,65 +1,38 @@
 import { AuthProvider } from "@refinedev/core";
+import { axiosInstance } from "./shared";
 
 const TOKEN_KEY = "refine-auth";
-const API_URL = "http://localhost:30000/api";
 
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem(TOKEN_KEY, data.accessToken);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        
-        return {
-          success: true,
-          redirectTo: "/",
-        };
-      }
-
-      const errorData = await response.json();
+      const response = await axiosInstance.post("/auth/login", { email, password });
+      const data = response.data;
+      
+      localStorage.setItem(TOKEN_KEY, data.accessToken);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      
       return {
-        success: false,
-        error: {
-          name: "LoginError",
-          message: errorData.message || "Invalid credentials",
-        },
+        success: true,
+        redirectTo: "/",
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: {
           name: "LoginError",
-          message: "Something went wrong during login",
+          message: error.response?.data?.message || "Invalid credentials",
         },
       };
     }
   },
 
   logout: async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
-    
     // Intentar hacer logout en el servidor
-    if (token) {
-      try {
-        await fetch(`${API_URL}/auth/logout`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-      } catch (error) {
-        console.error("Logout error:", error);
-      }
+    try {
+      await axiosInstance.post("/auth/logout");
+    } catch (error) {
+      console.error("Logout error:", error);
     }
     
     // Limpiar datos de autenticación
@@ -114,27 +87,15 @@ export const authProvider: AuthProvider = {
 
     // Solo verificar con el servidor si no tenemos datos de usuario
     try {
-      const response = await fetch(`${API_URL}/auth/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        localStorage.setItem("user", JSON.stringify(userData));
-        return {
-          authenticated: true,
-        };
-      } else {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem("user");
-        return {
-          authenticated: false,
-          redirectTo: "/login",
-        };
-      }
+      const response = await axiosInstance.get("/auth/profile");
+      const userData = response.data;
+      localStorage.setItem("user", JSON.stringify(userData));
+      return {
+        authenticated: true,
+      };
     } catch (error) {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem("user");
       return {
         authenticated: false,
         redirectTo: "/login",

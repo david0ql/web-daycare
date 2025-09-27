@@ -1,167 +1,85 @@
 import React from "react";
-import { useShow, usePermissions } from "@refinedev/core";
-import { Show, TagField, EditButton, DeleteButton } from "@refinedev/antd";
-import { Typography, Card, Row, Col, Space, Avatar, Divider, Alert } from "antd";
-import { UserOutlined, CalendarOutlined, EnvironmentOutlined, WarningOutlined } from "@ant-design/icons";
-import moment from "moment";
+import { Show, TextField, DateField, BooleanField } from "@refinedev/antd";
+import { Typography, Space, Tag, Avatar, Card, Row, Col } from "antd";
+import { UserOutlined } from "@ant-design/icons";
+import { ChildUtils } from "../../domains/children/utils/child.utils";
 
 const { Title, Text } = Typography;
 
-interface Child {
-  id: number;
-  firstName: string;
-  lastName: string;
-  birthDate: string;
-  birthCity?: string;
-  profilePicture?: string;
-  address?: string;
-  hasPaymentAlert: boolean;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export const ChildShow: React.FC = () => {
-  const { queryResult } = useShow<Child>();
-  const { data: permissions } = usePermissions({});
-  const canEdit = permissions === "administrator" || permissions === "educator";
-
-  const { data, isLoading } = queryResult;
-  const record = data?.data;
-
-  const calculateAge = (birthDate: string) => {
-    const birth = moment(birthDate);
-    const now = moment();
-    const years = now.diff(birth, "years");
-    const months = now.diff(birth, "months") % 12;
-    
-    if (years > 0) {
-      return `${years} año${years > 1 ? "s" : ""} y ${months} mes${months !== 1 ? "es" : ""}`;
-    }
-    return `${months} mes${months !== 1 ? "es" : ""}`;
-  };
-
   return (
-    <Show
-      isLoading={isLoading}
-      headerButtons={
-        canEdit ? (
-          <Space>
-            <EditButton />
-            {permissions === "administrator" && <DeleteButton />}
-          </Space>
-        ) : undefined
-      }
-    >
-      {record && (
-        <>
-          {record.hasPaymentAlert && (
-            <Alert
-              message="Alerta de Pago"
-              description="Este niño tiene pagos pendientes. Contacte con los padres."
-              type="warning"
-              icon={<WarningOutlined />}
-              style={{ marginBottom: 16 }}
-            />
-          )}
-          
-          <Card>
-            <Row gutter={[16, 16]}>
-              <Col span={24} md={8}>
-                <div style={{ textAlign: "center" }}>
-                  <Avatar
-                    size={120}
-                    src={record.profilePicture}
-                    icon={<UserOutlined />}
-                    style={{ marginBottom: 16 }}
-                  />
-                  <div>
-                    <Title level={3} style={{ marginBottom: 8 }}>
-                      {`${record.firstName} ${record.lastName}`}
-                    </Title>
-                    <Text type="secondary" style={{ fontSize: "16px", marginBottom: 16, display: "block" }}>
-                      {calculateAge(record.birthDate)}
-                    </Text>
-                    <div>
-                      <TagField
-                        value={record.isActive ? "Activo" : "Inactivo"}
-                        color={record.isActive ? "green" : "red"}
-                      />
-                    </div>
-                  </div>
+    <Show>
+      <Card>
+        <Row gutter={[16, 16]}>
+          <Col span={24}>
+            <Space align="center" size="large">
+              <Avatar
+                size={80}
+                icon={<UserOutlined />}
+                style={{ backgroundColor: "#1890ff" }}
+              />
+              <div>
+                <Title level={3} style={{ margin: 0 }}>
+                  <TextField value="firstName" /> <TextField value="lastName" />
+                </Title>
+                <Text type="secondary">
+                  {ChildUtils.getAgeDisplay("birthDate")}
+                </Text>
+              </div>
+            </Space>
+          </Col>
+        </Row>
+
+        <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+          <Col span={12}>
+            <Card size="small" title="Información Personal">
+              <Space direction="vertical" style={{ width: "100%" }}>
+                <div>
+                  <Text strong>Fecha de Nacimiento:</Text>
+                  <br />
+                  <DateField value="birthDate" format="YYYY-MM-DD" />
                 </div>
-              </Col>
-              
-              <Col span={24} md={16}>
-                <Title level={4}>Información Personal</Title>
-                <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-                  <div>
-                    <Text strong>
-                      <CalendarOutlined style={{ marginRight: 8 }} />
-                      Fecha de Nacimiento:
-                    </Text>
-                    <Text style={{ marginLeft: 8 }}>
-                      {moment(record.birthDate).format("DD/MM/YYYY")}
-                    </Text>
-                  </div>
-                  
-                  {record.birthCity && (
-                    <div>
-                      <Text strong>Ciudad de Nacimiento:</Text>
-                      <Text style={{ marginLeft: 8 }}>{record.birthCity}</Text>
-                    </div>
-                  )}
-                  
-                  {record.address && (
-                    <div>
-                      <Text strong>
-                        <EnvironmentOutlined style={{ marginRight: 8 }} />
-                        Dirección:
-                      </Text>
-                      <Text style={{ marginLeft: 8 }}>{record.address}</Text>
-                    </div>
-                  )}
-                </Space>
+                <div>
+                  <Text strong>Ciudad de Nacimiento:</Text>
+                  <br />
+                  <TextField value="birthCity" />
+                </div>
+                <div>
+                  <Text strong>Dirección:</Text>
+                  <br />
+                  <TextField value="address" />
+                </div>
+              </Space>
+            </Card>
+          </Col>
 
-                <Divider />
-
-                <Title level={4}>Estado de Cuenta</Title>
-                <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-                  <div>
-                    <Text strong>Estado de Pago:</Text>
-                    <Space style={{ marginLeft: 8 }}>
-                      {record.hasPaymentAlert && <WarningOutlined style={{ color: "#ff4d4f" }} />}
-                      <TagField
-                        value={record.hasPaymentAlert ? "Pagos Pendientes" : "Al Día"}
-                        color={record.hasPaymentAlert ? "red" : "green"}
-                      />
-                    </Space>
-                  </div>
-                </Space>
-
-                <Divider />
-
-                <Title level={4}>Información del Sistema</Title>
-                <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-                  <div>
-                    <Text strong>Fecha de Registro:</Text>
-                    <Text style={{ marginLeft: 8 }}>
-                      {moment(record.createdAt).format("DD/MM/YYYY HH:mm")}
-                    </Text>
-                  </div>
-                  
-                  <div>
-                    <Text strong>Última Actualización:</Text>
-                    <Text style={{ marginLeft: 8 }}>
-                      {moment(record.updatedAt).format("DD/MM/YYYY HH:mm")}
-                    </Text>
-                  </div>
-                </Space>
-              </Col>
-            </Row>
-          </Card>
-        </>
-      )}
+          <Col span={12}>
+            <Card size="small" title="Estado">
+              <Space direction="vertical" style={{ width: "100%" }}>
+                <div>
+                  <Text strong>Estado de Pago:</Text>
+                  <br />
+                  <Tag color={ChildUtils.getPaymentAlertColor(false)}>
+                    <BooleanField value="hasPaymentAlert" />
+                  </Tag>
+                </div>
+                <div>
+                  <Text strong>Estado Activo:</Text>
+                  <br />
+                  <Tag color={ChildUtils.getActiveStatusColor(true)}>
+                    <BooleanField value="isActive" />
+                  </Tag>
+                </div>
+                <div>
+                  <Text strong>Fecha de Registro:</Text>
+                  <br />
+                  <DateField value="createdAt" format="YYYY-MM-DD HH:mm" />
+                </div>
+              </Space>
+            </Card>
+          </Col>
+        </Row>
+      </Card>
     </Show>
   );
 };

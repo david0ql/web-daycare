@@ -38,7 +38,7 @@ export const AttendanceCreate: React.FC = () => {
 
   // Check-in mutation
   const { mutate: checkIn, isLoading: checkingIn } = useCustomMutation({
-    url: "http://localhost:30000/api/attendance/check-in",
+    url: "/attendance/check-in",
     method: "post",
     successNotification: {
       message: "Check-in exitoso",
@@ -54,7 +54,7 @@ export const AttendanceCreate: React.FC = () => {
 
   // Check-out mutation
   const { mutate: checkOut, isLoading: checkingOut } = useCustomMutation({
-    url: "http://localhost:30000/api/attendance/check-out",
+    url: "/attendance/check-out",
     method: "post",
     successNotification: {
       message: "Check-out exitoso",

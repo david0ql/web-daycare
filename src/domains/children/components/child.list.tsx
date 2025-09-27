@@ -1,31 +1,45 @@
 import React from "react";
-import { usePermissions } from "@refinedev/core";
-import { List, useTable, ShowButton, EditButton, DeleteButton } from "@refinedev/antd";
-import { Table, Space, Avatar, Typography, Tag } from "antd";
-import { UserOutlined, WarningOutlined } from "@ant-design/icons";
+import { List, useTable, EditButton, DeleteButton, TagField, CreateButton } from "@refinedev/antd";
+import { Table, Space, Tag, Avatar, Typography, Button } from "antd";
+import { UserOutlined, UserAddOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router";
 import { Child } from "../types/child.types";
 import { ChildUtils } from "../utils/child.utils";
+import { useAuth } from "../../../shared/hooks/use-auth.hook";
 
 const { Text } = Typography;
 
 export const ChildList: React.FC = () => {
-  const { data: permissions } = usePermissions({});
-  const canEdit = permissions === "administrator" || permissions === "educator";
+  const navigate = useNavigate();
+  const { isAdmin, isEducator } = useAuth();
 
   const { tableProps } = useTable<Child>({
-    syncWithLocation: false,
+    syncWithLocation: false, // Desactivar sincronización con URL para evitar problemas
     sorters: {
       initial: [
         {
-          field: "firstName",
-          order: "asc",
+          field: "createdAt",
+          order: "desc",
         },
       ],
     },
   });
 
+  const canManage = isAdmin() || isEducator();
+
   return (
-    <List>
+    <List
+      headerButtons={
+        canManage ? (
+          <CreateButton
+            icon={<UserAddOutlined />}
+            onClick={() => navigate("/children/create")}
+          >
+            Nuevo Niño
+          </CreateButton>
+        ) : undefined
+      }
+    >
       <Table {...tableProps} rowKey="id">
         <Table.Column
           dataIndex="profilePicture"
@@ -35,7 +49,7 @@ export const ChildList: React.FC = () => {
               size={40}
               src={record.profilePicture}
               icon={<UserOutlined />}
-              style={{ backgroundColor: "#52c41a" }}
+              style={{ backgroundColor: "#1890ff" }}
             >
               {ChildUtils.getInitials(record)}
             </Avatar>
@@ -49,23 +63,27 @@ export const ChildList: React.FC = () => {
               <Text strong>{ChildUtils.getFullName(record)}</Text>
               <br />
               <Text type="secondary" style={{ fontSize: "12px" }}>
-                {ChildUtils.formatBirthDate(record.birthDate)} • {ChildUtils.calculateAge(record.birthDate)}
+                {ChildUtils.getAgeDisplay(record.birthDate)}
               </Text>
             </div>
           )}
         />
         <Table.Column
-          dataIndex="parent"
-          title="Padre/Madre"
-          render={(parent) => (
-            <Text>{ChildUtils.getParentDisplayName({ parent } as Child)}</Text>
+          dataIndex="birthDate"
+          title="Fecha de Nacimiento"
+          render={(birthDate) => (
+            <Text type="secondary" style={{ fontSize: "12px" }}>
+              {ChildUtils.formatBirthDate(birthDate)}
+            </Text>
           )}
         />
         <Table.Column
-          dataIndex="category"
-          title="Categoría"
-          render={(category) => (
-            <Text>{ChildUtils.getCategoryDisplayName({ category } as Child)}</Text>
+          dataIndex="birthCity"
+          title="Ciudad de Nacimiento"
+          render={(birthCity) => (
+            <Text type="secondary" style={{ fontSize: "12px" }}>
+              {ChildUtils.formatBirthCity(birthCity)}
+            </Text>
           )}
         />
         <Table.Column
@@ -76,19 +94,24 @@ export const ChildList: React.FC = () => {
               {ChildUtils.formatAddress(address)}
             </Text>
           )}
+          ellipsis
         />
         <Table.Column
           dataIndex="hasPaymentAlert"
+          title="Estado de Pago"
+          render={(hasPaymentAlert) => (
+            <Tag color={ChildUtils.getPaymentAlertColor(hasPaymentAlert)}>
+              {ChildUtils.getPaymentAlertText(hasPaymentAlert)}
+            </Tag>
+          )}
+        />
+        <Table.Column
+          dataIndex="isActive"
           title="Estado"
-          render={(_, record: Child) => (
-            <Space>
-              <Tag color={ChildUtils.getStatusColor(record)}>
-                {ChildUtils.getStatusText(record)}
-              </Tag>
-              {record.hasPaymentAlert && (
-                <WarningOutlined style={{ color: "#faad14" }} />
-              )}
-            </Space>
+          render={(isActive) => (
+            <Tag color={ChildUtils.getActiveStatusColor(isActive)}>
+              {ChildUtils.getActiveStatusText(isActive)}
+            </Tag>
           )}
         />
         <Table.Column
@@ -105,11 +128,12 @@ export const ChildList: React.FC = () => {
           dataIndex="actions"
           render={(_, record: Child) => (
             <Space>
-              <ShowButton hideText size="small" recordItemId={record.id} />
-              {canEdit && (
+              {canManage && (
                 <>
                   <EditButton hideText size="small" recordItemId={record.id} />
-                  <DeleteButton hideText size="small" recordItemId={record.id} />
+                  {isAdmin() && (
+                    <DeleteButton hideText size="small" recordItemId={record.id} />
+                  )}
                 </>
               )}
             </Space>
