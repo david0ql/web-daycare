@@ -20,7 +20,7 @@ import {
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { CreateChildData, AvailableParent } from "../../domains/children/types/child.types";
 import { useAvailableParents } from "../../domains/children/hooks";
-import moment from "moment";
+import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -125,7 +125,7 @@ export const ChildCreate: React.FC = () => {
       hasPaymentAlert: Boolean(values.hasPaymentAlert),
       isActive: Boolean(values.isActive),
       // Format birth date
-      birthDate: values.birthDate ? moment(values.birthDate).format("YYYY-MM-DD") : undefined,
+          birthDate: values.birthDate ? dayjs(values.birthDate).format("YYYY-MM-DD") : undefined,
     };
     console.log("🔍 Form onFinish - transformed values:", transformedValues);
     
@@ -141,14 +141,6 @@ export const ChildCreate: React.FC = () => {
     }
   };
 
-  // Test form submission
-  const testSubmit = () => {
-    console.log("🔍 Testing form submission...");
-    const values = form.getFieldsValue();
-    console.log("🔍 Current form values:", values);
-    handleFinish(values);
-  };
-
   // Debug form state
   const handleValuesChange = (changedValues: any, allValues: any) => {
     console.log("🔍 Form values changed:", changedValues);
@@ -158,95 +150,89 @@ export const ChildCreate: React.FC = () => {
   return (
     <Create saveButtonProps={saveButtonProps}>
       <Form {...formProps} form={form} layout="vertical" onFinish={handleFinish} onValuesChange={handleValuesChange}>
-        {/* Debug Button */}
-        <div style={{ marginBottom: 16, padding: 16, backgroundColor: '#f0f0f0', borderRadius: 8 }}>
-          <Button onClick={testSubmit} type="primary">
-            🔍 Test Submit (Debug)
-          </Button>
-        </div>
         
         {/* Información Básica */}
         <Card title="Información Básica" style={{ marginBottom: 16 }}>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Nombre"
-                name="firstName"
-                rules={[{ required: true, message: "El nombre es requerido" }]}
-              >
-                <Input placeholder="Nombre del niño" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Apellido"
-                name="lastName"
-                rules={[{ required: true, message: "El apellido es requerido" }]}
-              >
-                <Input placeholder="Apellido del niño" />
-              </Form.Item>
-            </Col>
-          </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="Nombre"
+              name="firstName"
+              rules={[{ required: true, message: "El nombre es requerido" }]}
+            >
+              <Input placeholder="Nombre del niño" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Apellido"
+              name="lastName"
+              rules={[{ required: true, message: "El apellido es requerido" }]}
+            >
+              <Input placeholder="Apellido del niño" />
+            </Form.Item>
+          </Col>
+        </Row>
 
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Fecha de Nacimiento"
-                name="birthDate"
-                rules={[{ required: true, message: "La fecha de nacimiento es requerida" }]}
-                getValueFromEvent={(date) => date ? moment(date).format("YYYY-MM-DD") : undefined}
-                getValueProps={(value) => ({ value: value ? moment(value) : undefined })}
-              >
-                <DatePicker 
-                  style={{ width: "100%" }}
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="Fecha de Nacimiento"
+              name="birthDate"
+              rules={[{ required: true, message: "La fecha de nacimiento es requerida" }]}
+                getValueFromEvent={(date) => date ? dayjs(date).format("YYYY-MM-DD") : undefined}
+                getValueProps={(value) => ({ value: value ? dayjs(value) : undefined })}
+            >
+              <DatePicker
+                style={{ width: "100%" }}
                   placeholder="Seleccione la fecha de nacimiento"
                   format="YYYY-MM-DD"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Ciudad de Nacimiento"
-                name="birthCity"
-              >
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Ciudad de Nacimiento"
+              name="birthCity"
+            >
                 <Input placeholder="Ciudad de nacimiento (opcional)" />
-              </Form.Item>
-            </Col>
-          </Row>
+            </Form.Item>
+          </Col>
+        </Row>
 
-          <Form.Item
-            label="Dirección"
-            name="address"
-          >
+        <Form.Item
+          label="Dirección"
+          name="address"
+        >
             <TextArea 
               placeholder="Dirección del niño (opcional)"
-              rows={3}
-            />
-          </Form.Item>
+            rows={3}
+          />
+        </Form.Item>
 
-          <Form.Item
-            label="Foto de Perfil"
-            name="profilePicture"
-          >
-            <Input placeholder="URL de la imagen (opcional)" />
-          </Form.Item>
+        <Form.Item
+          label="Foto de Perfil"
+          name="profilePicture"
+        >
+          <Input placeholder="URL de la imagen (opcional)" />
+        </Form.Item>
 
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Alerta de Pago"
-                name="hasPaymentAlert"
-                initialValue={false}
-              >
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="Alerta de Pago"
+              name="hasPaymentAlert"
+              initialValue={false}
+            >
                 <BooleanSwitch />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Estado Activo"
-                name="isActive"
-                initialValue={true}
-              >
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Estado Activo"
+              name="isActive"
+              initialValue={true}
+            >
                 <BooleanSwitch />
               </Form.Item>
             </Col>
@@ -566,9 +552,9 @@ export const ChildCreate: React.FC = () => {
                 name={['medicalInformation', 'pediatricianPhone']}
               >
                 <Input placeholder="+57 300 555 1234 (opcional)" />
-              </Form.Item>
-            </Col>
-          </Row>
+            </Form.Item>
+          </Col>
+        </Row>
 
           <Form.Item
             label="Notas Adicionales"

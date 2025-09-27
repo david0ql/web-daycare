@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Form, Input, DatePicker, Switch, Button, Select, Card, Space, Typography, Divider, Row, Col, InputNumber, Tabs } from "antd";
 import { UpdateChildData } from "../../domains/children/types/child.types";
 import { useAvailableParents } from "../../domains/children/hooks/use-available-parents.hook";
-import moment from "moment";
+import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -13,26 +13,18 @@ const { TextArea } = Input;
 
 // Custom Switch component that always returns boolean
 const BooleanSwitch: React.FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({ value, onChange }) => {
-  const [internalValue, setInternalValue] = React.useState<boolean>(Boolean(value));
+  console.log("🔍 BooleanSwitch render - value:", value, typeof value);
   
-  React.useEffect(() => {
-    console.log("🔍 BooleanSwitch useEffect - value changed:", value, typeof value);
-    setInternalValue(Boolean(value));
-  }, [value]);
-
   const handleChange = (checked: boolean) => {
     console.log("🔍 BooleanSwitch onChange:", checked, typeof checked);
     console.log("🔍 BooleanSwitch current value:", value);
-    console.log("🔍 BooleanSwitch internal value:", internalValue);
-    
-    setInternalValue(checked);
     
     if (onChange) {
       onChange(checked);
     }
   };
 
-  return <Switch checked={internalValue} onChange={handleChange} />;
+  return <Switch checked={Boolean(value)} onChange={handleChange} />;
 };
 
 export const ChildEdit: React.FC = () => {
@@ -83,6 +75,21 @@ export const ChildEdit: React.FC = () => {
     onMutationError: (error, variables) => {
       console.log("🔍 EDIT Child Mutation error:", error);
       console.log("🔍 EDIT Child Mutation error - variables:", variables);
+      if (error?.response?.data?.message) {
+        console.log("🔍 Validation errors:", error.response.data.message);
+        const errorMessages = Array.isArray(error.response.data.message) 
+          ? error.response.data.message 
+          : [error.response.data.message];
+        
+        errorMessages.forEach((msg: any, index: number) => {
+          console.log(`🔍 Error ${index + 1}:`, msg);
+        });
+      }
+      open?.({ 
+        type: "error", 
+        message: "Error al actualizar el niño", 
+        description: "No se pudo actualizar el niño. Verifica los datos e intenta nuevamente." 
+      });
     }
   });
 
@@ -103,8 +110,10 @@ export const ChildEdit: React.FC = () => {
         return [];
       };
       
-      const formData = {
-        ...childData,
+          const formData = {
+            ...childData,
+            // Keep birth date as string for DatePicker (it will be converted by getValueProps)
+            birthDate: childData.birthDate,
         // Transform relationships
         parentRelationships: safeMap(childData.parentChildRelationships, (rel: any) => ({
           parentId: rel.parent?.id,
@@ -141,7 +150,13 @@ export const ChildEdit: React.FC = () => {
       };
       
       console.log("🔍 Transformed form data:", formData);
+      console.log("🔍 Setting form values - hasPaymentAlert:", (formData as any).hasPaymentAlert, "isActive:", (formData as any).isActive);
       form.setFieldsValue(formData);
+      
+      // Force update switches after setting form values
+      setTimeout(() => {
+        console.log("🔍 Form values after setFieldsValue:", form.getFieldsValue());
+      }, 100);
     }
   }, [formProps.initialValues, form]);
 
@@ -149,113 +164,138 @@ export const ChildEdit: React.FC = () => {
   const handleFinish = (values: any) => {
     console.log("🔍 Form onFinish - original values:", values);
     
-    const transformedValues = {
-      ...values,
-      hasPaymentAlert: Boolean(values.hasPaymentAlert),
-      isActive: Boolean(values.isActive),
-      // Format birth date
-      birthDate: values.birthDate ? moment(values.birthDate).format("YYYY-MM-DD") : undefined,
-    };
+        const transformedValues = {
+          ...values,
+          hasPaymentAlert: Boolean(values.hasPaymentAlert),
+          isActive: Boolean(values.isActive),
+          // Format birth date
+          birthDate: values.birthDate ? dayjs(values.birthDate).format("YYYY-MM-DD") : undefined,
+        };
     console.log("🔍 Form onFinish - transformed values:", transformedValues);
     
     // Call the original formProps.onFinish with transformed values
     if (formProps.onFinish) {
+      console.log("🔍 Calling formProps.onFinish with:", transformedValues);
       formProps.onFinish(transformedValues);
+    } else {
+      console.error("🔍 formProps.onFinish is not available!");
+    }
+  };
+
+
+  // Override saveButtonProps to use our custom handleFinish
+  const customSaveButtonProps = {
+    ...saveButtonProps,
+    onClick: () => {
+      console.log("🔍 Save button clicked - triggering form submit");
+      form.submit();
     }
   };
 
   return (
-    <Edit saveButtonProps={saveButtonProps}>
+    <Edit saveButtonProps={customSaveButtonProps}>
       <Form {...formProps} form={form} layout="vertical" onFinish={handleFinish}>
         {/* Información Básica */}
         <Card title="Información Básica" style={{ marginBottom: 16 }}>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Nombre"
-                name="firstName"
-                rules={[{ required: true, message: "El nombre es requerido" }]}
-              >
-                <Input placeholder="Nombre del niño" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Apellido"
-                name="lastName"
-                rules={[{ required: true, message: "El apellido es requerido" }]}
-              >
-                <Input placeholder="Apellido del niño" />
-              </Form.Item>
-            </Col>
-          </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="Nombre"
+              name="firstName"
+              rules={[{ required: true, message: "El nombre es requerido" }]}
+            >
+              <Input placeholder="Nombre del niño" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Apellido"
+              name="lastName"
+              rules={[{ required: true, message: "El apellido es requerido" }]}
+            >
+              <Input placeholder="Apellido del niño" />
+            </Form.Item>
+          </Col>
+        </Row>
 
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Fecha de Nacimiento"
-                name="birthDate"
-                rules={[{ required: true, message: "La fecha de nacimiento es requerida" }]}
-                getValueFromEvent={(date) => date ? moment(date).format("YYYY-MM-DD") : undefined}
-                getValueProps={(value) => ({ value: value ? moment(value) : undefined })}
-              >
-                <DatePicker 
-                  style={{ width: "100%" }}
-                  placeholder="Seleccione la fecha de nacimiento"
-                  format="YYYY-MM-DD"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Ciudad de Nacimiento"
-                name="birthCity"
-              >
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              label="Fecha de Nacimiento"
+              name="birthDate"
+              rules={[{ required: true, message: "La fecha de nacimiento es requerida" }]}
+              getValueFromEvent={(date) => date ? dayjs(date).format("YYYY-MM-DD") : undefined}
+              getValueProps={(value) => ({ value: value ? dayjs(value) : undefined })}
+            >
+              <DatePicker
+                style={{ width: "100%" }}
+                placeholder="Seleccione la fecha de nacimiento"
+                format="YYYY-MM-DD"
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Ciudad de Nacimiento"
+              name="birthCity"
+            >
                 <Input placeholder="Ciudad de nacimiento (opcional)" />
-              </Form.Item>
-            </Col>
-          </Row>
+            </Form.Item>
+          </Col>
+        </Row>
 
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item
-                label="Dirección"
-                name="address"
-              >
+        <Form.Item
+          label="Dirección"
+          name="address"
+        >
                 <TextArea 
                   placeholder="Dirección del niño (opcional)"
-                  rows={3}
-                />
-              </Form.Item>
+            rows={3}
+          />
+        </Form.Item>
             </Col>
           </Row>
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                label="Foto de Perfil"
-                name="profilePicture"
-              >
-                <Input placeholder="URL de la imagen (opcional)" />
-              </Form.Item>
+        <Form.Item
+          label="Foto de Perfil"
+          name="profilePicture"
+        >
+          <Input placeholder="URL de la imagen (opcional)" />
+        </Form.Item>
             </Col>
-            <Col span={12}>
+          <Col span={12}>
               <Space direction="vertical" style={{ width: "100%" }}>
-                <Form.Item
-                  label="Alerta de Pago"
-                  name="hasPaymentAlert"
-                  valuePropName="checked"
-                  getValueFromEvent={(checked) => checked}
-                  getValueProps={(value) => ({ checked: Boolean(value) })}
+            <Form.Item
+              label="Alerta de Pago"
+              name="hasPaymentAlert"
+              valuePropName="checked"
+                  getValueFromEvent={(checked) => {
+                    console.log("🔍 hasPaymentAlert getValueFromEvent:", checked);
+                    return checked;
+                  }}
+                  getValueProps={(value) => {
+                    console.log("🔍 hasPaymentAlert getValueProps:", value, typeof value);
+                    return { value: Boolean(value) };
+                  }}
                 >
                   <BooleanSwitch />
-                </Form.Item>
-                <Form.Item
-                  label="Estado Activo"
-                  name="isActive"
-                  valuePropName="checked"
-                  getValueFromEvent={(checked) => checked}
-                  getValueProps={(value) => ({ checked: Boolean(value) })}
+            </Form.Item>
+            <Form.Item
+              label="Estado Activo"
+              name="isActive"
+              valuePropName="checked"
+                  getValueFromEvent={(checked) => {
+                    console.log("🔍 isActive getValueFromEvent:", checked);
+                    return checked;
+                  }}
+                  getValueProps={(value) => {
+                    console.log("🔍 isActive getValueProps:", value, typeof value);
+                    return { value: Boolean(value) };
+                  }}
                 >
                   <BooleanSwitch />
                 </Form.Item>
@@ -317,8 +357,14 @@ export const ChildEdit: React.FC = () => {
                           name={[name, "isPrimary"]}
                           label="Principal"
                           valuePropName="checked"
-                          getValueFromEvent={(checked) => checked}
-                          getValueProps={(value) => ({ checked: Boolean(value) })}
+                          getValueFromEvent={(checked) => {
+                            console.log("🔍 isPrimary getValueFromEvent:", checked);
+                            return checked;
+                          }}
+                          getValueProps={(value) => {
+                            console.log("🔍 isPrimary getValueProps:", value, typeof value);
+                            return { value: Boolean(value) };
+                          }}
                         >
                           <BooleanSwitch />
                         </Form.Item>
@@ -390,8 +436,14 @@ export const ChildEdit: React.FC = () => {
                           name={[name, "isPrimary"]}
                           label="Principal"
                           valuePropName="checked"
-                          getValueFromEvent={(checked) => checked}
-                          getValueProps={(value) => ({ checked: Boolean(value) })}
+                          getValueFromEvent={(checked) => {
+                            console.log("🔍 isPrimary getValueFromEvent:", checked);
+                            return checked;
+                          }}
+                          getValueProps={(value) => {
+                            console.log("🔍 isPrimary getValueProps:", value, typeof value);
+                            return { value: Boolean(value) };
+                          }}
                         >
                           <BooleanSwitch />
                         </Form.Item>
@@ -603,9 +655,9 @@ export const ChildEdit: React.FC = () => {
                             placeholder="Información médica adicional"
                             rows={2}
                           />
-                        </Form.Item>
-                      </Col>
-                    </Row>
+            </Form.Item>
+          </Col>
+        </Row>
                     <Row>
                       <Col span={24}>
                         <Button

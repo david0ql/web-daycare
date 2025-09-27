@@ -176,7 +176,11 @@ export const stableFixedDataProvider: DataProvider = {
   update: async ({ resource, id, variables, meta }) => {
     try {
       console.log('Updating resource:', resource, id, variables);
-      const response = await axiosInstance.patch(`/${resource}/${id}`, variables, {
+      
+      // Use with-relations endpoint for children updates
+      const url = resource === 'children' ? `/${resource}/${id}/with-relations` : `/${resource}/${id}`;
+      
+      const response = await axiosInstance.patch(url, variables, {
         timeout: 10000
       });
       const data = response.data;
