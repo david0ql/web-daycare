@@ -58,7 +58,7 @@ export const AttendanceList: React.FC = () => {
   });
 
   const { tableProps } = useTable<AttendanceRecord>({
-    syncWithLocation: true,
+    syncWithLocation: false,
     sorters: {
       initial: [
         {

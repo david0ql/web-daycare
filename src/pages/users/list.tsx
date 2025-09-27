@@ -34,7 +34,7 @@ export const UserList: React.FC = () => {
   console.log("🔍 UserList - isAdmin():", isAdmin());
 
   const { tableProps } = useTable<User>({
-    syncWithLocation: true,
+    syncWithLocation: false,
     sorters: {
       initial: [
         {

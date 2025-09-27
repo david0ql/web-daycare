@@ -30,23 +30,20 @@ export const UserCreate: React.FC = () => {
   
   const { formProps, saveButtonProps } = useForm({
     onMutationSuccess: async (data, variables) => {
-      console.log("🔍 Mutation success - data:", data);
-      console.log("🔍 Mutation success - variables:", variables);
+      console.log("🔍 CREATE Mutation success - data:", data);
+      console.log("🔍 CREATE Mutation success - variables:", variables);
       
-      // Force invalidate and refetch all users-related queries
-      await queryClient.invalidateQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "users");
-        },
+      // Use Refine's useInvalidate for proper cache invalidation
+      invalidate({
+        resource: "users",
+        invalidates: ["list"],
       });
       
-      // Force refetch all users queries
-      await queryClient.refetchQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "users");
-        },
+      // Also invalidate the specific user data
+      invalidate({
+        resource: "users",
+        invalidates: ["detail"],
+        id: (data as any).id,
       });
       
       // Show success notification

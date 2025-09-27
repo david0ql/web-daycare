@@ -29,7 +29,7 @@ const App: React.FC = () => {
             resources={appResources}
             notificationProvider={useNotificationProvider}
             options={{
-              syncWithLocation: true,
+              syncWithLocation: false,
               warnWhenUnsavedChanges: true,
               title: {
                 text: "The Children's World",
@@ -40,9 +40,9 @@ const App: React.FC = () => {
                   defaultOptions: {
                     queries: {
                       retry: false, // Desactivar reintentos automáticos
-                      refetchOnMount: false, // No refetch automático al montar
+                      refetchOnMount: true, // Permitir refetch al montar para datos invalidados
                       refetchOnReconnect: false, // No refetch al reconectar
-                      staleTime: 2 * 60 * 1000, // 2 minutos de stale time
+                      staleTime: 30 * 1000, // 30 segundos de stale time
                       gcTime: 5 * 60 * 1000, // 5 minutos de garbage collection time
                     },
                     mutations: {

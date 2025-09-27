@@ -13,7 +13,7 @@ export const ChildList: React.FC = () => {
   const canEdit = permissions === "administrator" || permissions === "educator";
 
   const { tableProps } = useTable<Child>({
-    syncWithLocation: true,
+    syncWithLocation: false,
     sorters: {
       initial: [
         {
