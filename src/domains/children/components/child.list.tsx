@@ -1,17 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { List, useTable, EditButton, DeleteButton, TagField, CreateButton } from "@refinedev/antd";
 import { Table, Space, Tag, Avatar, Typography, Button } from "antd";
-import { UserOutlined, UserAddOutlined } from "@ant-design/icons";
+import { UserOutlined, UserAddOutlined, QrcodeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import { Child } from "../types/child.types";
 import { ChildUtils } from "../utils/child.utils";
 import { useAuth } from "../../../shared/hooks/use-auth.hook";
+import { QRGenerator } from "./qr-generator.component";
 
 const { Text } = Typography;
 
 export const ChildList: React.FC = () => {
   const navigate = useNavigate();
   const { isAdmin, isEducator } = useAuth();
+  const [selectedChild, setSelectedChild] = useState<Child | null>(null);
+  const [qrModalVisible, setQrModalVisible] = useState(false);
 
   const { tableProps } = useTable<Child>({
     syncWithLocation: false, // Desactivar sincronización con URL para evitar problemas
@@ -26,6 +29,16 @@ export const ChildList: React.FC = () => {
   });
 
   const canManage = isAdmin() || isEducator();
+
+  const handleOpenQRModal = (child: Child) => {
+    setSelectedChild(child);
+    setQrModalVisible(true);
+  };
+
+  const handleCloseQRModal = () => {
+    setQrModalVisible(false);
+    setSelectedChild(null);
+  };
 
   return (
     <List
@@ -128,6 +141,13 @@ export const ChildList: React.FC = () => {
           dataIndex="actions"
           render={(_, record: Child) => (
             <Space>
+              <Button
+                type="default"
+                icon={<QrcodeOutlined />}
+                size="small"
+                onClick={() => handleOpenQRModal(record)}
+                title="Generar Codigo QR"
+              />
               {canManage && (
                 <>
                   <EditButton hideText size="small" recordItemId={record.id} />
@@ -140,6 +160,14 @@ export const ChildList: React.FC = () => {
           )}
         />
       </Table>
+      
+      {selectedChild && (
+        <QRGenerator
+          child={selectedChild}
+          visible={qrModalVisible}
+          onClose={handleCloseQRModal}
+        />
+      )}
     </List>
   );
 };

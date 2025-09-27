@@ -1,6 +1,6 @@
 import React from "react";
-import { List } from "@refinedev/antd";
+import { CalendarList } from "../../domains/calendar";
 
-export const CalendarList: React.FC = () => {
-  return <List>Calendar List - En construcción</List>;
+export const CalendarListPage: React.FC = () => {
+  return <CalendarList />;
 };

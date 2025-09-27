@@ -18,7 +18,7 @@ import { UserCreate, UserEdit, Register } from "../../pages/users";
 import { ChildCreate, ChildEdit, ChildShow } from "../../pages/children";
 import { AttendanceList, AttendanceCreate, AttendanceShow, AttendanceEdit } from "../../pages/attendance";
 import { IncidentList, IncidentCreate, IncidentEdit, IncidentShow } from "../../pages/incidents";
-import { CalendarList, CalendarCreate, CalendarEdit } from "../../pages/calendar";
+import { CalendarListPage, CalendarCreate, CalendarEdit } from "../../pages/calendar";
 import { DocumentList, DocumentCreate, DocumentShow } from "../../pages/documents";
 import { MessageList, MessageCreate, MessageShow } from "../../pages/messaging";
 import { ReportList } from "../../pages/reports";
@@ -83,7 +83,7 @@ export const AppRoutes: React.FC = () => {
 
         {/* Calendar */}
         <Route path="/calendar">
-          <Route index element={<CalendarList />} />
+          <Route index element={<CalendarListPage />} />
           <Route path="create" element={<CalendarCreate />} />
           <Route path="edit/:id" element={<CalendarEdit />} />
         </Route>
