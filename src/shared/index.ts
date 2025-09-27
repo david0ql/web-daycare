@@ -26,6 +26,7 @@ export { ErrorComponent } from './components/error.component';
 export { CustomLayout } from './components/custom-layout.component';
 export { EnhancedSidebar } from './components/enhanced-sidebar.component';
 export { ExampleUsageComponent } from './components/example-usage.component';
+export { default as GlobalLoading } from './components/global-loading.component';
 
 // Hooks
 export { usePermissions } from './hooks/use-permissions.hook';

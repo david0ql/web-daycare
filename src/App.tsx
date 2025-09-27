@@ -16,6 +16,7 @@ import "@refinedev/antd/dist/reset.css";
 import { authProvider } from "./authProvider-refine-native";
 import { stableFixedDataProvider } from "./dataProvider-stable-fixed";
 import { appResources, AppRoutes } from "./shared";
+import GlobalLoading from "./shared/components/global-loading.component";
 
 const App: React.FC = () => {
   return (
@@ -56,6 +57,7 @@ const App: React.FC = () => {
             <AppRoutes />
             <UnsavedChangesNotifier />
             <DocumentTitleHandler />
+            <GlobalLoading />
           </Refine>
         </AntdApp>
       </ConfigProvider>

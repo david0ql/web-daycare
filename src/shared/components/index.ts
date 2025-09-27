@@ -9,3 +9,4 @@ export { LoginProtected } from "./login-protected.component";
 export { ErrorComponent } from "./error.component";
 export { LoadingComponent } from "./loading.component";
 export { ExampleUsage } from "./example-usage.component";
+export { default as GlobalLoading } from "./global-loading.component";
