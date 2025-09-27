@@ -26,9 +26,13 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem(TOKEN_KEY);
+    console.log('🔍 Token from localStorage:', token ? 'Present' : 'Missing');
     
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('🔍 Authorization header set:', `Bearer ${token.substring(0, 20)}...`);
+    } else {
+      console.log('🔍 No token found or no headers object');
     }
     
     // Agregar timestamp para medir tiempo de respuesta

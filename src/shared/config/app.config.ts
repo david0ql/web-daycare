@@ -26,6 +26,8 @@ export const appResources: ResourceProps[] = [
     name: "attendance",
     list: "/attendance",
     create: "/attendance/create",
+    show: "/attendance/show/:id",
+    edit: "/attendance/edit/:id",
     meta: {
       label: "Asistencia",
       icon: "📋",

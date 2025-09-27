@@ -11,3 +11,5 @@ export type {
 } from "./types/child.types";
 export { ChildUtils } from "./utils/child.utils";
 export { useAvailableParents } from "./hooks";
+export { useChildPickupUsers } from "./hooks/use-child-pickup-users.hook";
+export { useAuthorizedPickupPersons } from "./hooks/use-authorized-pickup-persons.hook";

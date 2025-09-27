@@ -1,271 +1,244 @@
-import React, { useState } from "react";
-import { useList, usePermissions, useCustom } from "@refinedev/core";
-import { List, useTable, TagField } from "@refinedev/antd";
-import { Table, Space, Avatar, Typography, Button, Card, Row, Col, DatePicker, Select } from "antd";
-import { UserOutlined, ClockCircleOutlined, CheckCircleOutlined } from "@ant-design/icons";
-import moment from "moment";
+import React from "react";
+import { List, useTable, DateField, BooleanField, TextField, EditButton, DeleteButton } from "@refinedev/antd";
+import { Table, Space, Tag, Typography, Card, Row, Col, Statistic, Avatar, Tooltip } from "antd";
+import { 
+  useTodayAttendance, 
+  useChildrenWithStatus, 
+  useAttendanceStats,
+  ChildWithStatus,
+  AttendanceStatus
+} from "../../domains/attendance";
+import { CheckCircleOutlined, ClockCircleOutlined, UserOutlined, CloseCircleOutlined } from "@ant-design/icons";
 
-const { Text, Title } = Typography;
-const { RangePicker } = DatePicker;
+const { Title, Text } = Typography;
 
-interface AttendanceRecord {
-  id: number;
-  child: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    profilePicture?: string;
-  };
-  date: string;
-  checkInTime?: string;
-  checkOutTime?: string;
-  deliveredBy?: {
-    id: number;
-    firstName: string;
-    lastName: string;
-  };
-  pickedUpBy?: {
-    id: number;
-    firstName: string;
-    lastName: string;
-  };
-  checkInNotes?: string;
-  checkOutNotes?: string;
-  createdBy: {
-    id: number;
-    firstName: string;
-    lastName: string;
-  };
-}
+const AttendanceStatusComponent: React.FC<{ status: AttendanceStatus }> = ({ status }) => {
+  // Determine presence based on check-in/check-out times, not isPresent field
+  const hasCheckIn = !!status.isCheckedIn;
+  const hasCheckOut = !!status.isCheckedOut;
+  
+  // If no check-in time, consider absent
+  if (!hasCheckIn) {
+    return (
+      <Tag color="red" icon={<CloseCircleOutlined />}>
+        Ausente
+      </Tag>
+    );
+  }
+
+  // If has check-out, show as "Salida" (checked out)
+  if (hasCheckOut) {
+    return (
+      <Tag color="green" icon={<CheckCircleOutlined />}>
+        Salida
+      </Tag>
+    );
+  }
+
+  // If has check-in but no check-out, show as "Presente"
+  return (
+    <Tag color="blue" icon={<ClockCircleOutlined />}>
+      Presente
+    </Tag>
+  );
+};
 
 export const AttendanceList: React.FC = () => {
-  const { data: permissions } = usePermissions({});
-  const canManage = permissions === "administrator" || permissions === "educator";
+  const { tableProps } = useTable();
+  const { data: todayAttendance, isLoading: loadingAttendance } = useTodayAttendance();
+  const { data: childrenWithStatus, isLoading: loadingChildren } = useChildrenWithStatus();
+  const { data: stats, isLoading: loadingStats } = useAttendanceStats();
 
-  const [dateRange, setDateRange] = useState<[moment.Moment, moment.Moment] | null>(null);
-  const [selectedChild, setSelectedChild] = useState<number | null>(null);
+  // Debug logs
+  console.log("🔍 Attendance List - tableProps:", tableProps);
+  console.log("🔍 Attendance List - tableProps.dataSource:", tableProps.dataSource);
+  console.log("🔍 Attendance List - stats:", stats);
+  
 
-  // Get today's attendance for quick view
-  const { data: todayAttendance } = useCustom({
-    url: "/attendance/today",
-    method: "get",
-  });
-
-  // Get children for filter
-  const { data: childrenData } = useList({
-    resource: "children",
-    pagination: { pageSize: 150 },
-  });
-
-  const { tableProps } = useTable<AttendanceRecord>({
-    syncWithLocation: false,
-    sorters: {
-      initial: [
-        {
-          field: "date",
-          order: "desc",
-        },
-      ],
+  const columns = [
+    {
+      title: "Niño",
+      dataIndex: ["child", "firstName"],
+      key: "child",
+      render: (_: any, record: any) => (
+        <Space>
+          <Avatar 
+            src={record.child?.profilePicture} 
+            icon={<UserOutlined />}
+            size="small"
+          />
+          <div>
+            <div>{record.child?.firstName} {record.child?.lastName}</div>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              ID: {record.childId}
+            </Text>
+          </div>
+        </Space>
+      ),
     },
-    filters: {
-      permanent: [
-        ...(dateRange
-          ? [
-              {
-                field: "date",
-                operator: "gte" as const,
-                value: dateRange[0].format("YYYY-MM-DD"),
-              },
-              {
-                field: "date",
-                operator: "lte" as const,
-                value: dateRange[1].format("YYYY-MM-DD"),
-              },
-            ]
-          : []),
-        ...(selectedChild
-          ? [
-              {
-                field: "childId",
-                operator: "eq" as const,
-                value: selectedChild,
-              },
-            ]
-          : []),
-      ],
+    {
+      title: "Fecha",
+      dataIndex: "attendanceDate",
+      key: "attendanceDate",
+      render: (value: string) => <DateField value={value} format="DD/MM/YYYY" />,
     },
-  });
-
-  const getStatusColor = (record: AttendanceRecord) => {
-    if (record.checkInTime && record.checkOutTime) return "green";
-    if (record.checkInTime && !record.checkOutTime) return "orange";
-    return "red";
-  };
-
-  const getStatusText = (record: AttendanceRecord) => {
-    if (record.checkInTime && record.checkOutTime) return "Completo";
-    if (record.checkInTime && !record.checkOutTime) return "Presente";
-    return "Ausente";
-  };
-
-  const todayStats = todayAttendance?.data || [];
-  const totalToday = todayStats.length;
-  const checkedIn = todayStats.filter((record: AttendanceRecord) => record.checkInTime).length;
-  const checkedOut = todayStats.filter((record: AttendanceRecord) => record.checkOutTime).length;
+    {
+      title: "Entrada",
+      dataIndex: "checkInTime",
+      key: "checkInTime",
+      render: (value: string) => value ? (
+        <Text>{new Date(value).toLocaleTimeString('es-CO', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        })}</Text>
+      ) : <Text type="secondary">-</Text>,
+    },
+    {
+      title: "Salida",
+      dataIndex: "checkOutTime",
+      key: "checkOutTime",
+      render: (value: string) => value ? (
+        <Text>{new Date(value).toLocaleTimeString('es-CO', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        })}</Text>
+      ) : <Text type="secondary">-</Text>,
+    },
+    {
+      title: "Estado",
+      dataIndex: "isPresent",
+      key: "isPresent",
+      render: (_: any, record: any) => {
+        const status: AttendanceStatus = {
+          isPresent: record.isPresent,
+          isCheckedIn: !!record.checkInTime,
+          isCheckedOut: !!record.checkOutTime,
+          attendance: record
+        };
+        return <AttendanceStatusComponent status={status} />;
+      },
+    },
+    {
+      title: "Entregado por",
+      dataIndex: ["deliveredBy2", "name"],
+      key: "deliveredBy",
+      render: (value: string, record: any) => value ? (
+        <Tooltip title={`${record.deliveredBy2?.relationship} - ${record.deliveredBy2?.phone}`}>
+          <Text>{value}</Text>
+        </Tooltip>
+      ) : <Text type="secondary">-</Text>,
+    },
+    {
+      title: "Recogido por",
+      dataIndex: ["pickedUpBy2", "name"],
+      key: "pickedUpBy",
+      render: (value: string, record: any) => value ? (
+        <Tooltip title={`${record.pickedUpBy2?.relationship} - ${record.pickedUpBy2?.phone}`}>
+          <Text>{value}</Text>
+        </Tooltip>
+      ) : <Text type="secondary">-</Text>,
+    },
+    {
+      title: "Notas",
+      key: "notes",
+      render: (_, record: any) => {
+        const checkInNotes = record.checkInNotes || 'N/A';
+        const checkOutNotes = record.checkOutNotes || 'N/A';
+        const notesText = `Check-in: ${checkInNotes} / Check-out: ${checkOutNotes}`;
+        
+        return (
+          <Tooltip title={notesText}>
+            <Text ellipsis style={{ maxWidth: 150 }}>
+              {notesText}
+            </Text>
+          </Tooltip>
+        );
+      },
+    },
+    {
+      title: "Acciones",
+      key: "actions",
+      render: (_, record: any) => {
+        console.log("🔍 Attendance List - record for actions:", record);
+        console.log("🔍 Attendance List - record.id:", record.id);
+        return (
+          <Space>
+            <EditButton 
+              hideText 
+              size="small" 
+              recordItemId={record.id}
+            />
+            <DeleteButton hideText size="small" recordItemId={record.id} />
+          </Space>
+        );
+      },
+    },
+  ];
 
   return (
     <div>
-      {/* Today's Summary */}
+      {/* Statistics Cards */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={8}>
+        <Col span={6}>
           <Card>
-            <div style={{ textAlign: "center" }}>
-              <Title level={3} style={{ margin: 0, color: "#1890ff" }}>
-                {totalToday}
-              </Title>
-              <Text>Registros Hoy</Text>
-            </div>
+            <Statistic
+              title="Total Niños"
+              value={stats?.totalChildren || 0}
+              loading={loadingStats}
+              prefix={<UserOutlined />}
+            />
           </Card>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <Card>
-            <div style={{ textAlign: "center" }}>
-              <Title level={3} style={{ margin: 0, color: "#52c41a" }}>
-                {checkedIn}
-              </Title>
-              <Text>Check-ins</Text>
-            </div>
+            <Statistic
+              title="Presentes Hoy"
+              value={stats?.presentToday || 0}
+              loading={loadingStats}
+              valueStyle={{ color: '#52c41a' }}
+              prefix={<CheckCircleOutlined />}
+            />
           </Card>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <Card>
-            <div style={{ textAlign: "center" }}>
-              <Title level={3} style={{ margin: 0, color: "#faad14" }}>
-                {checkedOut}
-              </Title>
-              <Text>Check-outs</Text>
-            </div>
+            <Statistic
+              title="Ausentes Hoy"
+              value={stats?.absentToday || 0}
+              loading={loadingStats}
+              valueStyle={{ color: '#ff4d4f' }}
+              prefix={<CloseCircleOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Tasa de Asistencia"
+              value={stats?.attendanceRate || 0}
+              loading={loadingStats}
+              suffix="%"
+              precision={1}
+            />
           </Card>
         </Col>
       </Row>
 
-      <List
-        headerButtons={
-          canManage ? (
-            <Space>
-              <Button type="primary" href="/attendance/create">
-                Nuevo Check-in
-              </Button>
-            </Space>
-          ) : undefined
-        }
-      >
-        {/* Filters */}
-        <Card style={{ marginBottom: 16 }}>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Text strong>Rango de Fechas:</Text>
-              <RangePicker
-                style={{ width: "100%", marginTop: 8 }}
-                value={dateRange}
-                onChange={(dates) => setDateRange(dates as [moment.Moment, moment.Moment])}
-                format="DD/MM/YYYY"
-              />
-            </Col>
-            <Col span={12}>
-              <Text strong>Filtrar por Niño:</Text>
-              <Select
-                style={{ width: "100%", marginTop: 8 }}
-                placeholder="Seleccione un niño"
-                allowClear
-                value={selectedChild}
-                onChange={setSelectedChild}
-                options={childrenData?.data?.map((child: any) => ({
-                  label: `${child.firstName} ${child.lastName}`,
-                  value: child.id,
-                }))}
-              />
-            </Col>
-          </Row>
-        </Card>
-
-        <Table {...tableProps} rowKey="id">
-          <Table.Column
-            dataIndex={["child", "profilePicture"]}
-            title="Niño"
-            render={(value, record: AttendanceRecord) => (
-              <Space>
-                <Avatar
-                  src={value}
-                  icon={<UserOutlined />}
-                  alt={`${record.child.firstName} ${record.child.lastName}`}
-                />
-                <div>
-                  <Text strong>{`${record.child.firstName} ${record.child.lastName}`}</Text>
-                </div>
-              </Space>
-            )}
-          />
-          <Table.Column
-            dataIndex="date"
-            title="Fecha"
-            render={(value) => moment(value).format("DD/MM/YYYY")}
-          />
-          <Table.Column
-            dataIndex="checkInTime"
-            title="Hora de Entrada"
-            render={(value) => (
-              <Space>
-                <ClockCircleOutlined style={{ color: value ? "#52c41a" : "#d9d9d9" }} />
-                {value ? moment(value, "HH:mm:ss").format("HH:mm") : "No registrado"}
-              </Space>
-            )}
-          />
-          <Table.Column
-            dataIndex="checkOutTime"
-            title="Hora de Salida"
-            render={(value) => (
-              <Space>
-                <CheckCircleOutlined style={{ color: value ? "#52c41a" : "#d9d9d9" }} />
-                {value ? moment(value, "HH:mm:ss").format("HH:mm") : "No registrado"}
-              </Space>
-            )}
-          />
-          <Table.Column
-            dataIndex={["deliveredBy", "firstName"]}
-            title="Entregado por"
-            render={(value, record: AttendanceRecord) =>
-              record.deliveredBy
-                ? `${record.deliveredBy.firstName} ${record.deliveredBy.lastName}`
-                : "No especificado"
-            }
-          />
-          <Table.Column
-            dataIndex={["pickedUpBy", "firstName"]}
-            title="Recogido por"
-            render={(value, record: AttendanceRecord) =>
-              record.pickedUpBy
-                ? `${record.pickedUpBy.firstName} ${record.pickedUpBy.lastName}`
-                : "No registrado"
-            }
-          />
-          <Table.Column
-            title="Estado"
-            render={(record: AttendanceRecord) => (
-              <TagField
-                value={getStatusText(record)}
-                color={getStatusColor(record)}
-              />
-            )}
-          />
-          <Table.Column
-            dataIndex={["createdBy", "firstName"]}
-            title="Registrado por"
-            render={(value, record: AttendanceRecord) =>
-              `${record.createdBy.firstName} ${record.createdBy.lastName}`
-            }
-          />
-        </Table>
+      {/* Attendance List */}
+      <List>
+        <Table
+          {...tableProps}
+          columns={columns}
+          rowKey="id"
+          loading={loadingAttendance}
+          pagination={{
+            ...tableProps.pagination,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} de ${total} registros`,
+          }}
+        />
       </List>
     </div>
   );

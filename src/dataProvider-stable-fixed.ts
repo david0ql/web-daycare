@@ -74,6 +74,8 @@ export const stableFixedDataProvider: DataProvider = {
       console.log('Response status:', response.status);
       
       const data = response.data;
+      
+      
       const result = {
         data: data.data || data || [],
         total: data.meta?.totalCount || data.length || 0,

@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { useList, useCustomMutation } from "@refinedev/core";
+import { useList } from "@refinedev/core";
 import { Create, useForm } from "@refinedev/antd";
-import { Form, Select, Input, Button, Card, Space, Avatar, Typography, Row, Col, Tabs, message } from "antd";
+import { Form, Select, Input, Button, Card, Space, Avatar, Typography, Row, Col, Tabs, message, Spin } from "antd";
 import { UserOutlined, LoginOutlined, LogoutOutlined } from "@ant-design/icons";
+import { useCheckIn, useCheckOut } from "../../domains/attendance";
+import { useAuthorizedPickupPersons } from "../../domains/children";
+import { axiosInstance } from "../../shared";
 
 const { Text, Title } = Typography;
 const { TextArea } = Input;
@@ -24,59 +27,86 @@ export const AttendanceCreate: React.FC = () => {
   const [activeTab, setActiveTab] = useState("checkin");
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
 
-  // Get children for selection
-  const { data: childrenData } = useList<Child>({
-    resource: "children",
-    pagination: { pageSize: 150 },
-  });
+  // Get children data using direct axios call
+  const [childrenData, setChildrenData] = React.useState<any>(null);
+  const [loadingChildren, setLoadingChildren] = React.useState(true);
+  const [childrenError, setChildrenError] = React.useState<any>(null);
 
-  // Get users for delivered/picked up by selection
-  const { data: usersData } = useList<User>({
-    resource: "users",
-    pagination: { pageSize: 150 },
-  });
+  React.useEffect(() => {
+    const fetchChildren = async () => {
+      try {
+        setLoadingChildren(true);
+        console.log("🔍 Fetching children with direct axios call");
+        const response = await axiosInstance.get("/children");
+        console.log("🔍 Children response:", response);
+        setChildrenData(response.data);
+        setChildrenError(null);
+      } catch (error) {
+        console.error("🔍 Error fetching children:", error);
+        setChildrenError(error);
+      } finally {
+        setLoadingChildren(false);
+      }
+    };
+
+    fetchChildren();
+  }, []);
+
+  // Debug children loading state
+  console.log("🔍 Children loading state:", { loadingChildren, childrenError, childrenData });
+
+  // Test direct axios call to children endpoint
+  React.useEffect(() => {
+    const testChildrenEndpoint = async () => {
+      try {
+        console.log("🔍 Testing direct axios call to /children endpoint");
+        const response = await axiosInstance.get("/children");
+        console.log("🔍 Direct children response:", response);
+        console.log("🔍 Direct children data:", response.data);
+        console.log("🔍 Direct children data.data:", response.data.data);
+      } catch (error) {
+        console.error("🔍 Direct children call error:", error);
+      }
+    };
+    
+    testChildrenEndpoint();
+  }, []);
+
+  // Get authorized pickup persons for selected child
+  const { data: authorizedPersons, isLoading: loadingAuthorizedPersons, error: authorizedPersonsError } = useAuthorizedPickupPersons(selectedChild?.id);
 
   // Check-in mutation
-  const { mutate: checkIn, isLoading: checkingIn } = useCustomMutation({
-    url: "/attendance/check-in",
-    method: "post",
-    successNotification: {
-      message: "Check-in exitoso",
-      description: "El niño ha sido registrado correctamente",
-      type: "success",
-    },
-    errorNotification: {
-      message: "Error en check-in",
-      description: "No se pudo registrar el check-in",
-      type: "error",
-    },
-  });
+  const { mutate: checkIn, isLoading: checkingIn } = useCheckIn();
 
   // Check-out mutation
-  const { mutate: checkOut, isLoading: checkingOut } = useCustomMutation({
-    url: "/attendance/check-out",
-    method: "post",
-    successNotification: {
-      message: "Check-out exitoso",
-      description: "El niño ha sido registrado para salida correctamente",
-      type: "success",
-    },
-    errorNotification: {
-      message: "Error en check-out",
-      description: "No se pudo registrar el check-out",
-      type: "error",
-    },
-  });
+  const { mutate: checkOut, isLoading: checkingOut } = useCheckOut();
 
-  // Filter active children and users on the frontend since API doesn't support these filters
-  const children = (childrenData?.data || []).filter((child: any) => child.isActive === true);
-  const users = (usersData?.data || []).filter((user: any) => user.isActive === true);
+  // Filter active children
+  const children = (childrenData?.data || []);
+  console.log("🔍 Raw children from API:", children);
+  // const children = (childrenData?.data || []).filter((child: any) => child.isActive === true);
+
+  // Debug logs
+  console.log("🔍 Attendance Create - childrenData:", childrenData);
+  console.log("🔍 Attendance Create - children (filtered):", children);
+  console.log("🔍 Attendance Create - childrenError:", childrenError);
+  console.log("🔍 Attendance Create - authorizedPersons:", authorizedPersons);
+  console.log("🔍 Attendance Create - authorizedPersonsError:", authorizedPersonsError);
+  console.log("🔍 Attendance Create - selectedChild:", selectedChild);
 
   const handleCheckIn = (values: any) => {
     checkIn({
       childId: values.childId,
       deliveredBy: values.deliveredBy,
       checkInNotes: values.checkInNotes,
+    }, {
+      onSuccess: () => {
+        message.success("Check-in exitoso. El niño ha sido registrado correctamente.");
+        setSelectedChild(null);
+      },
+      onError: (error: any) => {
+        message.error("Error en check-in: " + (error?.response?.data?.message || "No se pudo registrar el check-in"));
+      }
     });
   };
 
@@ -93,12 +123,20 @@ export const AttendanceCreate: React.FC = () => {
     checkOut({
       childId: values.childId,
       pickedUpBy: values.pickedUpBy,
-      checkOutNotes: values.checkOutNotes,
+      notes: values.checkOutNotes,
+    }, {
+      onSuccess: () => {
+        message.success("Check-out exitoso. El niño ha sido registrado para salida correctamente.");
+        setSelectedChild(null);
+      },
+      onError: (error: any) => {
+        message.error("Error en check-out: " + (error?.response?.data?.message || "No se pudo registrar el check-out"));
+      }
     });
   };
 
   const handleChildSelect = (childId: number) => {
-    const child = children.find((c) => c.id === childId);
+    const child = (children || []).find((c) => c.id === childId);
     setSelectedChild(child || null);
   };
 
@@ -126,7 +164,7 @@ export const AttendanceCreate: React.FC = () => {
               filterOption={(input, option) =>
                 (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
               }
-              options={children.map((child) => ({
+              options={(children || []).map((child) => ({
                 label: `${child.firstName} ${child.lastName}`,
                 value: child.id,
               }))}
@@ -158,16 +196,18 @@ export const AttendanceCreate: React.FC = () => {
             name="deliveredBy"
           >
             <Select
-              placeholder="¿Quién entrega al niño?"
+              placeholder={selectedChild ? "¿Quién entrega al niño?" : "Primero seleccione un niño"}
               allowClear
               showSearch
               optionFilterProp="children"
+              disabled={!selectedChild}
+              loading={loadingAuthorizedPersons}
               filterOption={(input, option) =>
                 (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
               }
-              options={users.map((user) => ({
-                label: `${user.firstName} ${user.lastName}`,
-                value: user.id,
+              options={(authorizedPersons || []).map((person) => ({
+                label: `${person.name} (${person.relationship})`,
+                value: person.id,
               }))}
             />
           </Form.Item>
@@ -220,7 +260,7 @@ export const AttendanceCreate: React.FC = () => {
               filterOption={(input, option) =>
                 (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
               }
-              options={children.map((child) => ({
+              options={(children || []).map((child) => ({
                 label: `${child.firstName} ${child.lastName}`,
                 value: child.id,
               }))}
@@ -253,15 +293,17 @@ export const AttendanceCreate: React.FC = () => {
             rules={[{ required: true, message: "Debe especificar quién recoge al niño" }]}
           >
             <Select
-              placeholder="¿Quién recoge al niño?"
+              placeholder={selectedChild ? "¿Quién recoge al niño?" : "Primero seleccione un niño"}
               showSearch
               optionFilterProp="children"
+              disabled={!selectedChild}
+              loading={loadingAuthorizedPersons}
               filterOption={(input, option) =>
                 (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
               }
-              options={users.map((user) => ({
-                label: `${user.firstName} ${user.lastName}`,
-                value: user.id,
+              options={(authorizedPersons || []).map((person) => ({
+                label: `${person.name} (${person.relationship})`,
+                value: person.id,
               }))}
             />
           </Form.Item>
@@ -294,6 +336,25 @@ export const AttendanceCreate: React.FC = () => {
       ),
     },
   ];
+
+  if (loadingChildren) {
+    return (
+      <Create
+        title="Gestión de Asistencia"
+        breadcrumb={false}
+        headerButtons={<></>}
+      >
+        <Card>
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            <Spin size="large" />
+            <div style={{ marginTop: 16 }}>
+              <Text>Cargando datos...</Text>
+            </div>
+          </div>
+        </Card>
+      </Create>
+    );
+  }
 
   return (
     <Create

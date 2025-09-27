@@ -147,8 +147,17 @@ export const ChildCreate: React.FC = () => {
     console.log("🔍 All form values:", allValues);
   };
 
+  // Override saveButtonProps to use our custom handleFinish
+  const customSaveButtonProps = {
+    ...saveButtonProps,
+    onClick: () => {
+      console.log("🔍 Save button clicked - triggering form submit");
+      form.submit();
+    }
+  };
+
   return (
-    <Create saveButtonProps={saveButtonProps}>
+    <Create saveButtonProps={customSaveButtonProps}>
       <Form {...formProps} form={form} layout="vertical" onFinish={handleFinish} onValuesChange={handleValuesChange}>
         
         {/* Información Básica */}
