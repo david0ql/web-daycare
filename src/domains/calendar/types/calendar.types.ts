@@ -38,9 +38,7 @@ export interface CreateCalendarEventData {
   endTime?: string;
 }
 
-export interface UpdateCalendarEventData extends Partial<CreateCalendarEventData> {
-  id: number;
-}
+export interface UpdateCalendarEventData extends Partial<CreateCalendarEventData> {}
 
 export interface CalendarFilter {
   eventType?: EventTypeEnum;

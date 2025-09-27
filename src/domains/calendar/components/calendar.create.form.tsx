@@ -33,7 +33,7 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
       eventType: values.eventType,
       startDate: values.startDate.format('YYYY-MM-DD'),
       endDate: values.endDate.format('YYYY-MM-DD'),
-      isAllDay: isAllDay,
+      isAllDay: Boolean(isAllDay), // Ensure it's always a boolean
       startTime: isAllDay ? undefined : values.startTime?.format('HH:mm'),
       endTime: isAllDay ? undefined : values.endTime?.format('HH:mm'),
     };
@@ -118,6 +118,8 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
               label="Todo el día"
               name="isAllDay"
               valuePropName="checked"
+              getValueFromEvent={(checked) => Boolean(checked)}
+              getValueProps={(value) => ({ value: Boolean(value) })}
             >
               <Switch 
                 checked={isAllDay}

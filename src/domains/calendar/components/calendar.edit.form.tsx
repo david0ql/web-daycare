@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Select, DatePicker, TimePicker, Switch, Card, Row, Col, Typography } from 'antd';
-import { useForm } from '@refinedev/core';
+import { Form, Input, Select, DatePicker, TimePicker, Switch, Card, Row, Col, Typography, Button, message } from 'antd';
 import { useNavigate } from 'react-router';
 import { UpdateCalendarEventData, EventTypeEnum, EVENT_TYPE_LABELS } from '../types/calendar.types';
+import { useCalendarEvent } from '../hooks/use-calendar.hook';
+import { axiosInstance } from '../../../shared';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 
@@ -22,13 +23,9 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [isAllDay, setIsAllDay] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const { formProps, saveButtonProps, queryResult } = useForm({
-    resource: 'calendar/events',
-    id: eventId,
-  });
-
-  const event = queryResult?.data?.data;
+  const { event, isLoading, error } = useCalendarEvent(eventId);
 
   // Update form when event data is loaded
   useEffect(() => {
@@ -57,33 +54,48 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
     }
   };
 
-  const handleSubmit = (values: any) => {
-    const eventData: UpdateCalendarEventData = {
-      id: eventId,
-      title: values.title,
-      description: values.description,
-      eventType: values.eventType,
-      startDate: values.startDate.format('YYYY-MM-DD'),
-      endDate: values.endDate.format('YYYY-MM-DD'),
-      isAllDay: isAllDay,
-      startTime: isAllDay ? undefined : values.startTime?.format('HH:mm'),
-      endTime: isAllDay ? undefined : values.endTime?.format('HH:mm'),
-    };
+  const handleSubmit = async (values: any) => {
+    setIsSubmitting(true);
+    
+    try {
+      // Remove id from the request body since it's passed in the URL
+      const eventData = {
+        title: values.title,
+        description: values.description,
+        eventType: values.eventType,
+        startDate: values.startDate.format('YYYY-MM-DD'),
+        endDate: values.endDate.format('YYYY-MM-DD'),
+        isAllDay: Boolean(isAllDay), // Ensure it's always a boolean
+        startTime: isAllDay ? undefined : values.startTime?.format('HH:mm'),
+        endTime: isAllDay ? undefined : values.endTime?.format('HH:mm'),
+      };
 
-    // Use saveButtonProps.onClick to trigger the update
-    if (saveButtonProps.onClick) {
-      saveButtonProps.onClick();
+      await axiosInstance.patch(`/calendar/events/${eventId}`, eventData);
+      
+      message.success('Evento actualizado exitosamente');
+      
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        navigate('/calendar');
+      }
+    } catch (error) {
+      console.error('Error updating event:', error);
+      message.error('Error al actualizar el evento');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (queryResult?.isLoading) {
+  if (isLoading) {
     return <Card loading />;
   }
 
-  if (!event) {
+  if (error || !event) {
     return (
       <Card>
         <Title level={4}>Evento no encontrado</Title>
+        <p>No se pudo cargar el evento o no existe.</p>
       </Card>
     );
   }
@@ -95,7 +107,6 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
       </Title>
       
       <Form
-        {...formProps}
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
@@ -137,6 +148,8 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
               label="Todo el día"
               name="isAllDay"
               valuePropName="checked"
+              getValueFromEvent={(checked) => Boolean(checked)}
+              getValueProps={(value) => ({ value: Boolean(value) })}
             >
               <Switch 
                 checked={isAllDay}
@@ -226,36 +239,19 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
 
         <Form.Item>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-            <Form.Item style={{ margin: 0 }}>
-              <button
-                type="button"
-                onClick={() => navigate('/calendar')}
-                style={{
-                  padding: '8px 16px',
-                  border: '1px solid #d9d9d9',
-                  borderRadius: '6px',
-                  background: 'white',
-                  cursor: 'pointer',
-                }}
-              >
-                Cancelar
-              </button>
-            </Form.Item>
-            <Form.Item style={{ margin: 0 }}>
-              <button
-                {...saveButtonProps}
-                style={{
-                  padding: '8px 16px',
-                  border: 'none',
-                  borderRadius: '6px',
-                  background: '#1890ff',
-                  color: 'white',
-                  cursor: 'pointer',
-                }}
-              >
-                {saveButtonProps.loading ? 'Guardando...' : 'Guardar Cambios'}
-              </button>
-            </Form.Item>
+            <Button
+              type="default"
+              onClick={() => navigate('/calendar')}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isSubmitting}
+            >
+              {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+            </Button>
           </div>
         </Form.Item>
       </Form>
