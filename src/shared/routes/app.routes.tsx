@@ -1,7 +1,8 @@
 import React from "react";
 import { Routes, Route, Outlet } from "react-router";
-import { Authenticated, ErrorComponent, useIsAuthenticated } from "@refinedev/core";
+import { Authenticated, ErrorComponent } from "@refinedev/core";
 import { CustomLayout } from "../components/custom-layout.component";
+import { LoginProtected } from "../components/login-protected.component";
 
 // Import pages
 import { Dashboard } from "../../pages/dashboard";
@@ -13,7 +14,7 @@ import { UserList } from "../../domains/users";
 import { ChildList } from "../../domains/children";
 
 // Import legacy pages
-import { UserCreate, UserEdit, UserShow, Register } from "../../pages/users";
+import { UserCreate, UserEdit, Register } from "../../pages/users";
 import { ChildCreate, ChildEdit, ChildShow } from "../../pages/children";
 import { AttendanceList, AttendanceCreate } from "../../pages/attendance";
 import { IncidentList, IncidentCreate, IncidentEdit, IncidentShow } from "../../pages/incidents";
@@ -22,56 +23,27 @@ import { DocumentList, DocumentCreate, DocumentShow } from "../../pages/document
 import { MessageList, MessageCreate, MessageShow } from "../../pages/messaging";
 import { ReportList } from "../../pages/reports";
 
-// Componente de debug para verificar autenticación
-const AuthDebug: React.FC = () => {
-  const { data: isAuthenticated, isLoading } = useIsAuthenticated();
-  
-  console.log("🔍 AuthDebug - isAuthenticated:", isAuthenticated);
-  console.log("🔍 AuthDebug - isLoading:", isLoading);
-  
-  // Verificación adicional del token en localStorage
-  const token = localStorage.getItem("refine-auth");
-  console.log("🔑 AuthDebug - Token in localStorage:", !!token);
-  
-  if (isLoading) {
-    return <div>Verificando autenticación...</div>;
-  }
-  
-  // Verificar que isAuthenticated sea verdadero
-  const isActuallyAuthenticated = Boolean(isAuthenticated);
-  console.log("🔍 AuthDebug - isActuallyAuthenticated:", isActuallyAuthenticated);
-  
-  // Si no hay token en localStorage, forzar login
-  if (!token) {
-    console.log("❌ AuthDebug - No token in localStorage, redirecting to login");
-    return <Login />;
-  }
-  
-  // Si Refine dice que no está autenticado, forzar login
-  if (!isActuallyAuthenticated) {
-    console.log("❌ AuthDebug - No autenticado según Refine, debería redirigir a login");
-    return <Login />;
-  }
-  
-  console.log("✅ AuthDebug - Autenticado, mostrando layout");
-  return (
-    <CustomLayout>
-      <Outlet />
-    </CustomLayout>
-  );
-};
 
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Ruta de login - accesible sin autenticación */}
-      <Route element={<Login />} path="/login" />
+      {/* Ruta de login - protegida contra usuarios ya autenticados usando componente nativo de Refine */}
+      <Route 
+        element={
+          <LoginProtected>
+            <Login />
+          </LoginProtected>
+        } 
+        path="/login" 
+      />
       
-      {/* Rutas protegidas - requieren autenticación */}
+      {/* Rutas protegidas - requieren autenticación usando componente nativo Authenticated de Refine */}
       <Route
         element={
           <Authenticated key="authenticated-layout" fallback={<Login />}>
-            <AuthDebug />
+            <CustomLayout>
+              <Outlet />
+            </CustomLayout>
           </Authenticated>
         }
       >
@@ -83,7 +55,6 @@ export const AppRoutes: React.FC = () => {
           <Route path="create" element={<UserCreate />} />
           <Route path="register" element={<Register />} />
           <Route path="edit/:id" element={<UserEdit />} />
-          <Route path="show/:id" element={<UserShow />} />
         </Route>
 
         {/* Children */}

@@ -13,7 +13,7 @@ import { ConfigProvider, App as AntdApp } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 import "@refinedev/antd/dist/reset.css";
 
-import { authProvider } from "./domains/auth";
+import { authProvider } from "./authProvider-refine-native";
 import { stableFixedDataProvider } from "./dataProvider-stable-fixed";
 import { appResources, AppRoutes } from "./shared";
 
@@ -40,11 +40,10 @@ const App: React.FC = () => {
                   defaultOptions: {
                     queries: {
                       retry: false, // Desactivar reintentos automáticos
-                      refetchOnWindowFocus: false, // No refetch al cambiar de ventana
-                      refetchOnMount: false, // No refetch al montar el componente
+                      refetchOnMount: false, // No refetch automático al montar
                       refetchOnReconnect: false, // No refetch al reconectar
-                      staleTime: 5 * 60 * 1000, // 5 minutos de stale time
-                      gcTime: 10 * 60 * 1000, // 10 minutos de garbage collection time
+                      staleTime: 2 * 60 * 1000, // 2 minutos de stale time
+                      gcTime: 5 * 60 * 1000, // 5 minutos de garbage collection time
                     },
                     mutations: {
                       retry: false, // Desactivar reintentos en mutaciones

@@ -1,7 +1,18 @@
 import React from "react";
-import { useList } from "@refinedev/core";
+import { useList, useInvalidate, useGo, useNotification } from "@refinedev/core";
 import { Create, useForm } from "@refinedev/antd";
+import { useQueryClient } from "@tanstack/react-query";
 import { Form, Input, Select, Switch, Upload, Button, Avatar } from "antd";
+
+// Custom Switch component that always returns boolean
+const BooleanSwitch: React.FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({ value, onChange }) => {
+  const handleChange = (checked: boolean) => {
+    console.log("🔍 BooleanSwitch onChange:", checked, typeof checked);
+    onChange?.(checked);
+  };
+
+  return <Switch checked={Boolean(value)} onChange={handleChange} />;
+};
 import { UserOutlined, UploadOutlined } from "@ant-design/icons";
 
 interface UserRole {
@@ -12,7 +23,48 @@ interface UserRole {
 }
 
 export const UserCreate: React.FC = () => {
-  const { formProps, saveButtonProps } = useForm();
+  const invalidate = useInvalidate();
+  const go = useGo();
+  const queryClient = useQueryClient();
+  const { open } = useNotification();
+  
+  const { formProps, saveButtonProps } = useForm({
+    onMutationSuccess: async (data, variables) => {
+      console.log("🔍 Mutation success - data:", data);
+      console.log("🔍 Mutation success - variables:", variables);
+      
+      // Force invalidate and refetch all users-related queries
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          const key = query.queryKey;
+          return Array.isArray(key) && key.some(k => k === "users");
+        },
+      });
+      
+      // Force refetch all users queries
+      await queryClient.refetchQueries({
+        predicate: (query) => {
+          const key = query.queryKey;
+          return Array.isArray(key) && key.some(k => k === "users");
+        },
+      });
+      
+      // Show success notification
+      open?.({
+        type: "success",
+        message: "Usuario creado exitosamente",
+        description: "El nuevo usuario ha sido registrado correctamente",
+      });
+      
+      // Navigate back to users list with a small delay for better UX
+      setTimeout(() => {
+        go({
+          to: "/users",
+          type: "push",
+        });
+      }, 1000);
+    }
+  });
 
   // Fetch user roles for the select
   const rolesQuery = useList<UserRole>({
@@ -21,9 +73,29 @@ export const UserCreate: React.FC = () => {
 
   const roles = rolesQuery.result?.data || [];
 
+  // Custom onFinish to transform data
+  const handleFinish = (values: any) => {
+    console.log("🔍 Form onFinish - original values:", values);
+    console.log("🔍 Form onFinish - roleId type:", typeof values.roleId, "value:", values.roleId);
+    
+    const transformedValues = {
+      ...values,
+      isActive: Boolean(values.isActive),
+      // Ensure roleId is a number
+      roleId: Number(values.roleId)
+    };
+    console.log("🔍 Form onFinish - transformed values:", transformedValues);
+    console.log("🔍 Form onFinish - transformed roleId type:", typeof transformedValues.roleId, "value:", transformedValues.roleId);
+    
+    // Call the original formProps.onFinish with transformed values
+    if (formProps.onFinish) {
+      formProps.onFinish(transformedValues);
+    }
+  };
+
   return (
     <Create saveButtonProps={saveButtonProps}>
-      <Form {...formProps} layout="vertical">
+      <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Form.Item
           label="Email"
           name="email"
@@ -86,10 +158,9 @@ export const UserCreate: React.FC = () => {
         <Form.Item
           label="Estado Activo"
           name="isActive"
-          valuePropName="checked"
           initialValue={true}
         >
-          <Switch />
+          <BooleanSwitch />
         </Form.Item>
 
         <Form.Item

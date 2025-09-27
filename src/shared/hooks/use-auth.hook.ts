@@ -206,21 +206,64 @@ export const useAuth = () => {
    * Verifica si el usuario es administrador
    */
   const isAdmin = (): boolean => {
-    return hasRole("administrator");
+    // Fallback: obtener permisos directamente del localStorage si permissions es undefined
+    let currentPermissions = permissions;
+    if (!currentPermissions) {
+      const userFromStorage = localStorage.getItem("user");
+      if (userFromStorage) {
+        try {
+          const userData = JSON.parse(userFromStorage);
+          currentPermissions = userData.role?.name;
+          console.log("🔍 isAdmin - Fallback from localStorage:", currentPermissions);
+        } catch (error) {
+          console.error("Error parsing user from localStorage:", error);
+        }
+      }
+    }
+    
+    const isAdminResult = currentPermissions === "administrator";
+    console.log("🔍 isAdmin - Result:", isAdminResult, "Permissions:", currentPermissions);
+    return isAdminResult;
   };
 
   /**
    * Verifica si el usuario es educador
    */
   const isEducator = (): boolean => {
-    return hasRole("educator");
+    // Fallback: obtener permisos directamente del localStorage si permissions es undefined
+    let currentPermissions = permissions;
+    if (!currentPermissions) {
+      const userFromStorage = localStorage.getItem("user");
+      if (userFromStorage) {
+        try {
+          const userData = JSON.parse(userFromStorage);
+          currentPermissions = userData.role?.name;
+        } catch (error) {
+          console.error("Error parsing user from localStorage:", error);
+        }
+      }
+    }
+    return currentPermissions === "educator";
   };
 
   /**
    * Verifica si el usuario es padre/madre
    */
   const isParent = (): boolean => {
-    return hasRole("parent");
+    // Fallback: obtener permisos directamente del localStorage si permissions es undefined
+    let currentPermissions = permissions;
+    if (!currentPermissions) {
+      const userFromStorage = localStorage.getItem("user");
+      if (userFromStorage) {
+        try {
+          const userData = JSON.parse(userFromStorage);
+          currentPermissions = userData.role?.name;
+        } catch (error) {
+          console.error("Error parsing user from localStorage:", error);
+        }
+      }
+    }
+    return currentPermissions === "parent";
   };
 
   // ===== FUNCIONES DE UTILIDAD =====

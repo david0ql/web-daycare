@@ -6,7 +6,6 @@ export const appResources: ResourceProps[] = [
     list: "/users",
     create: "/users/create",
     edit: "/users/edit/:id",
-    show: "/users/show/:id",
     meta: {
       label: "Usuarios",
       icon: "👥",

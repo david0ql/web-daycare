@@ -16,10 +16,9 @@ export const authProvider: AuthProvider = {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("🔐 Login successful - User data:", data.user);
-        console.log("🔐 User role:", data.user?.role);
         localStorage.setItem(TOKEN_KEY, data.accessToken);
         localStorage.setItem("user", JSON.stringify(data.user));
+        
         return {
           success: true,
           redirectTo: "/",
@@ -51,36 +50,21 @@ export const authProvider: AuthProvider = {
     // Intentar hacer logout en el servidor
     if (token) {
       try {
-        const response = await fetch(`${API_URL}/auth/logout`, {
+        await fetch(`${API_URL}/auth/logout`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
-        
-        if (!response.ok) {
-          console.warn("Server logout failed, but continuing with local cleanup");
-        }
       } catch (error) {
         console.error("Logout error:", error);
-        // Continuar con la limpieza local aunque falle el servidor
       }
     }
     
-    // Limpiar todos los datos de autenticación
+    // Limpiar datos de autenticación
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem("user");
-    sessionStorage.clear();
-    
-    // Limpiar cualquier cache de la aplicación
-    if (typeof window !== 'undefined' && window.caches) {
-      caches.keys().then(names => {
-        names.forEach(name => {
-          caches.delete(name);
-        });
-      });
-    }
     
     return {
       success: true,
@@ -91,7 +75,6 @@ export const authProvider: AuthProvider = {
   check: async () => {
     const token = localStorage.getItem(TOKEN_KEY);
     
-    // Si no hay token, no hacer petición
     if (!token) {
       return {
         authenticated: false,
@@ -99,14 +82,12 @@ export const authProvider: AuthProvider = {
       };
     }
 
-    // Verificar si el token está expirado antes de hacer la petición
+    // Verificar si el token está expirado
     try {
       const tokenPayload = JSON.parse(atob(token.split('.')[1]));
       const currentTime = Math.floor(Date.now() / 1000);
       
       if (tokenPayload.exp && tokenPayload.exp < currentTime) {
-        // Token expirado, limpiar localStorage
-        console.log("Token expired, clearing authentication");
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem("user");
         return {
@@ -115,8 +96,6 @@ export const authProvider: AuthProvider = {
         };
       }
     } catch (error) {
-      // Token inválido, limpiar localStorage
-      console.log("Invalid token format, clearing authentication");
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem("user");
       return {
@@ -125,7 +104,15 @@ export const authProvider: AuthProvider = {
       };
     }
 
-    // Token válido, verificar con el servidor
+    // Si tenemos un usuario en localStorage y el token es válido, no hacer petición al servidor
+    const user = localStorage.getItem("user");
+    if (user) {
+      return {
+        authenticated: true,
+      };
+    }
+
+    // Solo verificar con el servidor si no tenemos datos de usuario
     try {
       const response = await fetch(`${API_URL}/auth/profile`, {
         headers: {
@@ -134,16 +121,12 @@ export const authProvider: AuthProvider = {
       });
 
       if (response.ok) {
-        const user = await response.json();
-        console.log("🔐 Auth check - User data:", user);
-        console.log("🔐 Auth check - User role:", user?.role);
-        localStorage.setItem("user", JSON.stringify(user));
+        const userData = await response.json();
+        localStorage.setItem("user", JSON.stringify(userData));
         return {
           authenticated: true,
         };
       } else {
-        // Token inválido en el servidor, limpiar localStorage
-        console.log("Server rejected token, clearing authentication");
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem("user");
         return {
@@ -152,8 +135,6 @@ export const authProvider: AuthProvider = {
         };
       }
     } catch (error) {
-      console.error("Auth check error:", error);
-      // Error de red, mantener el token pero marcar como no autenticado
       return {
         authenticated: false,
         redirectTo: "/login",
@@ -165,8 +146,6 @@ export const authProvider: AuthProvider = {
     const user = localStorage.getItem("user");
     if (user) {
       const userData = JSON.parse(user);
-      console.log("🔐 getPermissions - User data:", userData);
-      console.log("🔐 getPermissions - Role:", userData.role?.name);
       return userData.role?.name || null;
     }
     return null;
@@ -176,16 +155,13 @@ export const authProvider: AuthProvider = {
     const user = localStorage.getItem("user");
     if (user) {
       const userData = JSON.parse(user);
-      console.log("🔐 getIdentity - User data:", userData);
       return userData;
     }
     return null;
   },
 
   onError: async (error) => {
-    console.error(error);
     if (error.status === 401) {
-      // Limpiar autenticación en caso de error 401
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem("user");
       return {

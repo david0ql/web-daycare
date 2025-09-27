@@ -5,6 +5,7 @@ import { axiosInstance } from "./shared";
 const requestCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 30000; // 30 segundos
 
+
 /**
  * Data Provider estable que evita bucles infinitos
  * Usa cache y manejo robusto de errores

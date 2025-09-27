@@ -1,9 +1,10 @@
 import React from "react";
 import { useList, usePermissions } from "@refinedev/core";
-import { List, useTable, ShowButton, EditButton, DeleteButton, TagField, CreateButton } from "@refinedev/antd";
+import { List, useTable, EditButton, DeleteButton, TagField, CreateButton } from "@refinedev/antd";
 import { Table, Space, Tag, Avatar, Typography, Button } from "antd";
 import { UserOutlined, UserAddOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
+import { useAuth } from "../../shared/hooks/use-auth.hook";
 
 const { Text } = Typography;
 
@@ -27,7 +28,10 @@ interface User {
 export const UserList: React.FC = () => {
   const navigate = useNavigate();
   const { data: permissions } = usePermissions({});
-  const isAdmin = permissions === "administrator";
+  const { isAdmin } = useAuth();
+  
+  console.log("🔍 UserList - permissions:", permissions);
+  console.log("🔍 UserList - isAdmin():", isAdmin());
 
   const { tableProps } = useTable<User>({
     syncWithLocation: true,
@@ -57,7 +61,7 @@ export const UserList: React.FC = () => {
   return (
     <List
       headerButtons={
-        isAdmin ? (
+        isAdmin() ? (
           <Button
             type="primary"
             icon={<UserAddOutlined />}
@@ -134,8 +138,7 @@ export const UserList: React.FC = () => {
           dataIndex="actions"
           render={(_, record: User) => (
             <Space>
-              <ShowButton hideText size="small" recordItemId={record.id} />
-              {isAdmin && (
+              {isAdmin() && (
                 <>
                   <EditButton hideText size="small" recordItemId={record.id} />
                   <DeleteButton hideText size="small" recordItemId={record.id} />
