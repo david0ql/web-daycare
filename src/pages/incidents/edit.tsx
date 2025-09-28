@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Edit, useForm } from '@refinedev/antd';
-import { Form, Input, Select, DatePicker, Row, Col, Typography, message } from 'antd';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useGo, useInvalidate } from '@refinedev/core';
+import { Form, Input, Select, DatePicker, Row, Col, Typography } from 'antd';
+import { useQuery } from '@tanstack/react-query';
+import { useGo, useInvalidate, useNotification } from '@refinedev/core';
 import { axiosInstance } from '../../shared';
 import { useUpdateIncident } from '../../domains/incidents';
 import dayjs from 'dayjs';
@@ -15,50 +15,39 @@ export const IncidentsEdit: React.FC = () => {
   const queryClient = useQueryClient();
   const go = useGo();
   const invalidate = useInvalidate();
+  const { open } = useNotification();
   
-  const { formProps, saveButtonProps, queryResult } = useForm({
-    resource: 'incidents',
-    onMutationSuccess: async (data) => {
-      // Use Refine's useInvalidate for proper cache invalidation
-      invalidate({
-        resource: "incidents",
-        invalidates: ["list"],
-      });
-      
-      // Also invalidate the specific incident data
-      invalidate({
-        resource: "incidents",
-        invalidates: ["detail"],
-        id: (data as any).id,
-      });
-      
-      // Force invalidate and refetch all incidents-related queries
-      await queryClient.invalidateQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
+      const { formProps, saveButtonProps, queryResult } = useForm({
+        resource: 'incidents',
+        onMutationSuccess: async (data) => {
+          // Use Refine's useInvalidate for proper cache invalidation (same as children)
+          invalidate({
+            resource: "incidents",
+            invalidates: ["list"],
+          });
+
+          // Also invalidate the specific incident data
+          invalidate({
+            resource: "incidents",
+            invalidates: ["detail"],
+            id: (data as any).id,
+          });
+
+          open?.({
+            type: "success",
+            message: "Incidente actualizado exitosamente",
+            description: "Los cambios se han guardado correctamente",
+          });
+
+          // Navigate back to incidents list
+          setTimeout(() => {
+            go({
+              to: "/incidents",
+              type: "push",
+            });
+          }, 1000);
         },
       });
-      
-      // Force refetch all incidents queries
-      await queryClient.refetchQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
-        },
-      });
-      
-      message.success('Incidente actualizado exitosamente');
-      
-      // Navigate back to incidents list
-      setTimeout(() => {
-        go({
-          to: "/incidents",
-          type: "push",
-        });
-      }, 1000);
-    },
-  });
 
   const updateIncidentMutation = useUpdateIncident();
   const incidentData = queryResult?.data?.data;
@@ -99,9 +88,22 @@ export const IncidentsEdit: React.FC = () => {
 
   const handleFinish = async (values: any) => {
     try {
+      // Validate and format date using dayjs
+      let incidentDate: string;
+      if (values.incidentDate && dayjs(values.incidentDate).isValid()) {
+        incidentDate = dayjs(values.incidentDate).toISOString();
+      } else {
+        open?.({
+          type: "error",
+          message: "Error al actualizar el incidente",
+          description: "La fecha del incidente es requerida y debe ser válida",
+        });
+        return;
+      }
+
       const incidentData = {
         ...values,
-        incidentDate: values.incidentDate.toISOString(),
+        incidentDate,
       };
 
       await updateIncidentMutation.mutateAsync({
@@ -109,7 +111,11 @@ export const IncidentsEdit: React.FC = () => {
         data: incidentData,
       });
     } catch (error: any) {
-      message.error('Error al actualizar el incidente: ' + (error.response?.data?.message || error.message));
+      open?.({
+        type: "error",
+        message: "Error al actualizar el incidente",
+        description: error.response?.data?.message || error.message,
+      });
     }
   };
 

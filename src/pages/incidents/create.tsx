@@ -1,67 +1,31 @@
 import React, { useState } from 'react';
 import { Create, useForm } from '@refinedev/antd';
-import { Form, Input, Select, DatePicker, Row, Col, Typography, message } from 'antd';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useGo, useInvalidate } from '@refinedev/core';
+import { Form, Input, Select, DatePicker, Row, Col, Typography, Button } from 'antd';
+import { useQuery } from '@tanstack/react-query';
+import { useGo, useInvalidate, useNotification } from '@refinedev/core';
 import { axiosInstance } from '../../shared';
 import { useCreateIncident } from '../../domains/incidents';
+import { IncidentAttachmentsMultiple } from './attachments-multiple';
 import dayjs from 'dayjs';
+import 'dayjs/locale/es';
 
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
 export const IncidentsCreate: React.FC = () => {
-  const queryClient = useQueryClient();
   const go = useGo();
   const invalidate = useInvalidate();
+  const { open } = useNotification();
   
-  const { formProps, saveButtonProps } = useForm({
-    resource: 'incidents',
-    onMutationSuccess: async (data) => {
-      // Use Refine's useInvalidate for proper cache invalidation
-      invalidate({
-        resource: "incidents",
-        invalidates: ["list"],
-      });
-      
-      // Also invalidate the specific incident data
-      invalidate({
-        resource: "incidents",
-        invalidates: ["detail"],
-        id: (data as any).id,
-      });
-      
-      // Force invalidate and refetch all incidents-related queries
-      await queryClient.invalidateQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
-        },
-      });
-      
-      // Force refetch all incidents queries
-      await queryClient.refetchQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
-        },
-      });
-      
-      message.success('Incidente creado exitosamente');
-      
-      // Navigate back to incidents list
-      setTimeout(() => {
-        go({
-          to: "/incidents",
-          type: "push",
-        });
-      }, 1000);
-    },
-  });
-
   const createIncidentMutation = useCreateIncident();
   const [selectedChildId, setSelectedChildId] = useState<number | undefined>(undefined);
+  const [form] = Form.useForm();
+  const [attachments, setAttachments] = useState<any[]>([]);
+  const [createdIncidentId, setCreatedIncidentId] = useState<number | null>(null);
+
+  // Set dayjs locale
+  dayjs.locale('es');
 
   // Fetch children for the select
   const { data: childrenData, isLoading: childrenLoading } = useQuery({
@@ -85,14 +49,84 @@ export const IncidentsCreate: React.FC = () => {
 
   const handleFinish = async (values: any) => {
     try {
+      console.log('🔍 handleFinish - values:', values);
+      console.log('🔍 handleFinish - incidentDate:', values.incidentDate);
+      console.log('🔍 handleFinish - incidentDate type:', typeof values.incidentDate);
+      
+      // Validate and format date using dayjs
+      let incidentDate: string;
+      
+      // Check if incidentDate exists and is valid
+      if (!values.incidentDate) {
+        console.log('🔍 handleFinish - no incidentDate provided');
+        open?.({
+          type: "error",
+          message: "Error al crear el incidente",
+          description: "La fecha del incidente es requerida",
+        });
+        return;
+      }
+      
+      // Try to parse the date
+      const parsedDate = dayjs(values.incidentDate);
+      if (!parsedDate.isValid()) {
+        console.log('🔍 handleFinish - invalid date format:', values.incidentDate);
+        open?.({
+          type: "error",
+          message: "Error al crear el incidente",
+          description: "La fecha del incidente no es válida",
+        });
+        return;
+      }
+      
+      incidentDate = parsedDate.toISOString();
+      console.log('🔍 handleFinish - formatted incidentDate:', incidentDate);
+
       const incidentData = {
         ...values,
-        incidentDate: values.incidentDate.toISOString(),
+        incidentDate,
       };
 
-      await createIncidentMutation.mutateAsync(incidentData);
+          await createIncidentMutation.mutateAsync(incidentData, {
+            onSuccess: async (data) => {
+              console.log('🔍 Create success - data:', data);
+
+              // Set the created incident ID to enable attachments
+              setCreatedIncidentId((data as any).id);
+
+              // Use Refine's useInvalidate for proper cache invalidation (same as children)
+              invalidate({
+                resource: "incidents",
+                invalidates: ["list"],
+              });
+
+              // Also invalidate the specific incident data
+              invalidate({
+                resource: "incidents",
+                invalidates: ["detail"],
+                id: (data as any).id,
+              });
+
+              open?.({
+                type: "success",
+                message: "Incidente creado exitosamente",
+                description: "El incidente ha sido registrado correctamente. Ahora puedes agregar adjuntos.",
+              });
+            },
+            onError: (error: any) => {
+              open?.({
+                type: "error",
+                message: "Error al crear el incidente",
+                description: error.response?.data?.message || error.message,
+              });
+            }
+          });
     } catch (error: any) {
-      message.error('Error al crear el incidente: ' + (error.response?.data?.message || error.message));
+      open?.({
+        type: "error",
+        message: "Error al crear el incidente",
+        description: error.response?.data?.message || error.message,
+      });
     }
   };
 
@@ -100,17 +134,22 @@ export const IncidentsCreate: React.FC = () => {
     <Create
       title="Crear Incidente"
       saveButtonProps={{
-        ...saveButtonProps,
-        onClick: () => formProps.form?.submit(),
+        loading: createIncidentMutation.isPending,
+        onClick: () => {
+          // Submit the form using Antd's form instance
+          form.submit();
+        },
+        style: createdIncidentId ? { display: 'none' } : {},
       }}
     >
       <Form
-        {...formProps}
+        form={form}
         layout="vertical"
         onFinish={handleFinish}
         initialValues={{
           incidentDate: dayjs(),
         }}
+        disabled={!!createdIncidentId}
       >
         <Row gutter={16}>
           <Col span={12}>
@@ -126,7 +165,7 @@ export const IncidentsCreate: React.FC = () => {
                 notFoundContent={childrenLoading ? "Cargando..." : "No hay niños disponibles"}
                 onChange={(value) => setSelectedChildId(value)}
                 filterOption={(input, option) =>
-                  (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                  (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
                 }
               >
                 {(childrenData?.data || []).map((child: any) => (
@@ -199,6 +238,20 @@ export const IncidentsCreate: React.FC = () => {
               label="Fecha y Hora del Incidente"
               name="incidentDate"
               rules={[{ required: true, message: 'Por favor seleccione la fecha y hora del incidente' }]}
+              getValueFromEvent={(date) => {
+                console.log("🔍 DatePicker getValueFromEvent:", date);
+                return date;
+              }}
+              getValueProps={(value) => {
+                console.log("🔍 DatePicker getValueProps:", value, typeof value);
+                if (!value) return { value: null };
+                if (dayjs.isDayjs(value)) return { value };
+                if (typeof value === 'string') {
+                  const dayjsValue = dayjs(value);
+                  return { value: dayjsValue.isValid() ? dayjsValue : null };
+                }
+                return { value: null };
+              }}
             >
               <DatePicker
                 showTime
@@ -235,6 +288,31 @@ export const IncidentsCreate: React.FC = () => {
           </Col>
         </Row>
       </Form>
+
+      {/* Attachments Section - Only show after incident is created */}
+      {createdIncidentId && (
+        <div style={{ marginTop: 24 }}>
+          <IncidentAttachmentsMultiple
+            incidentId={createdIncidentId}
+            onAttachmentsChange={setAttachments}
+          />
+          
+          <div style={{ marginTop: 16, textAlign: 'right' }}>
+            <Button
+              type="primary"
+              onClick={() => {
+                // Navigate back to incidents list
+                go({
+                  to: "/incidents",
+                  type: "push",
+                });
+              }}
+            >
+              Finalizar y volver a la lista
+            </Button>
+          </div>
+        </div>
+      )}
     </Create>
   );
 };

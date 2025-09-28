@@ -1,95 +1,91 @@
-import React from 'react';
-import { List, useTable, EditButton, DeleteButton, ShowButton, CreateButton } from '@refinedev/antd';
+import React, { useState } from 'react';
+import { List, EditButton, DeleteButton, ShowButton, CreateButton, useTable } from '@refinedev/antd';
 import { Table, Space, Tag, Button, Tooltip, Image, Typography } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, BellOutlined } from '@ant-design/icons';
-import { useIncidents, useMarkParentNotified, useDeleteIncident } from '../../domains/incidents';
+import { useIncidents, useDeleteIncident } from '../../domains/incidents';
 import { getSeverityColor, getSeverityLabel, formatIncidentDate, getIncidentStatus, getAttachmentUrl } from '../../domains/incidents';
-import { useQueryClient } from '@tanstack/react-query';
-import { useInvalidate } from '@refinedev/core';
-import { message } from 'antd';
+import { useInvalidate, useCustomMutation, useNotification } from '@refinedev/core';
 
 const { Text } = Typography;
 
 export const IncidentsList: React.FC = () => {
   const { tableProps } = useTable({
-    resource: 'incidents',
-    pagination: {
-      current: 1,
-      pageSize: 10,
+    syncWithLocation: false,
+    sorters: {
+      initial: [
+        {
+          field: "id",
+          order: "desc",
+        },
+      ],
     },
   });
 
-  const queryClient = useQueryClient();
   const invalidate = useInvalidate();
-  const markParentNotifiedMutation = useMarkParentNotified();
+  const { open } = useNotification();
+  const markParentNotifiedMutation = useCustomMutation();
   const deleteIncidentMutation = useDeleteIncident();
 
   const handleMarkParentNotified = async (incidentId: number) => {
     try {
-      await markParentNotifiedMutation.mutateAsync({ incidentId });
-      message.success('Incidente marcado como notificado a padres');
+      console.log('🔍 Mark parent notified - incidentId:', incidentId);
       
-      // Use Refine's useInvalidate for proper cache invalidation
+      await markParentNotifiedMutation.mutateAsync({
+        url: '/incidents/mark-parent-notified',
+        method: 'post',
+        values: { incidentId },
+        successNotification: false,
+      });
+      
+      console.log('🔍 Mark parent notified - mutation successful');
+
+      // Use Refine's useInvalidate for proper cache invalidation (same as children)
       invalidate({
         resource: "incidents",
         invalidates: ["list"],
       });
       
-      // Also invalidate the specific incident data
-      invalidate({
-        resource: "incidents",
-        invalidates: ["detail"],
-        id: incidentId,
-      });
-      
-      // Force invalidate and refetch all incidents-related queries
-      await queryClient.invalidateQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
-        },
-      });
-      
-      // Force refetch all incidents queries
-      await queryClient.refetchQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
-        },
+      open?.({
+        type: "success",
+        message: "Incidente marcado como notificado a padres",
+        description: "El padre ha sido notificado correctamente",
       });
     } catch (error) {
-      message.error('Error al marcar como notificado');
+      console.log('🔍 Mark parent notified - error:', error);
+      open?.({
+        type: "error",
+        message: "Error al marcar como notificado",
+        description: "No se pudo notificar al padre. Intenta nuevamente.",
+      });
     }
   };
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteIncidentMutation.mutateAsync(id);
-      message.success('Incidente eliminado exitosamente');
+      console.log('🔍 Delete incident - id:', id);
       
-      // Use Refine's useInvalidate for proper cache invalidation
+      await deleteIncidentMutation.mutateAsync(id);
+      
+      console.log('🔍 Delete incident - mutation successful');
+
+      // Use Refine's useInvalidate for proper cache invalidation (same as children)
       invalidate({
         resource: "incidents",
         invalidates: ["list"],
       });
       
-      // Force invalidate and refetch all incidents-related queries
-      await queryClient.invalidateQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
-        },
-      });
-      
-      // Force refetch all incidents queries
-      await queryClient.refetchQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
-        },
+      open?.({
+        type: "success",
+        message: "Incidente eliminado exitosamente",
+        description: "El incidente ha sido eliminado correctamente",
       });
     } catch (error) {
-      message.error('Error al eliminar el incidente');
+      console.log('🔍 Delete incident - error:', error);
+      open?.({
+        type: "error",
+        message: "Error al eliminar el incidente",
+        description: "No se pudo eliminar el incidente. Intenta nuevamente.",
+      });
     }
   };
 
@@ -209,7 +205,6 @@ export const IncidentsList: React.FC = () => {
                 size="small"
                 icon={<BellOutlined />}
                 onClick={() => handleMarkParentNotified(record.id)}
-                loading={markParentNotifiedMutation.isPending}
               />
             </Tooltip>
           )}
@@ -217,7 +212,6 @@ export const IncidentsList: React.FC = () => {
             hideText
             size="small"
             recordItemId={record.id}
-            onConfirm={() => handleDelete(record.id)}
             confirmTitle="¿Está seguro de que desea eliminar este incidente?"
             confirmOkText="Sí, eliminar"
             confirmCancelText="Cancelar"
@@ -241,13 +235,6 @@ export const IncidentsList: React.FC = () => {
         columns={columns}
         rowKey="id"
         scroll={{ x: 1200 }}
-        pagination={{
-          ...tableProps.pagination,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} de ${total} incidentes`,
-        }}
       />
     </List>
   );

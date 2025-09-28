@@ -70,9 +70,9 @@ export const stableFixedDataProvider: DataProvider = {
     // Crear clave única para el cache
     const cacheKey = `${resource}-${JSON.stringify(params)}`;
     
-    // Verificar cache
+    // Verificar cache - deshabilitado temporalmente para incidents
     const cached = requestCache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION && !resource.includes('incidents')) {
       console.log('Using cached data for:', resource);
       return cached.data;
     }
