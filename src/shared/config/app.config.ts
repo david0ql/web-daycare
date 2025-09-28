@@ -65,16 +65,6 @@ export const appResources: ResourceProps[] = [
     },
   },
   {
-    name: "messaging",
-    list: "/messaging",
-    create: "/messaging/create",
-    show: "/messaging/show/:id",
-    meta: {
-      label: "Mensajes",
-      icon: "💬",
-    },
-  },
-  {
     name: "reports",
     list: "/reports",
     meta: {

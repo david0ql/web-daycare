@@ -7,7 +7,6 @@ import {
   FileTextOutlined,
   CalendarOutlined,
   WarningOutlined,
-  MessageOutlined,
   BarChartOutlined,
   DashboardOutlined,
   LogoutOutlined,
@@ -167,25 +166,6 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           icon: <UserAddOutlined />,
           label: "Subir Documento",
           path: "/documents/create",
-        }] : []),
-      ],
-    },
-    {
-      key: "messaging",
-      icon: <MessageOutlined />,
-      label: "Mensajes",
-      children: [
-        {
-          key: "/messaging",
-          icon: <MessageOutlined />,
-          label: "Bandeja de Entrada",
-          path: "/messaging",
-        },
-        ...((isAdmin() || isEducator()) ? [{
-          key: "/messaging/create",
-          icon: <UserAddOutlined />,
-          label: "Nuevo Mensaje",
-          path: "/messaging/create",
         }] : []),
       ],
     },

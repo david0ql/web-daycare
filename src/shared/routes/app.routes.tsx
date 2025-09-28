@@ -20,7 +20,6 @@ import { AttendanceList, AttendanceCreate, AttendanceShow, AttendanceEdit } from
 import { IncidentList, IncidentCreate, IncidentEdit, IncidentShow } from "../../pages/incidents";
 import { CalendarListPage, CalendarCreate, CalendarEdit } from "../../pages/calendar";
 import { DocumentList, DocumentCreate, DocumentShow } from "../../pages/documents";
-import { MessageList, MessageCreate, MessageShow } from "../../pages/messaging";
 import { ReportList } from "../../pages/reports";
 
 
@@ -95,12 +94,6 @@ export const AppRoutes: React.FC = () => {
           <Route path="show/:id" element={<DocumentShow />} />
         </Route>
 
-        {/* Messaging */}
-        <Route path="/messaging">
-          <Route index element={<MessageList />} />
-          <Route path="create" element={<MessageCreate />} />
-          <Route path="show/:id" element={<MessageShow />} />
-        </Route>
 
         {/* Reports */}
         <Route path="/reports">
