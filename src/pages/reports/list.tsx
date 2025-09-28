@@ -137,7 +137,7 @@ export const ReportList: React.FC = () => {
             <RangePicker
               value={dateRange}
               onChange={setDateRange}
-              format="DD/MM/YYYY"
+              format="YYYY-MM-DD"
               placeholder={['Fecha inicio', 'Fecha fin']}
               style={{ marginTop: '8px' }}
             />
