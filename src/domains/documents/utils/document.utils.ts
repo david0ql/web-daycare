@@ -77,7 +77,7 @@ export const canUploadMultiple = (documentType: DocumentType): boolean => {
 // Obtener URL del documento
 export const getDocumentUrl = (filename: string): string => {
   const token = localStorage.getItem('refine-auth');
-  return `http://localhost:30000/api/static/files/documents/${filename}/simple?token=${token}`;
+  return `https://api.thechildrenworld.com/api/static/files/documents/${filename}/simple?token=${token}`;
 };
 
 // Verificar si un documento está próximo a expirar

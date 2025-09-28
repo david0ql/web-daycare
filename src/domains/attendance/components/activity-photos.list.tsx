@@ -28,7 +28,7 @@ export const ActivityPhotosList: React.FC<ActivityPhotosListProps> = ({
 
   const getImageUrl = (photo: ActivityPhoto) => {
     // Assuming the API serves images from a static route
-    return `http://localhost:30000/uploads/activity-photos/${photo.filename}`;
+    return `https://api.thechildrenworld.com/uploads/activity-photos/${photo.filename}`;
   };
 
   if (isLoading) {

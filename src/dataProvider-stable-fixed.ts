@@ -240,11 +240,11 @@ export const stableFixedDataProvider: DataProvider = {
     }
   },
 
-  getApiUrl: () => axiosInstance.defaults.baseURL || "http://localhost:30000/api",
+  getApiUrl: () => axiosInstance.defaults.baseURL || "https://api.thechildrenworld.com/api",
 
   custom: async ({ url, method, payload, meta }) => {
     let requestUrl = url;
-    const baseURL = axiosInstance.defaults.baseURL || "http://localhost:30000/api";
+    const baseURL = axiosInstance.defaults.baseURL || "https://api.thechildrenworld.com/api";
     if (url.startsWith(baseURL)) {
       requestUrl = url.replace(baseURL, '');
     }

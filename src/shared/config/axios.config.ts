@@ -9,7 +9,7 @@ declare module 'axios' {
   }
 }
 
-const API_URL = "http://localhost:30000/api";
+const API_URL = "https://api.thechildrenworld.com/api";
 const TOKEN_KEY = "refine-auth";
 
 // Create axios instance

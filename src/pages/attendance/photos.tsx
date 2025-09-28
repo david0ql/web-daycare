@@ -34,7 +34,7 @@ export const AttendancePhotos: React.FC = () => {
   const getImageUrl = (record: any) => {
     // Use axiosInstance to get the image with JWT token
     const token = localStorage.getItem('refine-auth');
-    return `http://localhost:30000/api/uploads/activity-photos/${record.filename}?token=${token}`;
+    return `https://api.thechildrenworld.com/api/uploads/activity-photos/${record.filename}?token=${token}`;
   };
 
   return (

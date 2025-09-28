@@ -118,13 +118,13 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
   const handlePreview = (attachment: Attachment) => {
     if (attachment.fileType === 'image') {
       const token = localStorage.getItem('refine-auth');
-      const imageUrl = `http://localhost:30000/api/uploads/incident-attachments/${attachment.filename}?token=${token}`;
+      const imageUrl = `https://api.thechildrenworld.com/api/uploads/incident-attachments/${attachment.filename}?token=${token}`;
       setPreviewImage(imageUrl);
       setPreviewVisible(true);
     } else {
       // For documents, you might want to open in a new tab or download
       const token = localStorage.getItem('refine-auth');
-      const fileUrl = `http://localhost:30000/api/uploads/incident-attachments/${attachment.filename}?token=${token}`;
+      const fileUrl = `https://api.thechildrenworld.com/api/uploads/incident-attachments/${attachment.filename}?token=${token}`;
       window.open(fileUrl, '_blank');
     }
   };

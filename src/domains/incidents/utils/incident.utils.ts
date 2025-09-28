@@ -71,5 +71,5 @@ export const getFileTypeLabel = (fileType: 'image' | 'document') => {
 
 export const getAttachmentUrl = (filePath: string) => {
   const token = localStorage.getItem('refine-auth');
-  return `http://localhost:30000/api/uploads/incident-attachments/${filePath.split('/').pop()}?token=${token}`;
+  return `https://api.thechildrenworld.com/api/uploads/incident-attachments/${filePath.split('/').pop()}?token=${token}`;
 };

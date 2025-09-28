@@ -48,7 +48,7 @@ Antes de comenzar, asegúrate de tener instalado:
    ```
 
 3. **Configura la API**:
-   - Asegúrate de que tu API de NestJS esté ejecutándose en `http://localhost:30000`
+   - Asegúrate de que tu API de NestJS esté ejecutándose en `https://api.thechildrenworld.com`
    - Verifica que la API tenga configurado CORS para permitir conexiones desde el frontend
    - La API debe tener los siguientes endpoints disponibles:
      - `/api/auth/*` - Autenticación
@@ -142,7 +142,7 @@ La URL de la API está configurada en:
 - `src/authProvider.ts`
 - `src/dataProvider.ts`
 
-Actualmente configurada para: `http://localhost:30000/api`
+Actualmente configurada para: `https://api.thechildrenworld.com/api`
 
 ### Personalización de Temas
 El tema de Ant Design se puede personalizar en `src/App.tsx`:

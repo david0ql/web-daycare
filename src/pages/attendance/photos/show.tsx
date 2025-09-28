@@ -12,7 +12,7 @@ export const AttendancePhotosShow: React.FC = () => {
   const record = data?.data;
 
   const getImageUrl = (record: any) => {
-    return `http://localhost:30000/api/uploads/activity-photos/${record.filename}`;
+    return `https://api.thechildrenworld.com/api/uploads/activity-photos/${record.filename}`;
   };
 
   return (
