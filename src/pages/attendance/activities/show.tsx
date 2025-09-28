@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 const { Title, Text } = Typography;
 
 export const AttendanceActivitiesShow: React.FC = () => {
-  const { data, isLoading } = useShow();
+  const { data, isLoading } = useShow() as any;
   const record = data?.data;
 
   const getActivityStatus = () => {

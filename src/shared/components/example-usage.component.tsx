@@ -11,7 +11,7 @@ const { Title, Text } = Typography;
  * Componente de ejemplo que demuestra el uso de todos los hooks de Refine
  * implementados con las mejores prácticas
  */
-export const ExampleUsageComponent: React.FC = () => {
+export const ExampleUsage: React.FC = () => {
   // ===== HOOKS DE AUTENTICACIÓN =====
   const { 
     user, 
@@ -46,12 +46,19 @@ export const ExampleUsageComponent: React.FC = () => {
   } = useAppNavigation();
 
   // ===== USO DE HOOKS DE DATOS =====
-  const { data: users, isLoading: usersLoading } = useDataList("users");
-  const { data: children, isLoading: childrenLoading } = useDataList("children");
+  const { result: usersResult, query: usersQuery } = useDataList("users");
+  const { result: childrenResult, query: childrenQuery } = useDataList("children");
+  const usersLoading = usersQuery.isLoading;
+  const childrenLoading = childrenQuery.isLoading;
+  const users = usersResult?.data || [];
+  const children = childrenResult?.data || [];
   
-  const { create: createUser, isLoading: createUserLoading } = useDataCreate("users");
-  const { update: updateUser, isLoading: updateUserLoading } = useDataUpdate("users");
-  const { delete: deleteUser, isLoading: deleteUserLoading } = useDataDelete("users");
+  const { create: createUser, mutation: createUserMutation } = useDataCreate("users");
+  const { update: updateUser, mutation: updateUserMutation } = useDataUpdate("users");
+  const { delete: deleteUser, mutation: deleteUserMutation } = useDataDelete("users");
+  const createUserLoading = createUserMutation.isPending;
+  const updateUserLoading = updateUserMutation.isPending;
+  const deleteUserLoading = deleteUserMutation.isPending;
 
   // ===== FUNCIONES DE EJEMPLO =====
   
@@ -219,7 +226,7 @@ export const ExampleUsageComponent: React.FC = () => {
       {/* Lista de Usuarios */}
       <Card title="Lista de Usuarios" loading={usersLoading}>
         <List
-          dataSource={users?.data || []}
+          dataSource={users || []}
           renderItem={(user: any) => (
             <List.Item
               actions={[
@@ -259,7 +266,7 @@ export const ExampleUsageComponent: React.FC = () => {
       {/* Lista de Niños */}
       <Card title="Lista de Niños" loading={childrenLoading}>
         <List
-          dataSource={children?.data || []}
+          dataSource={children || []}
           renderItem={(child: any) => (
             <List.Item
               actions={[

@@ -16,11 +16,12 @@ import {
 const { Title, Text } = Typography;
 
 export const DocumentShow: React.FC = () => {
-  const { data, isLoading } = useOne({
+  const { result: documentData, query: documentQuery } = useOne({
     resource: 'documents',
-  });
+  }) as any;
+  const isLoading = documentQuery.isLoading;
 
-  const document = data?.data;
+  const document = documentData;
 
   const handleDownload = () => {
     if (document) {

@@ -1,4 +1,8 @@
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+// Extend dayjs with plugins
+dayjs.extend(relativeTime);
 
 export class DateUtils {
   static formatDate(date: string | Date, format: string = 'DD/MM/YYYY'): string {

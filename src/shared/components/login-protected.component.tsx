@@ -12,7 +12,7 @@ interface LoginProtectedProps {
  */
 export const LoginProtected: React.FC<LoginProtectedProps> = ({ children }) => {
   return (
-    <Authenticated fallback={children} redirectOnFail="/">
+    <Authenticated fallback={children} redirectOnFail="/" key="login-protected">
       <Navigate to="/" replace />
     </Authenticated>
   );

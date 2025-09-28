@@ -84,7 +84,6 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
                     </Text>
                     <Tag
                       color={CalendarUtils.getEventTypeColor(event.eventType)}
-                      size="small"
                     >
                       {CalendarUtils.getEventTypeLabel(event.eventType)}
                     </Tag>
@@ -106,7 +105,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
                         </div>
                       )}
                       {event.isAllDay && (
-                        <Tag size="small" style={{ fontSize: '10px' }}>
+                        <Tag style={{ fontSize: '10px' }}>
                           Todo el día
                         </Tag>
                       )}

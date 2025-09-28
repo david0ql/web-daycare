@@ -24,7 +24,8 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
   const [form] = Form.useForm();
   const [isAllDay, setIsAllDay] = useState(true);
   
-  const { mutate: createEvent, isLoading } = useCreate();
+  const { mutate: createEvent, mutation } = useCreate();
+  const isLoading = mutation.isPending;
 
   const handleSubmit = (values: any) => {
     const eventData: CreateCalendarEventData = {

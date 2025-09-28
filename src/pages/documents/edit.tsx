@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Edit, useForm } from '@refinedev/antd';
 import { Form, Input, Select, DatePicker, Row, Col, Typography } from 'antd';
 import { useQuery } from '@tanstack/react-query';
-import { useGo, useInvalidate, useNotification } from '@refinedev/core';
+import { useGo, useInvalidate, useNotification, useOne } from '@refinedev/core';
 import { axiosInstance } from '../../shared';
 import { useUpdateDocument } from '../../domains/documents';
 import dayjs from 'dayjs';
@@ -15,7 +15,7 @@ export const DocumentEdit: React.FC = () => {
   const invalidate = useInvalidate();
   const { open } = useNotification();
 
-  const { formProps, saveButtonProps, queryResult } = useForm({
+  const { formProps, saveButtonProps } = useForm({
     resource: 'documents',
     onMutationSuccess: async (data) => {
       // Use Refine's useInvalidate for proper cache invalidation (same as children)
@@ -48,7 +48,12 @@ export const DocumentEdit: React.FC = () => {
   });
 
   const updateDocumentMutation = useUpdateDocument();
-  const documentData = queryResult?.data?.data;
+  
+  // Get document data using useOne
+  const { result: documentData, query: documentQuery } = useOne({
+    resource: 'documents',
+  }) as any;
+  const documentLoading = documentQuery.isLoading;
 
   // Fetch children for the select
   const { data: childrenData, isLoading: childrenLoading } = useQuery({
@@ -107,7 +112,7 @@ export const DocumentEdit: React.FC = () => {
     }
   };
 
-  if (queryResult?.isLoading) {
+  if (documentLoading) {
     return <div>Cargando...</div>;
   }
 
@@ -137,7 +142,7 @@ export const DocumentEdit: React.FC = () => {
                 loading={childrenLoading}
                 notFoundContent={childrenLoading ? "Cargando..." : "No hay niños disponibles"}
                 filterOption={(input, option) =>
-                  (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                  String(option?.children || "").toLowerCase().includes(input.toLowerCase())
                 }
               >
                 {(childrenData?.data || []).map((child: any) => (
@@ -161,7 +166,7 @@ export const DocumentEdit: React.FC = () => {
                 notFoundContent={documentTypesLoading ? "Cargando..." : "No hay tipos de documento disponibles"}
                 showSearch
                 filterOption={(input, option) =>
-                  (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                  String(option?.children || "").toLowerCase().includes(input.toLowerCase())
                 }
               >
                 {(documentTypesData?.data || []).map((type: any) => (

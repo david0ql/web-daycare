@@ -76,10 +76,10 @@ export const AttendanceCreate: React.FC = () => {
   const { data: authorizedPersons, isLoading: loadingAuthorizedPersons, error: authorizedPersonsError } = useAuthorizedPickupPersons(selectedChild?.id);
 
   // Check-in mutation
-  const { mutate: checkIn, isLoading: checkingIn } = useCheckIn();
+  const { mutate: checkIn, isPending: checkingIn } = useCheckIn();
 
   // Check-out mutation
-  const { mutate: checkOut, isLoading: checkingOut } = useCheckOut();
+  const { mutate: checkOut, isPending: checkingOut } = useCheckOut();
 
   // Filter active children
   const children = (childrenData?.data || []);
@@ -98,7 +98,7 @@ export const AttendanceCreate: React.FC = () => {
     checkIn({
       childId: values.childId,
       deliveredBy: values.deliveredBy,
-      checkInNotes: values.checkInNotes,
+      notes: values.checkInNotes,
     }, {
       onSuccess: () => {
         message.success("Check-in exitoso. El niño ha sido registrado correctamente.");
@@ -136,7 +136,7 @@ export const AttendanceCreate: React.FC = () => {
   };
 
   const handleChildSelect = (childId: number) => {
-    const child = (children || []).find((c) => c.id === childId);
+    const child = (children || []).find((c: any) => c.id === childId);
     setSelectedChild(child || null);
   };
 
@@ -162,9 +162,9 @@ export const AttendanceCreate: React.FC = () => {
               optionFilterProp="children"
               onChange={handleChildSelect}
               filterOption={(input, option) =>
-                (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                String(option?.label ?? "").toLowerCase().includes(input.toLowerCase())
               }
-              options={(children || []).map((child) => ({
+              options={(children || []).map((child: any) => ({
                 label: `${child.firstName} ${child.lastName}`,
                 value: child.id,
               }))}
@@ -203,7 +203,7 @@ export const AttendanceCreate: React.FC = () => {
               disabled={!selectedChild}
               loading={loadingAuthorizedPersons}
               filterOption={(input, option) =>
-                (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                String(option?.label ?? "").toLowerCase().includes(input.toLowerCase())
               }
               options={(authorizedPersons || []).map((person) => ({
                 label: `${person.name} (${person.relationship})`,
@@ -258,9 +258,9 @@ export const AttendanceCreate: React.FC = () => {
               optionFilterProp="children"
               onChange={handleChildSelect}
               filterOption={(input, option) =>
-                (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                String(option?.label ?? "").toLowerCase().includes(input.toLowerCase())
               }
-              options={(children || []).map((child) => ({
+              options={(children || []).map((child: any) => ({
                 label: `${child.firstName} ${child.lastName}`,
                 value: child.id,
               }))}
@@ -299,7 +299,7 @@ export const AttendanceCreate: React.FC = () => {
               disabled={!selectedChild}
               loading={loadingAuthorizedPersons}
               filterOption={(input, option) =>
-                (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                String(option?.label ?? "").toLowerCase().includes(input.toLowerCase())
               }
               options={(authorizedPersons || []).map((person) => ({
                 label: `${person.name} (${person.relationship})`,

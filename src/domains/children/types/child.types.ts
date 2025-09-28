@@ -108,6 +108,17 @@ export interface UpdateChildData extends Partial<CreateChildData> {
   id: number;
 }
 
+// Aliases for backward compatibility
+export type CreateChildRequest = CreateChildData;
+export type UpdateChildRequest = UpdateChildData;
+
+export interface ChildListResponse {
+  data: Child[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export interface AvailableParent {
   id: number;
   name: string;

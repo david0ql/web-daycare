@@ -33,7 +33,7 @@ export const useAppNavigation = () => {
     try {
       go({ to: path, ...options });
     } catch (error) {
-      openNotification({
+      openNotification?.({
         type: "error",
         message: "Error de navegación",
         description: "No se pudo navegar a la ruta solicitada",
@@ -97,7 +97,7 @@ export const useAppNavigation = () => {
     try {
       back();
     } catch (error) {
-      openNotification({
+      openNotification?.({
         type: "error",
         message: "Error de navegación",
         description: "No se pudo volver atrás",
@@ -174,7 +174,7 @@ export const useAppNavigation = () => {
    * Obtiene los query parameters
    */
   const getCurrentQuery = () => {
-    return parsed?.query || {};
+    return (parsed as any)?.query || {};
   };
 
   /**
@@ -239,8 +239,8 @@ export const useAppNavigation = () => {
     if (hasPermission) {
       navigateTo(path, options);
     } else {
-      openNotification({
-        type: "warning",
+      openNotification?.({
+        type: "error",
         message: "Acceso denegado",
         description: "No tienes permisos para acceder a esta sección",
       });
@@ -265,7 +265,7 @@ export const useAppNavigation = () => {
   
   const currentPath = useMemo(() => getCurrentPath(), [parsed?.pathname]);
   const currentParams = useMemo(() => getCurrentParams(), [parsed?.params]);
-  const currentQuery = useMemo(() => getCurrentQuery(), [parsed?.query]);
+  const currentQuery = useMemo(() => getCurrentQuery(), [(parsed as any)?.query]);
   const currentResource = useMemo(() => getCurrentResource(), [currentPath]);
   const currentResourceId = useMemo(() => getCurrentResourceId(), [currentParams]);
 

@@ -141,7 +141,7 @@ export const AttendanceList: React.FC = () => {
     {
       title: "Notas",
       key: "notes",
-      render: (_, record: any) => {
+      render: (_: any, record: any) => {
         const checkInNotes = record.checkInNotes || 'N/A';
         const checkOutNotes = record.checkOutNotes || 'N/A';
         const notesText = `Check-in: ${checkInNotes} / Check-out: ${checkOutNotes}`;
@@ -158,7 +158,7 @@ export const AttendanceList: React.FC = () => {
     {
       title: "Acciones",
       key: "actions",
-      render: (_, record: any) => {
+      render: (_: any, record: any) => {
         console.log("🔍 Attendance List - record for actions:", record);
         console.log("🔍 Attendance List - record.id:", record.id);
         return (

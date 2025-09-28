@@ -10,10 +10,10 @@ import { IncidentAttachments } from './attachments';
 const { Title, Text, Paragraph } = Typography;
 
 export const IncidentsShow: React.FC = () => {
-  const { data, isLoading } = useOne({
+  const { result: incident, query: incidentQuery } = useOne({
     resource: 'incidents',
-  });
-  const incident = data?.data;
+  }) as any;
+  const isLoading = incidentQuery.isLoading;
 
   const queryClient = useQueryClient();
   const markParentNotifiedMutation = useMarkParentNotified();
@@ -66,7 +66,6 @@ export const IncidentsShow: React.FC = () => {
         <DeleteButton
           key="delete"
           icon={<DeleteOutlined />}
-          onConfirm={handleDelete}
           confirmTitle="¿Está seguro de que desea eliminar este incidente?"
           confirmOkText="Sí, eliminar"
           confirmCancelText="Cancelar"

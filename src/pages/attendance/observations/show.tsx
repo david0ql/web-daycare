@@ -8,8 +8,7 @@ import dayjs from 'dayjs';
 const { Title, Text } = Typography;
 
 export const AttendanceObservationsShow: React.FC = () => {
-  const { queryResult } = useShow();
-  const { data, isLoading } = queryResult;
+  const { data, isLoading } = useShow() as any;
   const record = data?.data;
 
   const getMoodTag = (mood: string) => {

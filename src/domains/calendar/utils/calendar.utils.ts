@@ -1,9 +1,11 @@
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { CalendarEvent, EventTypeEnum, EVENT_TYPE_COLORS, EVENT_TYPE_LABELS } from '../types/calendar.types';
 
 // Extend dayjs with plugins
 dayjs.extend(isBetween);
+dayjs.extend(isSameOrBefore);
 
 export class CalendarUtils {
   /**

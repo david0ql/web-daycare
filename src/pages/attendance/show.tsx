@@ -8,8 +8,7 @@ import { AttendanceDetailsTabs } from "../../domains/attendance";
 const { Title, Text } = Typography;
 
 export const AttendanceShow: React.FC = () => {
-  const { queryResult } = useShow();
-  const { data, isLoading } = queryResult;
+  const { data, isLoading } = useShow() as any;
   const record = data?.data;
 
   const getStatusTag = () => {

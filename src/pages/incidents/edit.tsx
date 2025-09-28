@@ -168,7 +168,7 @@ export const IncidentsEdit: React.FC = () => {
     formProps.onFinish?.(updateData);
   };
 
-  if (formProps.loading) {
+  if (saveButtonProps.disabled) {
     return <div>Cargando...</div>;
   }
 
@@ -199,7 +199,7 @@ export const IncidentsEdit: React.FC = () => {
                 loading={childrenLoading}
                 notFoundContent={childrenLoading ? "Cargando..." : "No hay niños disponibles"}
                 filterOption={(input, option) =>
-                  (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                  String(option?.children || "").toLowerCase().includes(input.toLowerCase())
                 }
               >
                 {(childrenData?.data || []).map((child: any) => (
@@ -326,7 +326,6 @@ export const IncidentsEdit: React.FC = () => {
       {/* Attachments Section */}
       {incidentData?.id && (
         <div style={{ marginTop: 24 }}>
-          {console.log('🔍 Rendering attachments with:', { incidentId: incidentData.id, attachments })}
           <IncidentAttachmentsMultiple
             incidentId={incidentData.id}
             initialAttachments={attachments}

@@ -26,7 +26,7 @@ export const useData = () => {
   // ===== FUNCIONES DE NOTIFICACIÓN =====
   
   const showSuccessNotification = (message: string, description?: string) => {
-    openNotification({
+    openNotification?.({
       type: "success",
       message,
       description,
@@ -34,7 +34,7 @@ export const useData = () => {
   };
 
   const showErrorNotification = (message: string, description?: string) => {
-    openNotification({
+    openNotification?.({
       type: "error",
       message,
       description,
@@ -53,7 +53,7 @@ export const useData = () => {
     });
 
     // Manejo de errores
-    if (result.isError) {
+    if (result.query.isError) {
       showErrorNotification(
         "Error al cargar datos",
         `No se pudieron cargar los datos de ${resource}`
@@ -73,7 +73,7 @@ export const useData = () => {
       ...options,
     });
 
-    if (result.isError) {
+    if (result.query.isError) {
       showErrorNotification(
         "Error al cargar elemento",
         `No se pudo cargar el elemento de ${resource}`
@@ -93,7 +93,7 @@ export const useData = () => {
       ...options,
     });
 
-    if (result.isError) {
+    if (result.query.isError) {
       showErrorNotification(
         "Error al cargar elementos",
         `No se pudieron cargar los elementos de ${resource}`
@@ -155,7 +155,7 @@ export const useData = () => {
 
     const createManyWithNotification = async (values: any[]) => {
       try {
-        const response = await result.mutateAsync(values);
+        const response = await result.mutateAsync({ values });
         showSuccessNotification(
           "Elementos creados",
           `Se han creado ${values.length} elementos en ${resource} correctamente`
@@ -273,7 +273,7 @@ export const useData = () => {
 
     const deleteWithNotification = async (id: string | number) => {
       try {
-        const response = await result.mutateAsync({ id });
+        const response = await result.mutateAsync({ id, resource });
         showSuccessNotification(
           "Elemento eliminado",
           `Se ha eliminado el elemento de ${resource} correctamente`
@@ -311,7 +311,7 @@ export const useData = () => {
 
     const deleteManyWithNotification = async (ids: (string | number)[]) => {
       try {
-        const response = await result.mutateAsync({ ids });
+        const response = await result.mutateAsync({ ids, resource });
         showSuccessNotification(
           "Elementos eliminados",
           `Se han eliminado ${ids.length} elementos de ${resource} correctamente`
@@ -350,7 +350,7 @@ export const useData = () => {
       ...options,
     });
 
-    if (result.isError) {
+    if (result.query.isError) {
       showErrorNotification(
         "Error en operación personalizada",
         `No se pudo realizar la operación GET en ${url}`

@@ -106,8 +106,8 @@ export const Dashboard: React.FC = () => {
     absentToday: attendanceStats?.absentToday || 0,
   };
 
-  const checkedIn = attendanceStats?.checkedIn || attendanceRecords.filter((record: AttendanceRecord) => record.checkInTime).length;
-  const checkedOut = attendanceStats?.checkedOut || attendanceRecords.filter((record: AttendanceRecord) => record.checkOutTime).length;
+  const checkedIn = attendanceStats?.checkedIn || attendanceRecords.filter((record: any) => record.checkInTime).length;
+  const checkedOut = attendanceStats?.checkedOut || attendanceRecords.filter((record: any) => record.checkOutTime).length;
 
   return (
     <div style={{ padding: "24px" }}>
@@ -245,7 +245,7 @@ export const Dashboard: React.FC = () => {
           >
             <AntList
               dataSource={attendanceRecords.slice(0, 5)}
-              renderItem={(record: AttendanceRecord) => (
+              renderItem={(record: any) => (
                 <AntList.Item>
                   <AntList.Item.Meta
                     avatar={

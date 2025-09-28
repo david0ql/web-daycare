@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Row, Col, Button, DatePicker, Space, Typography, Divider, message } from 'antd';
 import { FileTextOutlined, DownloadOutlined, CalendarOutlined } from '@ant-design/icons';
 import { axiosInstance } from '../../shared';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/es';
 
 const { Title, Text } = Typography;
@@ -136,7 +136,7 @@ export const ReportList: React.FC = () => {
             <br />
             <RangePicker
               value={dateRange}
-              onChange={setDateRange}
+              onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs] | null)}
               format="YYYY-MM-DD"
               placeholder={['Fecha inicio', 'Fecha fin']}
               style={{ marginTop: '8px' }}

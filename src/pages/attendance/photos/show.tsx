@@ -7,8 +7,7 @@ import dayjs from 'dayjs';
 const { Title, Text } = Typography;
 
 export const AttendancePhotosShow: React.FC = () => {
-  const { queryResult } = useShow();
-  const { data, isLoading } = queryResult;
+  const { data, isLoading } = useShow() as any;
   const record = data?.data;
 
   const getImageUrl = (record: any) => {
