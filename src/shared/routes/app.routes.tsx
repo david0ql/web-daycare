@@ -36,7 +36,7 @@ import {
 } from "../../pages/attendance";
 import { IncidentsList, IncidentsCreate, IncidentsEdit, IncidentsShow } from "../../pages/incidents";
 import { CalendarListPage, CalendarCreate, CalendarEdit } from "../../pages/calendar";
-import { DocumentList, DocumentCreate, DocumentShow } from "../../pages/documents";
+import { DocumentList, DocumentCreate, DocumentEdit, DocumentShow } from "../../pages/documents";
 import { ReportList } from "../../pages/reports";
 
 
@@ -135,6 +135,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="/documents">
           <Route index element={<DocumentList />} />
           <Route path="create" element={<DocumentCreate />} />
+          <Route path="edit/:id" element={<DocumentEdit />} />
           <Route path="show/:id" element={<DocumentShow />} />
         </Route>
 

@@ -91,6 +91,7 @@ export const appResources: ResourceProps[] = [
     name: "documents",
     list: "/documents",
     create: "/documents/create",
+    edit: "/documents/edit/:id",
     show: "/documents/show/:id",
     meta: {
       label: "Documentos",
