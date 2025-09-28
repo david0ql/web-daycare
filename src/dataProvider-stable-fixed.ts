@@ -5,6 +5,20 @@ import { axiosInstance } from "./shared";
 const requestCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 30000; // 30 segundos
 
+// Función para limpiar el cache
+export const clearDataProviderCache = (resource?: string) => {
+  if (resource) {
+    // Limpiar cache específico para un resource
+    const keysToDelete = Array.from(requestCache.keys()).filter(key => key.includes(resource));
+    keysToDelete.forEach(key => requestCache.delete(key));
+    console.log(`🧹 Cleared cache for resource: ${resource}`);
+  } else {
+    // Limpiar todo el cache
+    requestCache.clear();
+    console.log('🧹 Cleared all data provider cache');
+  }
+};
+
 
 
 /**
@@ -66,7 +80,15 @@ export const stableFixedDataProvider: DataProvider = {
     console.log('Final params:', params);
 
     try {
-      const response = await axiosInstance.get(`/${resource}`, { 
+      // Para attendance modules, usar endpoint /all para listas
+      let endpoint = `/${resource}`;
+      if (resource.includes('attendance/daily-activities') || 
+          resource.includes('attendance/daily-observations') || 
+          resource.includes('attendance/activity-photos')) {
+        endpoint = `/${resource}/all`;
+      }
+      
+      const response = await axiosInstance.get(endpoint, { 
         params,
         timeout: 10000 // Reducir timeout
       });

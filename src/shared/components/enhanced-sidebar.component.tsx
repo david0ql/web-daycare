@@ -12,7 +12,10 @@ import {
   LogoutOutlined,
   HomeOutlined,
   BookOutlined,
-  SafetyOutlined
+  SafetyOutlined,
+  CheckCircleOutlined,
+  EyeOutlined,
+  CameraOutlined
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router";
 import { colors } from "../styles/colors.styles";
@@ -110,6 +113,24 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           label: "Marcar Asistencia",
           path: "/attendance/create",
         }] : []),
+        {
+          key: "/attendance/activities",
+          icon: <CheckCircleOutlined />,
+          label: "Actividades Diarias",
+          path: "/attendance/activities",
+        },
+        {
+          key: "/attendance/observations",
+          icon: <EyeOutlined />,
+          label: "Observaciones",
+          path: "/attendance/observations",
+        },
+        {
+          key: "/attendance/photos",
+          icon: <CameraOutlined />,
+          label: "Fotos de Actividades",
+          path: "/attendance/photos",
+        },
       ],
     },
     {

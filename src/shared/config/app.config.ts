@@ -34,6 +34,39 @@ export const appResources: ResourceProps[] = [
     },
   },
   {
+    name: "attendance/daily-activities",
+    list: "/attendance/activities",
+    create: "/attendance/activities/create",
+    edit: "/attendance/activities/edit/:id",
+    show: "/attendance/activities/show/:id",
+    meta: {
+      label: "Actividades Diarias",
+      icon: "✅",
+    },
+  },
+  {
+    name: "attendance/daily-observations",
+    list: "/attendance/observations",
+    create: "/attendance/observations/create",
+    edit: "/attendance/observations/edit/:id",
+    show: "/attendance/observations/show/:id",
+    meta: {
+      label: "Observaciones",
+      icon: "👁️",
+    },
+  },
+  {
+    name: "attendance/activity-photos",
+    list: "/attendance/photos",
+    create: "/attendance/photos/create",
+    edit: "/attendance/photos/edit/:id",
+    show: "/attendance/photos/show/:id",
+    meta: {
+      label: "Fotos de Actividades",
+      icon: "📷",
+    },
+  },
+  {
     name: "incidents",
     list: "/incidents",
     create: "/incidents/create",

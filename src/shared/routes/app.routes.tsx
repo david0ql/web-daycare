@@ -16,7 +16,24 @@ import { ChildList } from "../../domains/children";
 // Import legacy pages
 import { UserCreate, UserEdit, Register } from "../../pages/users";
 import { ChildCreate, ChildEdit, ChildShow } from "../../pages/children";
-import { AttendanceList, AttendanceCreate, AttendanceShow, AttendanceEdit } from "../../pages/attendance";
+import { 
+  AttendanceList, 
+  AttendanceCreate, 
+  AttendanceShow, 
+  AttendanceEdit, 
+  AttendanceActivities, 
+  AttendanceObservations, 
+  AttendancePhotos,
+  AttendanceActivitiesCreate,
+  AttendanceActivitiesEdit,
+  AttendanceActivitiesShow,
+  AttendanceObservationsCreate,
+  AttendanceObservationsEdit,
+  AttendanceObservationsShow,
+  AttendancePhotosCreate,
+  AttendancePhotosEdit,
+  AttendancePhotosShow
+} from "../../pages/attendance";
 import { IncidentList, IncidentCreate, IncidentEdit, IncidentShow } from "../../pages/incidents";
 import { CalendarListPage, CalendarCreate, CalendarEdit } from "../../pages/calendar";
 import { DocumentList, DocumentCreate, DocumentShow } from "../../pages/documents";
@@ -70,6 +87,33 @@ export const AppRoutes: React.FC = () => {
           <Route path="create" element={<AttendanceCreate />} />
           <Route path="show/:id" element={<AttendanceShow />} />
           <Route path="edit/:id" element={<AttendanceEdit />} />
+          
+          {/* Activities */}
+          <Route path="activities">
+            <Route index element={<AttendanceActivities />} />
+            <Route path="create" element={<AttendanceActivitiesCreate />} />
+            <Route path="create/:attendanceId" element={<AttendanceActivitiesCreate />} />
+            <Route path="edit/:id" element={<AttendanceActivitiesEdit />} />
+            <Route path="show/:id" element={<AttendanceActivitiesShow />} />
+          </Route>
+          
+          {/* Observations */}
+          <Route path="observations">
+            <Route index element={<AttendanceObservations />} />
+            <Route path="create" element={<AttendanceObservationsCreate />} />
+            <Route path="create/:attendanceId" element={<AttendanceObservationsCreate />} />
+            <Route path="edit/:id" element={<AttendanceObservationsEdit />} />
+            <Route path="show/:id" element={<AttendanceObservationsShow />} />
+          </Route>
+          
+          {/* Photos */}
+          <Route path="photos">
+            <Route index element={<AttendancePhotos />} />
+            <Route path="create" element={<AttendancePhotosCreate />} />
+            <Route path="create/:attendanceId" element={<AttendancePhotosCreate />} />
+            <Route path="edit/:id" element={<AttendancePhotosEdit />} />
+            <Route path="show/:id" element={<AttendancePhotosShow />} />
+          </Route>
         </Route>
 
         {/* Incidents */}

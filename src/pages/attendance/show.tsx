@@ -3,6 +3,7 @@ import { Show, DateField, TextField } from "@refinedev/antd";
 import { useShow } from "@refinedev/core";
 import { Typography, Card, Row, Col, Tag, Avatar, Space, Divider } from "antd";
 import { UserOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { AttendanceDetailsTabs } from "../../domains/attendance";
 
 const { Title, Text } = Typography;
 
@@ -177,6 +178,16 @@ export const AttendanceShow: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      <Divider />
+
+      {/* Daily Activities, Observations, and Photos */}
+      {record?.childId && record?.id && (
+        <AttendanceDetailsTabs
+          childId={record.childId}
+          attendanceId={record.id}
+        />
+      )}
     </Show>
   );
 };

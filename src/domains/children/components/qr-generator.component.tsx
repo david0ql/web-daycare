@@ -134,3 +134,4 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({ child, visible, onClos
     </Modal>
   );
 };
+
