@@ -35,8 +35,15 @@ export const AttendanceObservationsCreate: React.FC = () => {
       }
       
       // Get today's attendance and filter by selected child
-      const response = await axiosInstance.get("/attendance/today");
-      const todayAttendances = response.data || [];
+      const todayResponse = await axiosInstance.get("/attendance/today");
+      const todayAttendances = todayResponse.data || [];
+      
+      // If no today's records, get all attendance records for this child
+      if (todayAttendances.length === 0) {
+        const allResponse = await axiosInstance.get("/attendance");
+        const allAttendances = allResponse.data?.data || [];
+        return allAttendances.filter((attendance: any) => attendance.childId === selectedChildId);
+      }
       
       // Filter by selected child
       return todayAttendances.filter((attendance: any) => attendance.childId === selectedChildId);

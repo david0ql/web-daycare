@@ -32,8 +32,9 @@ export const AttendancePhotos: React.FC = () => {
   });
 
   const getImageUrl = (record: any) => {
-    // Assuming the API serves images from a static route
-    return `http://localhost:30000/uploads/activity-photos/${record.filename}`;
+    // Use axiosInstance to get the image with JWT token
+    const token = localStorage.getItem('refine-auth');
+    return `http://localhost:30000/api/uploads/activity-photos/${record.filename}?token=${token}`;
   };
 
   return (

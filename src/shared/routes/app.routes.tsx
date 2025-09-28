@@ -34,7 +34,7 @@ import {
   AttendancePhotosEdit,
   AttendancePhotosShow
 } from "../../pages/attendance";
-import { IncidentList, IncidentCreate, IncidentEdit, IncidentShow } from "../../pages/incidents";
+import { IncidentsList, IncidentsCreate, IncidentsEdit, IncidentsShow } from "../../pages/incidents";
 import { CalendarListPage, CalendarCreate, CalendarEdit } from "../../pages/calendar";
 import { DocumentList, DocumentCreate, DocumentShow } from "../../pages/documents";
 import { ReportList } from "../../pages/reports";
@@ -118,10 +118,10 @@ export const AppRoutes: React.FC = () => {
 
         {/* Incidents */}
         <Route path="/incidents">
-          <Route index element={<IncidentList />} />
-          <Route path="create" element={<IncidentCreate />} />
-          <Route path="edit/:id" element={<IncidentEdit />} />
-          <Route path="show/:id" element={<IncidentShow />} />
+          <Route index element={<IncidentsList />} />
+          <Route path="create" element={<IncidentsCreate />} />
+          <Route path="edit/:id" element={<IncidentsEdit />} />
+          <Route path="show/:id" element={<IncidentsShow />} />
         </Route>
 
         {/* Calendar */}

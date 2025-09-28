@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Create, useForm } from "@refinedev/antd";
+import { Create } from "@refinedev/antd";
 import { Form, Input, Upload, Button, message, Row, Col, Typography, Select } from "antd";
 import { UploadOutlined, CameraOutlined } from "@ant-design/icons";
-import { useParams } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useParams, useNavigate } from "react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../../../shared";
 import dayjs from 'dayjs';
 
@@ -13,9 +13,12 @@ const { Option } = Select;
 
 export const AttendancePhotosCreate: React.FC = () => {
   const { attendanceId } = useParams();
-  const { formProps, saveButtonProps } = useForm();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [form] = Form.useForm();
   const [fileList, setFileList] = useState<any[]>([]);
   const [selectedChildId, setSelectedChildId] = useState<number | undefined>(undefined);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Fetch children for the select
   const { data: childrenData, isLoading: childrenLoading } = useQuery({
@@ -36,8 +39,15 @@ export const AttendancePhotosCreate: React.FC = () => {
       }
       
       // Get today's attendance and filter by selected child
-      const response = await axiosInstance.get("/attendance/today");
-      const todayAttendances = response.data || [];
+      const todayResponse = await axiosInstance.get("/attendance/today");
+      const todayAttendances = todayResponse.data || [];
+      
+      // If no today's records, get all attendance records for this child
+      if (todayAttendances.length === 0) {
+        const allResponse = await axiosInstance.get("/attendance");
+        const allAttendances = allResponse.data?.data || [];
+        return allAttendances.filter((attendance: any) => attendance.childId === selectedChildId);
+      }
       
       // Filter by selected child
       return todayAttendances.filter((attendance: any) => attendance.childId === selectedChildId);
@@ -52,19 +62,58 @@ export const AttendancePhotosCreate: React.FC = () => {
   console.log('Children data.data:', childrenData?.data);
   console.log('Attendance data.data:', attendanceData?.data);
 
-  const handleFinish = (values: any) => {
+  const handleFinish = async (values: any) => {
     if (fileList.length === 0) {
       message.error('Por favor seleccione una foto');
       return;
     }
 
-    const formData = {
-      ...values,
-      attendanceId: values.attendanceId || (attendanceId ? parseInt(attendanceId) : undefined),
-      file: fileList[0].originFileObj,
-    };
+    const file = fileList[0].originFileObj;
+    if (!file) {
+      message.error('Error: archivo no válido');
+      return;
+    }
+
+    console.log('File to upload:', file);
+    console.log('File type:', file.type);
+    console.log('File size:', file.size);
+
+    setIsSubmitting(true);
     
-    formProps.onFinish?.(formData);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('childId', parseInt(values.childId).toString());
+      formData.append('attendanceId', parseInt(values.attendanceId || (attendanceId ? parseInt(attendanceId) : undefined)).toString());
+      if (values.caption) {
+        formData.append('caption', values.caption);
+      }
+
+      const response = await axiosInstance.post('/attendance/activity-photos', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      message.success('Foto subida exitosamente');
+      
+      // Invalidate cache
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          const key = query.queryKey;
+          return Array.isArray(key) && key.some(k => k === "attendance/activity-photos");
+        },
+      });
+      
+      // Navigate back to photos list
+      navigate('/attendance/photos');
+      
+    } catch (error: any) {
+      console.error('Error uploading photo:', error);
+      message.error('Error al subir la foto: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileChange = ({ fileList: newFileList }: any) => {
@@ -90,9 +139,12 @@ export const AttendancePhotosCreate: React.FC = () => {
   return (
     <Create
       title="Subir Foto de Actividad"
-      saveButtonProps={saveButtonProps}
+      saveButtonProps={{
+        loading: isSubmitting,
+        onClick: () => form.submit(),
+      }}
     >
-      <Form {...formProps} layout="vertical" onFinish={handleFinish}>
+      <Form form={form} layout="vertical" onFinish={handleFinish}>
         <Row gutter={16}>
           <Col span={12}>
                 <Form.Item
@@ -108,7 +160,7 @@ export const AttendancePhotosCreate: React.FC = () => {
                     onChange={(value) => {
                       setSelectedChildId(value);
                       // Clear attendance selection when child changes
-                      formProps.form?.setFieldsValue({ attendanceId: undefined });
+                      form.setFieldsValue({ attendanceId: undefined });
                     }}
                   >
                     {(childrenData?.data || []).map((child: any) => (

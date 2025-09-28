@@ -5,7 +5,6 @@ import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, BellOutlined }
 import { useIncidents, useMarkParentNotified, useDeleteIncident } from '../../domains/incidents';
 import { getSeverityColor, getSeverityLabel, formatIncidentDate, getIncidentStatus, getAttachmentUrl } from '../../domains/incidents';
 import { useQueryClient } from '@tanstack/react-query';
-import { useInvalidate } from '@refinedev/core';
 import { message } from 'antd';
 
 const { Text } = Typography;
@@ -20,7 +19,6 @@ export const IncidentsList: React.FC = () => {
   });
 
   const queryClient = useQueryClient();
-  const invalidate = useInvalidate();
   const markParentNotifiedMutation = useMarkParentNotified();
   const deleteIncidentMutation = useDeleteIncident();
 
@@ -28,35 +26,6 @@ export const IncidentsList: React.FC = () => {
     try {
       await markParentNotifiedMutation.mutateAsync({ incidentId });
       message.success('Incidente marcado como notificado a padres');
-      
-      // Use Refine's useInvalidate for proper cache invalidation
-      invalidate({
-        resource: "incidents",
-        invalidates: ["list"],
-      });
-      
-      // Also invalidate the specific incident data
-      invalidate({
-        resource: "incidents",
-        invalidates: ["detail"],
-        id: incidentId,
-      });
-      
-      // Force invalidate and refetch all incidents-related queries
-      await queryClient.invalidateQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
-        },
-      });
-      
-      // Force refetch all incidents queries
-      await queryClient.refetchQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
-        },
-      });
     } catch (error) {
       message.error('Error al marcar como notificado');
     }
@@ -66,28 +35,6 @@ export const IncidentsList: React.FC = () => {
     try {
       await deleteIncidentMutation.mutateAsync(id);
       message.success('Incidente eliminado exitosamente');
-      
-      // Use Refine's useInvalidate for proper cache invalidation
-      invalidate({
-        resource: "incidents",
-        invalidates: ["list"],
-      });
-      
-      // Force invalidate and refetch all incidents-related queries
-      await queryClient.invalidateQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
-        },
-      });
-      
-      // Force refetch all incidents queries
-      await queryClient.refetchQueries({
-        predicate: (query) => {
-          const key = query.queryKey;
-          return Array.isArray(key) && key.some(k => k === "incidents");
-        },
-      });
     } catch (error) {
       message.error('Error al eliminar el incidente');
     }
