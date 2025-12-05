@@ -17,6 +17,8 @@ import { authProvider } from "./authProvider-refine-native";
 import { stableFixedDataProvider } from "./dataProvider-stable-fixed";
 import { appResources, AppRoutes } from "./shared";
 import GlobalLoading from "./shared/components/global-loading.component";
+import { NotificationInitializer } from "./shared/components/notification-initializer.component";
+import { useCustomNotificationProvider } from "./shared/providers/custom-notification.provider";
 
 const App: React.FC = () => {
   return (
@@ -28,7 +30,7 @@ const App: React.FC = () => {
             authProvider={authProvider}
             routerProvider={routerProvider}
             resources={appResources}
-            notificationProvider={useNotificationProvider}
+            notificationProvider={useCustomNotificationProvider}
             options={{
               syncWithLocation: false,
               warnWhenUnsavedChanges: true,
@@ -54,6 +56,7 @@ const App: React.FC = () => {
               },
             }}
           >
+            <NotificationInitializer />
             <AppRoutes />
             <UnsavedChangesNotifier />
             <DocumentTitleHandler />

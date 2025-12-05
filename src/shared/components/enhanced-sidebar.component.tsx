@@ -10,7 +10,6 @@ import {
   BarChartOutlined,
   DashboardOutlined,
   LogoutOutlined,
-  HomeOutlined,
   BookOutlined,
   SafetyOutlined,
   CheckCircleOutlined,
@@ -283,7 +282,18 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           color: "white",
           textAlign: "center"
         }}>
-          <HomeOutlined style={{ fontSize: "32px", marginBottom: "8px" }} />
+          <img 
+            src="/logo.png" 
+            alt="The Children's World Learning Center"
+            style={{ 
+              width: collapsed ? "40px" : "150px",
+              height: "auto",
+              marginBottom: collapsed ? "0" : "2px",
+              objectFit: "contain",
+              display: "block",
+              margin: collapsed ? "0 auto" : "0 auto 8px"
+            }}
+          />
           {!collapsed && (
             <>
               <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "4px" }}>

@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import { notificationService } from '../services/notification.service';
 
 // Extender el tipo de configuración para incluir metadata
 declare module 'axios' {
@@ -11,6 +12,132 @@ declare module 'axios' {
 
 const API_URL = "https://api.thechildrenworld.com/api";
 const TOKEN_KEY = "refine-auth";
+
+/**
+ * Interfaz para la estructura de error de NestJS
+ */
+interface NestJSErrorResponse {
+  statusCode?: number;
+  message?: string | string[];
+  error?: string | string[];
+}
+
+/**
+ * Extrae el mensaje de error del formato de NestJS
+ * Maneja los 3 casos posibles de respuesta de NestJS:
+ * 1. { statusCode: 404, message: "Post not found" }
+ * 2. { statusCode: 404, message: "Not Found", error: "Post with id 6 not found" }
+ * 3. { statusCode: 400, message: "Bad Request", error: ["password must be longer than or equal to 7 characters"] }
+ */
+function extractErrorMessage(errorData: any): string {
+  if (!errorData) {
+    return "An unknown error occurred";
+  }
+
+  // Si el errorData es una cadena, retornarla directamente
+  if (typeof errorData === "string") {
+    return errorData;
+  }
+
+  // Caso 1: { statusCode: 404, message: "Post not found" }
+  // Si message existe y es un string, usarlo directamente
+  if (errorData.message && typeof errorData.message === "string") {
+    // Si message es genérico como "Not Found", "Bad Request", etc., preferir el campo error
+    const genericMessages = ["Not Found", "Bad Request", "Unauthorized", "Forbidden", "Conflict", "Internal Server Error"];
+    if (genericMessages.includes(errorData.message) && errorData.error) {
+      // Caso 2: Preferir el campo error si message es genérico
+      if (Array.isArray(errorData.error)) {
+        return errorData.error.join(". ");
+      }
+      if (typeof errorData.error === "string") {
+        return errorData.error;
+      }
+    }
+    // Si message no es genérico, usarlo directamente del API
+    return errorData.message;
+  }
+
+  // Caso 3: { statusCode: 400, message: "Bad Request", error: ["password must be longer..."] }
+  // Si error es un array, unir los mensajes
+  if (errorData.error) {
+    if (Array.isArray(errorData.error)) {
+      return errorData.error.join(". ");
+    }
+    if (typeof errorData.error === "string") {
+      return errorData.error;
+    }
+  }
+
+  // Si message es un array (caso menos común)
+  if (Array.isArray(errorData.message)) {
+    return errorData.message.join(". ");
+  }
+
+  // Fallback
+  return "An unknown error occurred";
+}
+
+/**
+ * Obtiene el título del error según el código de estado HTTP
+ * Solo se usa como fallback si no hay mensaje del API
+ */
+function getErrorTitle(status: number): string {
+  if (status >= 300 && status < 400) {
+    return "Redirect Error";
+  }
+  if (status === 400) {
+    return "Validation Error";
+  }
+  if (status === 401) {
+    return "Unauthorized";
+  }
+  if (status === 403) {
+    return "Forbidden";
+  }
+  if (status === 404) {
+    return "Not Found";
+  }
+  if (status === 409) {
+    return "Conflict";
+  }
+  if (status === 422) {
+    return "Validation Error";
+  }
+  if (status >= 500) {
+    return "Server Error";
+  }
+  return "Request Error";
+}
+
+/**
+ * Maneja errores HTTP y muestra notificaciones
+ */
+function handleHttpError(error: AxiosError, status: number): void {
+  const errorData = error.response?.data as NestJSErrorResponse | undefined;
+  const errorMessage = extractErrorMessage(errorData);
+
+  // No mostrar notificación para errores 401 ya que se manejan arriba
+  if (status === 401) {
+    return;
+  }
+
+  // Marcar el error para que Refine no muestre notificaciones automáticas
+  // Esto evita notificaciones duplicadas
+  if (error.response) {
+    (error.response as any).__notificationHandled = true;
+  }
+  (error as any).__notificationHandled = true;
+  (error as any).skipNotification = true;
+  
+  // Guardar el error en window para que el notification provider pueda verificar
+  if (typeof window !== "undefined") {
+    (window as any).__lastAxiosError = error;
+  }
+
+  // Mostrar notificación de error con el mensaje del API directamente
+  // Usar solo el mensaje del API, sin títulos adicionales
+  notificationService.error(errorMessage, undefined);
+}
 
 // Create axios instance
 const axiosInstance: AxiosInstance = axios.create({
@@ -102,12 +229,39 @@ axiosInstance.interceptors.response.use(
     });
     console.log('============================================');
     
+    const status = error.response?.status;
+    
     // Handle common error cases
-    if (error.response?.status === 401) {
+    if (status === 401) {
       console.warn('🔐 Token expired or invalid - clearing token');
       localStorage.removeItem(TOKEN_KEY);
-      // No redirigir automáticamente, dejar que la app maneje el error
-      // window.location.href = '/login';
+      // Marcar el error para evitar notificaciones duplicadas
+      if (error.response) {
+        (error.response as any).__notificationHandled = true;
+      }
+      (error as any).__notificationHandled = true;
+      (error as any).skipNotification = true;
+      
+      // Try to get error message from API, otherwise use default
+      const errorData = error.response?.data as NestJSErrorResponse | undefined;
+      const errorMessage = extractErrorMessage(errorData);
+      notificationService.error(
+        errorMessage || "Session expired. Please log in again."
+      );
+    }
+    
+    // Handle errors with status codes 300-500
+    if (status && status >= 300 && status < 600) {
+      handleHttpError(error, status);
+    } else if (!error.response && error.request) {
+      // Network error (no server response)
+      // Mark error to avoid duplicate notifications
+      (error as any).__notificationHandled = true;
+      (error as any).skipNotification = true;
+      notificationService.error(
+        "Connection Error",
+        "Unable to connect to the server. Please check your internet connection."
+      );
     }
     
     return Promise.reject(error);
