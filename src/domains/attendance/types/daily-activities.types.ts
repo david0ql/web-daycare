@@ -49,14 +49,14 @@ export interface UpdateDailyActivityData extends Partial<CreateDailyActivityData
 
 // Activity type labels
 export const ACTIVITY_TYPE_LABELS = {
-  [ActivityTypeEnum.BREAKFAST]: 'Desayuno',
-  [ActivityTypeEnum.LUNCH]: 'Almuerzo',
-  [ActivityTypeEnum.SNACK]: 'Merienda',
-  [ActivityTypeEnum.NAP]: 'Siesta',
-  [ActivityTypeEnum.DIAPER_CHANGE]: 'Cambio de Pañal',
-  [ActivityTypeEnum.CLOTHING_CHANGE]: 'Cambio de Ropa',
-  [ActivityTypeEnum.HYDRATION]: 'Hidratación',
-  [ActivityTypeEnum.OTHER]: 'Otro',
+  [ActivityTypeEnum.BREAKFAST]: 'Breakfast',
+  [ActivityTypeEnum.LUNCH]: 'Lunch',
+  [ActivityTypeEnum.SNACK]: 'Snack',
+  [ActivityTypeEnum.NAP]: 'Nap',
+  [ActivityTypeEnum.DIAPER_CHANGE]: 'Diaper Change',
+  [ActivityTypeEnum.CLOTHING_CHANGE]: 'Clothing Change',
+  [ActivityTypeEnum.HYDRATION]: 'Hydration',
+  [ActivityTypeEnum.OTHER]: 'Other',
 } as const;
 
 // Activity type icons
