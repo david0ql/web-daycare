@@ -2,7 +2,7 @@ import React from "react";
 import { useInvalidate, useGo, useNotification } from "@refinedev/core";
 import { Edit, useForm } from "@refinedev/antd";
 import { useQueryClient } from "@tanstack/react-query";
-import { Form, Input, DatePicker, Switch, Button, Select, Card, Space, Typography, Divider, Row, Col, InputNumber, Tabs } from "antd";
+import { Form, Input, DatePicker, Switch, Button, Select, Card, Space, Typography, Divider, Row, Col, InputNumber, Tabs, message } from "antd";
 import { UpdateChildData } from "../../domains/children/types/child.types";
 import { useAvailableParents } from "../../domains/children/hooks/use-available-parents.hook";
 import dayjs from "dayjs";
@@ -164,6 +164,14 @@ export const ChildEdit: React.FC = () => {
   const handleFinish = (values: any) => {
     console.log("🔍 Form onFinish - original values:", values);
     
+    // Validar que haya al menos un padre asignado
+    const parentRelationships = values.parentRelationships || [];
+    if (parentRelationships.length === 0) {
+      message.error("Debe tener al menos un padre o madre asignado");
+      form.scrollToField("parentRelationships");
+      return;
+    }
+    
         const transformedValues = {
           ...values,
           hasPaymentAlert: Boolean(values.hasPaymentAlert),
@@ -305,7 +313,15 @@ export const ChildEdit: React.FC = () => {
         </Card>
 
         {/* Relaciones Padre-Hijo */}
-        <Card title="Relaciones Padre-Hijo" style={{ marginBottom: 16 }}>
+        <Card 
+          title={
+            <Space>
+              <span>Relaciones Padre-Hijo</span>
+              <Text type="danger" style={{ fontSize: '14px' }}>(Obligatorio - Mínimo 1)</Text>
+            </Space>
+          } 
+          style={{ marginBottom: 16 }}
+        >
           <Form.List name="parentRelationships">
             {(fields, { add, remove }) => (
               <>

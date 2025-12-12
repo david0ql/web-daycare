@@ -343,6 +343,8 @@ export const AttendanceCreate: React.FC = () => {
         title="Gestión de Asistencia"
         breadcrumb={false}
         headerButtons={<></>}
+        // saveButtonProps={{ style: { display: 'none' } }} // Comentado: el check-in y check-out tienen sus propios botones
+        saveButtonProps={{ style: { display: 'none' } }}
       >
         <Card>
           <div style={{ textAlign: 'center', padding: '50px' }}>
@@ -361,6 +363,8 @@ export const AttendanceCreate: React.FC = () => {
       title="Gestión de Asistencia"
       breadcrumb={false}
       headerButtons={<></>}
+      // saveButtonProps={{ style: { display: 'none' } }} // Comentado: el check-in y check-out tienen sus propios botones
+      saveButtonProps={{ style: { display: 'none' } }}
     >
       <Card>
         <Tabs

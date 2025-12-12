@@ -15,7 +15,8 @@ import {
   Divider,
   Row,
   Col,
-  InputNumber
+  InputNumber,
+  message
 } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { CreateChildData, AvailableParent } from "../../domains/children/types/child.types";
@@ -119,6 +120,14 @@ export const ChildCreate: React.FC = () => {
   // Custom onFinish to transform data
   const handleFinish = (values: any) => {
     console.log("🔍 Form onFinish - original values:", values);
+    
+    // Validar que haya al menos una persona autorizada para recoger
+    const authorizedPickupPersons = values.authorizedPickupPersons || [];
+    if (authorizedPickupPersons.length === 0) {
+      message.error("Debe agregar al menos una persona autorizada para recoger al niño");
+      form.scrollToField("authorizedPickupPersons");
+      return;
+    }
     
     const transformedValues = {
       ...values,
@@ -417,7 +426,15 @@ export const ChildCreate: React.FC = () => {
         </Card>
 
         {/* Personas Autorizadas para Recoger */}
-        <Card title="Personas Autorizadas para Recoger" style={{ marginBottom: 16 }}>
+        <Card 
+          title={
+            <Space>
+              <span>Personas Autorizadas para Recoger</span>
+              <Text type="danger" style={{ fontSize: '14px' }}>(Obligatorio - Mínimo 1)</Text>
+            </Space>
+          } 
+          style={{ marginBottom: 16 }}
+        >
           <Form.List name="authorizedPickupPersons">
             {(fields, { add, remove }) => (
               <>
