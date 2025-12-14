@@ -39,8 +39,8 @@ export const AttendanceObservationsEdit: React.FC = () => {
       // Show success notification
       open?.({
         type: "success",
-        message: "Observación actualizada exitosamente",
-        description: "Los cambios se han guardado correctamente",
+        message: "Observation updated successfully",
+        description: "Changes have been saved correctly",
       });
       
       // Navigate back to observations list with a small delay for better UX
@@ -63,8 +63,8 @@ export const AttendanceObservationsEdit: React.FC = () => {
       }
       open?.({ 
         type: "error", 
-        message: "Error al actualizar la observación", 
-        description: "No se pudo actualizar la observación. Verifica los datos e intenta nuevamente." 
+        message: "Error updating observation", 
+        description: "Could not update observation. Please check the data and try again." 
       });
     }
   });
@@ -74,19 +74,19 @@ export const AttendanceObservationsEdit: React.FC = () => {
   };
 
   return (
-    <Edit
-      title="Editar Observación Diaria"
+      <Edit
+      title="Edit Daily Observation"
       saveButtonProps={saveButtonProps}
     >
       <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Estado de Ánimo"
+              label="Mood"
               name="mood"
-              rules={[{ required: true, message: 'Por favor seleccione el estado de ánimo' }]}
+              rules={[{ required: true, message: 'Please select mood' }]}
             >
-              <Select placeholder="Seleccione el estado de ánimo">
+              <Select placeholder="Select mood">
                 {Object.entries(MOOD_LABELS).map(([key, label]) => (
                   <Option key={key} value={key}>
                     {label}
@@ -100,13 +100,13 @@ export const AttendanceObservationsEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Observaciones Generales"
+              label="General Observations"
               name="generalObservations"
-              rules={[{ required: true, message: 'Por favor ingrese las observaciones' }]}
+              rules={[{ required: true, message: 'Please enter observations' }]}
             >
               <TextArea 
                 rows={4}
-                placeholder="Describa las observaciones sobre el niño"
+                placeholder="Describe observations about the child"
                 maxLength={1000}
                 showCount
               />

@@ -43,8 +43,8 @@ export const AttendanceActivitiesEdit: React.FC = () => {
       // Show success notification
       open?.({
         type: "success",
-        message: "Actividad actualizada exitosamente",
-        description: "Los cambios se han guardado correctamente",
+        message: "Activity updated successfully",
+        description: "Changes have been saved correctly",
       });
       
       // Navigate back to activities list with a small delay for better UX
@@ -67,8 +67,8 @@ export const AttendanceActivitiesEdit: React.FC = () => {
       }
       open?.({ 
         type: "error", 
-        message: "Error al actualizar la actividad", 
-        description: "No se pudo actualizar la actividad. Verifica los datos e intenta nuevamente." 
+        message: "Error updating activity", 
+        description: "Could not update activity. Please check the data and try again." 
       });
     }
   });
@@ -101,19 +101,19 @@ export const AttendanceActivitiesEdit: React.FC = () => {
   };
 
   return (
-    <Edit
-      title="Editar Actividad Diaria"
+      <Edit
+      title="Edit Daily Activity"
       saveButtonProps={saveButtonProps}
     >
       <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Tipo de Actividad"
+              label="Activity Type"
               name="activityType"
-              rules={[{ required: true, message: 'Por favor seleccione el tipo de actividad' }]}
+              rules={[{ required: true, message: 'Please select activity type' }]}
             >
-              <Select placeholder="Seleccione el tipo de actividad">
+              <Select placeholder="Select activity type">
                 {Object.values(ActivityTypeEnum).map((type) => (
                   <Option key={type} value={type}>
                     {ACTIVITY_TYPE_LABELS[type]}
@@ -125,7 +125,7 @@ export const AttendanceActivitiesEdit: React.FC = () => {
           
           <Col span={12}>
             <Form.Item
-              label="Completada"
+              label="Completed"
               name="completed"
               valuePropName="checked"
               getValueFromEvent={(checked) => Boolean(checked)}
@@ -146,16 +146,16 @@ export const AttendanceActivitiesEdit: React.FC = () => {
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item
-                    label="Hora de Completado"
+                    label="Completion Time"
                     name="timeCompleted"
-                    rules={[{ required: true, message: 'Por favor seleccione la hora de completado' }]}
+                    rules={[{ required: true, message: 'Please select completion time' }]}
                     getValueFromEvent={(time) => time ? dayjs(time) : undefined}
                     getValueProps={(value) => ({ value: value ? dayjs(value) : undefined })}
                   >
                     <TimePicker 
                       style={{ width: '100%' }}
                       format="HH:mm"
-                      placeholder="Seleccione la hora"
+                      placeholder="Select time"
                     />
                   </Form.Item>
                 </Col>
@@ -167,12 +167,12 @@ export const AttendanceActivitiesEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Notas"
+              label="Notes"
               name="notes"
             >
               <TextArea 
                 rows={3}
-                placeholder="Notas adicionales sobre la actividad (opcional)"
+                placeholder="Additional notes about the activity (optional)"
                 maxLength={500}
                 showCount
               />

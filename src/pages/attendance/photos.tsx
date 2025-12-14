@@ -39,7 +39,7 @@ export const AttendancePhotos: React.FC = () => {
 
   return (
     <List
-      title="Fotos de Actividades"
+      title="Activity Photos"
       headerButtons={[
         <Button 
           type="primary" 
@@ -47,14 +47,14 @@ export const AttendancePhotos: React.FC = () => {
           icon={<PlusOutlined />}
           onClick={() => navigate('/attendance/photos/create')}
         >
-          Subir Foto
+          Upload Photo
         </Button>,
       ]}
     >
       <Table {...tableProps} rowKey="id">
         <Table.Column
           dataIndex="child"
-          title="Niño"
+          title="Child"
           render={(child: any) => (
             <Space>
               <Avatar 
@@ -69,7 +69,7 @@ export const AttendancePhotos: React.FC = () => {
         />
         <Table.Column
           dataIndex="filename"
-          title="Foto"
+          title="Photo"
           render={(filename: string, record: any) => (
             <Image
               width={60}
@@ -82,25 +82,25 @@ export const AttendancePhotos: React.FC = () => {
         />
         <Table.Column
           dataIndex="caption"
-          title="Descripción"
+          title="Description"
           render={(caption: string) => (
             <Tooltip title={caption}>
               <Text ellipsis style={{ maxWidth: 200 }}>
-                {caption || 'Sin descripción'}
+                {caption || 'No description'}
               </Text>
             </Tooltip>
           )}
         />
         <Table.Column
           dataIndex="attendance"
-          title="Fecha"
+          title="Date"
           render={(attendance: any) => (
             <DateField value={attendance?.attendanceDate} format="DD/MM/YYYY" />
           )}
         />
         <Table.Column
           dataIndex="uploadedBy2"
-          title="Subido por"
+          title="Uploaded by"
           render={(user: any) => (
             <Text type="secondary">
               {user?.firstName} {user?.lastName}
@@ -109,13 +109,13 @@ export const AttendancePhotos: React.FC = () => {
         />
         <Table.Column
           dataIndex="createdAt"
-          title="Creado"
+          title="Created"
           render={(value: string) => (
             <DateField value={value} format="DD/MM/YYYY HH:mm" />
           )}
         />
         <Table.Column
-          title="Acciones"
+          title="Actions"
           dataIndex="actions"
           render={(_, record: any) => (
             <Space>

@@ -34,7 +34,7 @@ export const Login: React.FC = () => {
       
     } catch (error: any) {
       console.error("❌ Login error:", error);
-      setLoginError(error.response?.data?.message || error.message || "Error al iniciar sesión");
+      setLoginError(error.response?.data?.message || error.message || "Error signing in");
     } finally {
       setIsLoading(false);
     }
@@ -64,13 +64,13 @@ export const Login: React.FC = () => {
           <Title level={2} style={{ color: colors.text.primary, marginBottom: "8px" }}>
             🏫 The Children's World
           </Title>
-          <Text type="secondary" style={{ color: colors.text.secondary }}>Sistema de Gestión de Guardería</Text>
+          <Text type="secondary" style={{ color: colors.text.secondary }}>Daycare Management System</Text>
         </div>
 
         {(error || loginError) && (
           <Alert
-            message="Error de autenticación"
-            description={loginError || "Credenciales incorrectas. Verifica tu email y contraseña."}
+            message="Authentication Error"
+            description={loginError || "Incorrect credentials. Please verify your email and password."}
             type="error"
             style={{ marginBottom: "16px" }}
           />
@@ -86,8 +86,8 @@ export const Login: React.FC = () => {
             name="email"
             label="Email"
             rules={[
-              { required: true, message: "Por favor ingresa tu email" },
-              { type: "email", message: "Ingresa un email válido" },
+              { required: true, message: "Please enter your email" },
+              { type: "email", message: "Please enter a valid email" },
             ]}
           >
             <Input
@@ -99,14 +99,14 @@ export const Login: React.FC = () => {
 
           <Form.Item
             name="password"
-            label="Contraseña"
+            label="Password"
             rules={[
-              { required: true, message: "Por favor ingresa tu contraseña" },
+              { required: true, message: "Please enter your password" },
             ]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Tu contraseña"
+              placeholder="Your password"
               size="large"
             />
           </Form.Item>
@@ -125,7 +125,7 @@ export const Login: React.FC = () => {
                 fontWeight: 500,
               }}
             >
-              Iniciar Sesión
+              Sign In
             </Button>
           </Form.Item>
         </Form>

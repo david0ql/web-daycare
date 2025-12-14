@@ -47,12 +47,12 @@ export const Error404: React.FC = () => {
           subTitle={
             <div style={{ color: colors.text.secondary }}>
               <div style={{ fontSize: "24px", marginBottom: "16px" }}>
-                🏫 Página no encontrada
+                🏫 Page Not Found
               </div>
               <div style={{ fontSize: "16px", lineHeight: "1.6" }}>
-                Lo sentimos, la página que buscas no existe o ha sido movida.
+                Sorry, the page you are looking for does not exist or has been moved.
                 <br />
-                Verifica la URL o regresa a la página principal.
+                Please verify the URL or return to the main page.
               </div>
             </div>
           }
@@ -76,7 +76,7 @@ export const Error404: React.FC = () => {
                 boxShadow: colors.shadows.md,
               }}
             >
-              Ir al Dashboard
+              Go to Dashboard
             </Button>,
             <Button
               key="back"
@@ -94,7 +94,7 @@ export const Error404: React.FC = () => {
                 color: colors.text.primary,
               }}
             >
-              Volver Atrás
+              Go Back
             </Button>,
           ]}
         />
@@ -116,11 +116,11 @@ export const Error404: React.FC = () => {
             lineHeight: "1.5"
           }}>
             <strong style={{ color: colors.text.primary }}>
-              ¿Necesitas ayuda?
+              Need help?
             </strong>
             <br />
-            Si crees que esto es un error, contacta al administrador del sistema
-            o verifica que la URL sea correcta.
+            If you believe this is an error, contact the system administrator
+            or verify that the URL is correct.
           </div>
         </div>
       </div>

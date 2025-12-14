@@ -50,11 +50,11 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
         fileType: file.type.startsWith('image/') ? 'image' : 'document',
       });
 
-      message.success('Archivo subido exitosamente');
+      message.success('File uploaded successfully');
       onAttachmentsChange();
       setFileList([]);
     } catch (error: any) {
-      message.error('Error al subir archivo: ' + (error.response?.data?.message || error.message));
+      message.error('Error uploading file: ' + (error.response?.data?.message || error.message));
     } finally {
       setIsUploading(false);
     }
@@ -63,10 +63,10 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
   const handleRemoveAttachment = async (attachmentId: number) => {
     try {
       await removeAttachmentMutation.mutateAsync(attachmentId);
-      message.success('Archivo eliminado exitosamente');
+      message.success('File deleted successfully');
       onAttachmentsChange();
     } catch (error: any) {
-      message.error('Error al eliminar archivo');
+      message.error('Error deleting file');
     }
   };
 
@@ -82,13 +82,13 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
                        file.type.includes('text');
     
     if (!isValidType) {
-      message.error('Solo se permiten archivos de imagen, PDF o documentos');
+      message.error('Only image, PDF, or document files are allowed');
       return false;
     }
 
     const isLt10M = file.size / 1024 / 1024 < 10;
     if (!isLt10M) {
-      message.error('El archivo debe ser menor a 10MB');
+      message.error('File must be less than 10MB');
       return false;
     }
 
@@ -110,7 +110,7 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
           loading={isUploading}
           disabled={isUploading}
         >
-          Subir Archivo
+          Upload File
         </Button>
       </Upload>
 
@@ -128,7 +128,7 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
                   onClick={() => handlePreview(attachment.filePath)}
                   disabled={attachment.fileType !== 'image'}
                 >
-                  Ver
+                  View
                 </Button>,
                 <Button
                   key="delete"
@@ -138,7 +138,7 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
                   onClick={() => handleRemoveAttachment(attachment.id)}
                   loading={removeAttachmentMutation.isPending}
                 >
-                  Eliminar
+                  Delete
                 </Button>,
               ]}
             >
@@ -171,10 +171,10 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
                 description={
                   <Space>
                     <Text type="secondary">
-                      {attachment.fileType === 'image' ? 'Imagen' : 'Documento'}
+                      {attachment.fileType === 'image' ? 'Image' : 'Document'}
                     </Text>
                     <Text type="secondary">
-                      Subido por: {attachment.uploadedBy2?.firstName} {attachment.uploadedBy2?.lastName}
+                      Uploaded by: {attachment.uploadedBy2?.firstName} {attachment.uploadedBy2?.lastName}
                     </Text>
                     <Text type="secondary">
                       {new Date(attachment.createdAt).toLocaleDateString()}
@@ -189,7 +189,7 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
 
       <Modal
         open={previewVisible}
-        title="Vista previa"
+        title="Preview"
         footer={null}
         onCancel={() => setPreviewVisible(false)}
       >

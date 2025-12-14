@@ -22,34 +22,34 @@ export const IncidentsShow: React.FC = () => {
   const handleMarkParentNotified = async () => {
     try {
       await markParentNotifiedMutation.mutateAsync({ incidentId: incident.id });
-      message.success('Incidente marcado como notificado a padres');
+      message.success('Incident marked as notified to parents');
     } catch (error) {
-      message.error('Error al marcar como notificado');
+      message.error('Error marking as notified');
     }
   };
 
   const handleDelete = async () => {
     try {
       await deleteIncidentMutation.mutateAsync(incident.id);
-      message.success('Incidente eliminado exitosamente');
+      message.success('Incident deleted successfully');
     } catch (error) {
-      message.error('Error al eliminar el incidente');
+      message.error('Error deleting incident');
     }
   };
 
   if (isLoading) {
-    return <div>Cargando...</div>;
+    return <div>Loading...</div>;
   }
 
   if (!incident) {
-    return <div>Incidente no encontrado</div>;
+    return <div>Incident not found</div>;
   }
 
   const status = getIncidentStatus(incident.parentNotified);
 
   return (
     <Show
-      title="Detalles del Incidente"
+      title="Incident Details"
       headerButtons={[
         <EditButton key="edit" icon={<EditOutlined />} />,
         !incident.parentNotified && (
@@ -60,29 +60,29 @@ export const IncidentsShow: React.FC = () => {
             onClick={handleMarkParentNotified}
             loading={markParentNotifiedMutation.isPending}
           >
-            Marcar como Notificado
+            Mark as Notified
           </Button>
         ),
         <DeleteButton
           key="delete"
           icon={<DeleteOutlined />}
-          confirmTitle="¿Está seguro de que desea eliminar este incidente?"
-          confirmOkText="Sí, eliminar"
-          confirmCancelText="Cancelar"
+          confirmTitle="Are you sure you want to delete this incident?"
+          confirmOkText="Yes, delete"
+          confirmCancelText="Cancel"
         />,
       ]}
     >
       <Row gutter={[16, 16]}>
         <Col span={24}>
-          <Card title="Información General">
+          <Card title="General Information">
             <Row gutter={[16, 16]}>
               <Col span={12}>
-                <Text strong>ID del Incidente:</Text>
+                <Text strong>Incident ID:</Text>
                 <br />
                 <Text>{incident.id}</Text>
               </Col>
               <Col span={12}>
-                <Text strong>Estado:</Text>
+                <Text strong>Status:</Text>
                 <br />
                 <Tag color={status.status}>{status.text}</Tag>
               </Col>
@@ -91,15 +91,15 @@ export const IncidentsShow: React.FC = () => {
         </Col>
 
         <Col span={24}>
-          <Card title="Detalles del Incidente">
+          <Card title="Incident Details">
             <Row gutter={[16, 16]}>
               <Col span={12}>
-                <Text strong>Título:</Text>
+                <Text strong>Title:</Text>
                 <br />
                 <Text>{incident.title}</Text>
               </Col>
               <Col span={12}>
-                <Text strong>Fecha del Incidente:</Text>
+                <Text strong>Incident Date:</Text>
                 <br />
                 <Text>{formatIncidentDate(incident.incidentDate)}</Text>
               </Col>
@@ -109,14 +109,14 @@ export const IncidentsShow: React.FC = () => {
             
             <Row gutter={[16, 16]}>
               <Col span={12}>
-                <Text strong>Niño:</Text>
+                <Text strong>Child:</Text>
                 <br />
                 <Text>{incident.child?.firstName} {incident.child?.lastName}</Text>
               </Col>
               <Col span={12}>
-                <Text strong>Ubicación:</Text>
+                <Text strong>Location:</Text>
                 <br />
-                <Text>{incident.location || 'No especificada'}</Text>
+                <Text>{incident.location || 'Not specified'}</Text>
               </Col>
             </Row>
             
@@ -124,7 +124,7 @@ export const IncidentsShow: React.FC = () => {
             
             <Row gutter={[16, 16]}>
               <Col span={12}>
-                <Text strong>Tipo de Incidente:</Text>
+                <Text strong>Incident Type:</Text>
                 <br />
                 <Space>
                   <Text>{incident.incidentType?.name}</Text>
@@ -134,7 +134,7 @@ export const IncidentsShow: React.FC = () => {
                 </Space>
               </Col>
               <Col span={12}>
-                <Text strong>Reportado por:</Text>
+                <Text strong>Reported by:</Text>
                 <br />
                 <Text>{incident.reportedBy2?.firstName} {incident.reportedBy2?.lastName}</Text>
               </Col>
@@ -143,21 +143,21 @@ export const IncidentsShow: React.FC = () => {
         </Col>
 
         <Col span={24}>
-          <Card title="Descripción">
+          <Card title="Description">
             <Paragraph>{incident.description}</Paragraph>
           </Card>
         </Col>
 
         {incident.actionTaken && (
           <Col span={24}>
-            <Card title="Acción Tomada">
+            <Card title="Action Taken">
               <Paragraph>{incident.actionTaken}</Paragraph>
             </Card>
           </Col>
         )}
 
         <Col span={24}>
-          <Card title="Adjuntos">
+          <Card title="Attachments">
             <IncidentAttachments
               incidentId={incident.id}
               attachments={incident.incidentAttachments || []}
@@ -175,15 +175,15 @@ export const IncidentsShow: React.FC = () => {
         </Col>
 
         <Col span={24}>
-          <Card title="Información del Sistema">
+          <Card title="System Information">
             <Row gutter={[16, 16]}>
               <Col span={12}>
-                <Text strong>Creado:</Text>
+                <Text strong>Created:</Text>
                 <br />
                 <Text>{new Date(incident.createdAt).toLocaleString()}</Text>
               </Col>
               <Col span={12}>
-                <Text strong>Última actualización:</Text>
+                <Text strong>Last updated:</Text>
                 <br />
                 <Text>{new Date(incident.updatedAt).toLocaleString()}</Text>
               </Col>

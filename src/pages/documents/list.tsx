@@ -65,15 +65,15 @@ export const DocumentList: React.FC = () => {
       
       open?.({
         type: "success",
-        message: "Documento eliminado exitosamente",
-        description: "El documento ha sido eliminado correctamente",
+        message: "Document deleted successfully",
+        description: "The document has been deleted correctly",
       });
     } catch (error) {
       console.log('🔍 Delete document - error:', error);
       open?.({
         type: "error",
-        message: "Error al eliminar el documento",
-        description: "No se pudo eliminar el documento. Intenta nuevamente.",
+        message: "Error deleting document",
+        description: "Could not delete document. Please try again.",
       });
     }
   };
@@ -90,18 +90,18 @@ export const DocumentList: React.FC = () => {
       sorter: (a: any, b: any) => a.id - b.id,
     },
     {
-      title: 'Niño',
+      title: 'Child',
       dataIndex: ['child', 'firstName'],
       render: (value: any, record: any) => `${record.child.firstName} ${record.child.lastName}`,
       sorter: (a: any, b: any) => a.child.firstName.localeCompare(b.child.firstName),
     },
     {
-      title: 'Tipo de Documento',
+      title: 'Document Type',
       dataIndex: ['documentType', 'name'],
       sorter: (a: any, b: any) => a.documentType.name.localeCompare(b.documentType.name),
     },
     {
-      title: 'Archivo',
+      title: 'File',
       dataIndex: 'originalFilename',
       render: (value: string, record: any) => (
         <Space>
@@ -113,13 +113,13 @@ export const DocumentList: React.FC = () => {
       sorter: (a: any, b: any) => a.originalFilename.localeCompare(b.originalFilename),
     },
     {
-      title: 'Fecha de Subida',
+      title: 'Upload Date',
       dataIndex: 'createdAt',
       render: (value: string) => formatDocumentDate(value),
       sorter: (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     },
     {
-      title: 'Fecha de Expiración',
+      title: 'Expiration Date',
       dataIndex: 'expiresAt',
       render: (value: string | null, record: any) => (
         <Space direction="vertical" size={0}>
@@ -137,17 +137,17 @@ export const DocumentList: React.FC = () => {
       },
     },
     {
-      title: 'Subido por',
+      title: 'Uploaded by',
       dataIndex: ['uploadedBy2', 'firstName'],
       render: (value: any, record: any) => `${record.uploadedBy2.firstName} ${record.uploadedBy2.lastName}`,
       sorter: (a: any, b: any) => a.uploadedBy2.firstName.localeCompare(b.uploadedBy2.firstName),
     },
     {
-      title: 'Acciones',
+      title: 'Actions',
       key: 'actions',
       render: (record: any) => (
         <Space>
-          <Tooltip title="Descargar documento">
+          <Tooltip title="Download document">
             <Button
               type="link"
               size="small"
@@ -159,9 +159,9 @@ export const DocumentList: React.FC = () => {
             hideText
             size="small"
             recordItemId={record.id}
-            confirmTitle="¿Está seguro de que desea eliminar este documento?"
-            confirmOkText="Sí, eliminar"
-            confirmCancelText="Cancelar"
+            confirmTitle="Are you sure you want to delete this document?"
+            confirmOkText="Yes, delete"
+            confirmCancelText="Cancel"
           />
         </Space>
       ),
@@ -170,10 +170,10 @@ export const DocumentList: React.FC = () => {
 
   return (
     <List
-      title="Documentos"
+      title="Documents"
       headerButtons={[
         <CreateButton key="create" icon={<PlusOutlined />}>
-          Subir Documento
+          Upload Document
         </CreateButton>,
       ]}
     >

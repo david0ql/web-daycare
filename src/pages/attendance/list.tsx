@@ -21,7 +21,7 @@ const AttendanceStatusComponent: React.FC<{ status: AttendanceStatus }> = ({ sta
   if (!hasCheckIn) {
     return (
       <Tag color="red" icon={<CloseCircleOutlined />}>
-        Ausente
+        Absent
       </Tag>
     );
   }
@@ -30,7 +30,7 @@ const AttendanceStatusComponent: React.FC<{ status: AttendanceStatus }> = ({ sta
   if (hasCheckOut) {
     return (
       <Tag color="green" icon={<CheckCircleOutlined />}>
-        Salida
+        Checked Out
       </Tag>
     );
   }
@@ -38,7 +38,7 @@ const AttendanceStatusComponent: React.FC<{ status: AttendanceStatus }> = ({ sta
   // If has check-in but no check-out, show as "Presente"
   return (
     <Tag color="blue" icon={<ClockCircleOutlined />}>
-      Presente
+        Present
     </Tag>
   );
 };
@@ -57,7 +57,7 @@ export const AttendanceList: React.FC = () => {
 
   const columns = [
     {
-      title: "Niño",
+      title: "Child",
       dataIndex: ["child", "firstName"],
       key: "child",
       render: (_: any, record: any) => (
@@ -77,13 +77,13 @@ export const AttendanceList: React.FC = () => {
       ),
     },
     {
-      title: "Fecha",
+      title: "Date",
       dataIndex: "attendanceDate",
       key: "attendanceDate",
       render: (value: string) => <DateField value={value} format="DD/MM/YYYY" />,
     },
     {
-      title: "Entrada",
+      title: "Check-in",
       dataIndex: "checkInTime",
       key: "checkInTime",
       render: (value: string) => value ? (
@@ -94,7 +94,7 @@ export const AttendanceList: React.FC = () => {
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: "Salida",
+      title: "Check-out",
       dataIndex: "checkOutTime",
       key: "checkOutTime",
       render: (value: string) => value ? (
@@ -105,7 +105,7 @@ export const AttendanceList: React.FC = () => {
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: "Estado",
+      title: "Status",
       dataIndex: "isPresent",
       key: "isPresent",
       render: (_: any, record: any) => {
@@ -119,7 +119,7 @@ export const AttendanceList: React.FC = () => {
       },
     },
     {
-      title: "Entregado por",
+      title: "Delivered by",
       dataIndex: ["deliveredBy2", "name"],
       key: "deliveredBy",
       render: (value: string, record: any) => value ? (
@@ -129,7 +129,7 @@ export const AttendanceList: React.FC = () => {
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: "Recogido por",
+      title: "Picked up by",
       dataIndex: ["pickedUpBy2", "name"],
       key: "pickedUpBy",
       render: (value: string, record: any) => value ? (
@@ -139,7 +139,7 @@ export const AttendanceList: React.FC = () => {
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: "Notas",
+      title: "Notes",
       key: "notes",
       render: (_: any, record: any) => {
         const checkInNotes = record.checkInNotes || 'N/A';
@@ -156,7 +156,7 @@ export const AttendanceList: React.FC = () => {
       },
     },
     {
-      title: "Acciones",
+      title: "Actions",
       key: "actions",
       render: (_: any, record: any) => {
         console.log("🔍 Attendance List - record for actions:", record);
@@ -182,7 +182,7 @@ export const AttendanceList: React.FC = () => {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Total Niños"
+              title="Total Children"
               value={stats?.totalChildren || 0}
               loading={loadingStats}
               prefix={<UserOutlined />}
@@ -192,7 +192,7 @@ export const AttendanceList: React.FC = () => {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Presentes Hoy"
+              title="Present Today"
               value={stats?.presentToday || 0}
               loading={loadingStats}
               valueStyle={{ color: '#52c41a' }}
@@ -203,7 +203,7 @@ export const AttendanceList: React.FC = () => {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Ausentes Hoy"
+              title="Absent Today"
               value={stats?.absentToday || 0}
               loading={loadingStats}
               valueStyle={{ color: '#ff4d4f' }}
@@ -214,7 +214,7 @@ export const AttendanceList: React.FC = () => {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Tasa de Asistencia"
+              title="Attendance Rate"
               value={stats?.attendanceRate || 0}
               loading={loadingStats}
               suffix="%"
@@ -225,7 +225,7 @@ export const AttendanceList: React.FC = () => {
       </Row>
 
       {/* Attendance List */}
-      <List>
+      <List title="Attendance Record">
         <Table
           {...tableProps}
           columns={columns}
@@ -236,7 +236,7 @@ export const AttendanceList: React.FC = () => {
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total, range) =>
-              `${range[0]}-${range[1]} de ${total} registros`,
+              `${range[0]}-${range[1]} of ${total} records`,
           }}
         />
       </List>

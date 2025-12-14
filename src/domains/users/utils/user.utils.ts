@@ -29,13 +29,13 @@ export class UserUtils {
   static getRoleDisplayName(roleName: string): string {
     switch (roleName) {
       case "administrator":
-        return "Administrador";
+        return "Administrator";
       case "educator":
-        return "Educador";
+        return "Educator";
       case "parent":
-        return "Padre/Madre";
+        return "Parent";
       case "staff":
-        return "Personal";
+        return "Staff";
       default:
         return roleName;
     }

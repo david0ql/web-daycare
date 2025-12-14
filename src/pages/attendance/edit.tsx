@@ -103,7 +103,7 @@ export const AttendanceEdit: React.FC = () => {
   }
 
   return (
-    <Edit saveButtonProps={customSaveButtonProps}>
+    <Edit title="Edit Attendance" saveButtonProps={customSaveButtonProps}>
       <AttendanceEditForm 
         formProps={formProps} 
         form={form}
@@ -135,21 +135,21 @@ const AttendanceEditForm: React.FC<{
   return (
     <Form {...formProps} form={form} layout="vertical" onFinish={onFinish}>
       <Form.Item
-        label="Niño"
+        label="Child"
         name="childId"
-        rules={[{ required: true, message: "Debe seleccionar un niño" }]}
+        rules={[{ required: true, message: "You must select a child" }]}
       >
         <Select
           {...childrenSelectProps}
-          placeholder="Seleccione un niño"
+          placeholder="Select a child"
           disabled
         />
       </Form.Item>
 
       <Form.Item
-        label="Fecha de Asistencia"
+        label="Attendance Date"
         name="attendanceDate"
-        rules={[{ required: true, message: "Debe especificar la fecha" }]}
+        rules={[{ required: true, message: "You must specify the date" }]}
         getValueFromEvent={(date) => {
           console.log("🔍 DatePicker getValueFromEvent:", date);
           return date;
@@ -168,12 +168,12 @@ const AttendanceEditForm: React.FC<{
         <DatePicker
           style={{ width: '100%' }}
           format="DD/MM/YYYY"
-          placeholder="Seleccione la fecha"
+          placeholder="Select the date"
         />
       </Form.Item>
 
       <Form.Item
-        label="Hora de Entrada"
+        label="Check-in Time"
         name="checkInTime"
         getValueFromEvent={(time) => {
           console.log("🔍 TimePicker getValueFromEvent:", time);
@@ -194,12 +194,12 @@ const AttendanceEditForm: React.FC<{
         <TimePicker
           style={{ width: '100%' }}
           format="HH:mm"
-          placeholder="Seleccione la hora de entrada"
+          placeholder="Select check-in time"
         />
       </Form.Item>
 
       <Form.Item
-        label="Hora de Salida"
+        label="Check-out Time"
         name="checkOutTime"
         getValueFromEvent={(time) => {
           console.log("🔍 TimePicker getValueFromEvent:", time);
@@ -220,16 +220,16 @@ const AttendanceEditForm: React.FC<{
         <TimePicker
           style={{ width: '100%' }}
           format="HH:mm"
-          placeholder="Seleccione la hora de salida"
+          placeholder="Select check-out time"
         />
       </Form.Item>
 
       <Form.Item
-        label="Entregado por"
+        label="Delivered by"
         name="deliveredBy"
       >
         <Select
-          placeholder="¿Quién entrega al niño?"
+          placeholder="Who delivers the child?"
           allowClear
           showSearch
           optionFilterProp="children"
@@ -244,11 +244,11 @@ const AttendanceEditForm: React.FC<{
       </Form.Item>
 
       <Form.Item
-        label="Recogido por"
+        label="Picked up by"
         name="pickedUpBy"
       >
         <Select
-          placeholder="¿Quién recoge al niño?"
+          placeholder="Who picks up the child?"
           allowClear
           showSearch
           optionFilterProp="children"
@@ -263,22 +263,22 @@ const AttendanceEditForm: React.FC<{
       </Form.Item>
 
       <Form.Item
-        label="Notas de Entrada"
+        label="Check-in Notes"
         name="checkInNotes"
       >
         <TextArea
           rows={3}
-          placeholder="Notas sobre la entrada del niño"
+          placeholder="Notes about the child's check-in"
         />
       </Form.Item>
 
       <Form.Item
-        label="Notas de Salida"
+        label="Check-out Notes"
         name="notes"
       >
         <TextArea
           rows={3}
-          placeholder="Notas sobre la salida del niño"
+          placeholder="Notes about the child's check-out"
         />
       </Form.Item>
     </Form>

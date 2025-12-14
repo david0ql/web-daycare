@@ -19,7 +19,7 @@ interface UpcomingEventsWidgetProps {
 }
 
 export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
-  title = "Próximos Eventos",
+  title = "Upcoming Events",
   maxItems = 5,
   showCreateButton = true,
 }) => {
@@ -52,7 +52,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
             icon={<PlusOutlined />}
             onClick={handleCreateEvent}
           >
-            Crear
+            Create
           </Button>
         )
       }
@@ -61,7 +61,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
       {upcomingEvents.length === 0 ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No hay eventos próximos"
+          description="No upcoming events"
           style={{ padding: '20px 0' }}
         />
       ) : (
@@ -93,7 +93,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
                   <Space direction="vertical" size="small">
                     <div>
                       <Text type="secondary" style={{ fontSize: '12px' }}>
-                        {dayjs(event.startDate).format('DD [de] MMMM [de] YYYY')}
+                        {dayjs(event.startDate).format('MMMM DD, YYYY')}
                       </Text>
                       {!event.isAllDay && event.startTime && (
                         <div>
@@ -106,7 +106,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
                       )}
                       {event.isAllDay && (
                         <Tag style={{ fontSize: '10px' }}>
-                          Todo el día
+                          All Day
                         </Tag>
                       )}
                     </div>
@@ -133,7 +133,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
             size="small"
             onClick={() => navigate('/calendar')}
           >
-            Ver todos los eventos
+            View all events
           </Button>
         </div>
       )}

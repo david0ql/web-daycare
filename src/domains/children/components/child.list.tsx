@@ -48,7 +48,7 @@ export const ChildList: React.FC = () => {
             icon={<UserAddOutlined />}
             onClick={() => navigate("/children/create")}
           >
-            Nuevo Niño
+            New Child
           </CreateButton>
         ) : undefined
       }
@@ -70,7 +70,7 @@ export const ChildList: React.FC = () => {
         />
         <Table.Column
           dataIndex="firstName"
-          title="Nombre"
+          title="Name"
           render={(_, record: Child) => (
             <div>
               <Text strong>{ChildUtils.getFullName(record)}</Text>
@@ -83,7 +83,7 @@ export const ChildList: React.FC = () => {
         />
         <Table.Column
           dataIndex="birthDate"
-          title="Fecha de Nacimiento"
+          title="Birth Date"
           render={(birthDate) => (
             <Text type="secondary" style={{ fontSize: "12px" }}>
               {ChildUtils.formatBirthDate(birthDate)}
@@ -92,7 +92,7 @@ export const ChildList: React.FC = () => {
         />
         <Table.Column
           dataIndex="birthCity"
-          title="Ciudad de Nacimiento"
+          title="Birth City"
           render={(birthCity) => (
             <Text type="secondary" style={{ fontSize: "12px" }}>
               {ChildUtils.formatBirthCity(birthCity)}
@@ -101,7 +101,7 @@ export const ChildList: React.FC = () => {
         />
         <Table.Column
           dataIndex="address"
-          title="Dirección"
+          title="Address"
           render={(address) => (
             <Text type="secondary" style={{ fontSize: "12px" }}>
               {ChildUtils.formatAddress(address)}
@@ -111,7 +111,7 @@ export const ChildList: React.FC = () => {
         />
         <Table.Column
           dataIndex="hasPaymentAlert"
-          title="Estado de Pago"
+          title="Payment Status"
           render={(hasPaymentAlert) => (
             <Tag color={ChildUtils.getPaymentAlertColor(hasPaymentAlert)}>
               {ChildUtils.getPaymentAlertText(hasPaymentAlert)}
@@ -120,7 +120,7 @@ export const ChildList: React.FC = () => {
         />
         <Table.Column
           dataIndex="isActive"
-          title="Estado"
+          title="Status"
           render={(isActive) => (
             <Tag color={ChildUtils.getActiveStatusColor(isActive)}>
               {ChildUtils.getActiveStatusText(isActive)}
@@ -129,7 +129,7 @@ export const ChildList: React.FC = () => {
         />
         <Table.Column
           dataIndex="createdAt"
-          title="Fecha de Registro"
+          title="Registration Date"
           render={(date) => (
             <Text type="secondary" style={{ fontSize: "12px" }}>
               {new Date(date).toLocaleDateString()}
@@ -137,7 +137,7 @@ export const ChildList: React.FC = () => {
           )}
         />
         <Table.Column
-          title="Acciones"
+          title="Actions"
           dataIndex="actions"
           render={(_, record: Child) => (
             <Space>
@@ -146,7 +146,7 @@ export const ChildList: React.FC = () => {
                 icon={<QrcodeOutlined />}
                 size="small"
                 onClick={() => handleOpenQRModal(record)}
-                title="Generar Codigo QR"
+                title="Generate QR Code"
               />
               {canManage && (
                 <>

@@ -40,8 +40,8 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
     if (!incidentId) {
       open?.({
         type: "error",
-        message: "Error al subir archivo",
-        description: "No se ha seleccionado un incidente",
+        message: "Error uploading file",
+        description: "No incident has been selected",
       });
       return false;
     }
@@ -75,15 +75,15 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
 
       open?.({
         type: "success",
-        message: "Archivo subido exitosamente",
-        description: `El archivo ${file.name} ha sido subido correctamente`,
+        message: "File uploaded successfully",
+        description: `The file ${file.name} has been uploaded correctly`,
       });
 
       return false; // Prevent default upload behavior
     } catch (error: any) {
       open?.({
         type: "error",
-        message: "Error al subir archivo",
+        message: "Error uploading file",
         description: error.response?.data?.message || error.message,
       });
       return false;
@@ -103,13 +103,13 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
 
       open?.({
         type: "success",
-        message: "Archivo eliminado exitosamente",
-        description: "El archivo ha sido eliminado correctamente",
+        message: "File deleted successfully",
+        description: "The file has been deleted correctly",
       });
     } catch (error: any) {
       open?.({
         type: "error",
-        message: "Error al eliminar archivo",
+        message: "Error deleting file",
         description: error.response?.data?.message || error.message,
       });
     }
@@ -139,7 +139,7 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
 
   return (
     <div>
-      <Typography.Title level={5}>Adjuntos del Incidente</Typography.Title>
+      <Typography.Title level={5}>Incident Attachments</Typography.Title>
       
       {!disabled && (
         <Dragger
@@ -153,10 +153,10 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
             <UploadOutlined />
           </p>
           <p className="ant-upload-text">
-            Haz clic o arrastra archivos aquí para subir
+            Click or drag files here to upload
           </p>
           <p className="ant-upload-hint">
-            Puedes subir múltiples archivos (imágenes y documentos)
+            You can upload multiple files (images and documents)
           </p>
         </Dragger>
       )}
@@ -174,7 +174,7 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
                   icon={<EyeOutlined />}
                   onClick={() => handlePreview(attachment)}
                 >
-                  Ver
+                  View
                 </Button>,
                 !disabled && (
                   <Button
@@ -184,7 +184,7 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
                     icon={<DeleteOutlined />}
                     onClick={() => attachment.id && handleDelete(attachment.id)}
                   >
-                    Eliminar
+                    Delete
                   </Button>
                 ),
               ].filter(Boolean)}
@@ -195,13 +195,13 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
                   <Space>
                     <Text strong>{attachment.filename}</Text>
                     <Tag color={getFileTypeColor(attachment.fileType)}>
-                      {attachment.fileType === 'image' ? 'Imagen' : 'Documento'}
+                      {attachment.fileType === 'image' ? 'Image' : 'Document'}
                     </Tag>
                   </Space>
                 }
                 description={
                   <Text type="secondary">
-                    Subido el {new Date(attachment.createdAt || '').toLocaleDateString()}
+                    Uploaded on {new Date(attachment.createdAt || '').toLocaleDateString()}
                   </Text>
                 }
               />
@@ -212,7 +212,7 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
 
       <Modal
         open={previewVisible}
-        title="Vista previa de imagen"
+        title="Image Preview"
         footer={null}
         onCancel={() => setPreviewVisible(false)}
         width={800}

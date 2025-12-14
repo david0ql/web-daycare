@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Button, DatePicker, Space, Typography, Divider, message } from 'antd';
 import { FileTextOutlined, DownloadOutlined, CalendarOutlined } from '@ant-design/icons';
 import { axiosInstance } from '../../shared';
@@ -15,9 +15,13 @@ export const ReportList: React.FC = () => {
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
 
+  useEffect(() => {
+    document.title = "Report Generator | The Children's World";
+  }, []);
+
   const handleGenerateReport = async (reportType: string, endpoint: string, filename: string) => {
     if (!dateRange) {
-      message.error('Por favor seleccione un rango de fechas');
+      message.error('Please select a date range');
       return;
     }
 
@@ -46,7 +50,7 @@ export const ReportList: React.FC = () => {
       message.success(`${reportType} generado exitosamente`);
     } catch (error: any) {
       console.error('Error generating report:', error);
-      message.error(`Error al generar ${reportType}: ${error.response?.data?.message || error.message}`);
+      message.error(`Error generating ${reportType}: ${error.response?.data?.message || error.message}`);
     } finally {
       setLoading(null);
     }
@@ -69,10 +73,10 @@ export const ReportList: React.FC = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      message.success('Reporte de alertas de pago generado exitosamente');
+      message.success('Payment alerts report generated successfully');
     } catch (error: any) {
       console.error('Error generating payment alerts report:', error);
-      message.error(`Error al generar reporte de alertas de pago: ${error.response?.data?.message || error.message}`);
+      message.error(`Error generating payment alerts report: ${error.response?.data?.message || error.message}`);
     } finally {
       setLoading(null);
     }
@@ -80,38 +84,38 @@ export const ReportList: React.FC = () => {
 
   const reports = [
     {
-      title: 'Reporte de Asistencia',
-      description: 'Genera un reporte de asistencia para el rango de fechas seleccionado',
+      title: 'Attendance Report',
+      description: 'Generate an attendance report for the selected date range',
       icon: <CalendarOutlined style={{ fontSize: '24px', color: '#1890ff' }} />,
       action: () => handleGenerateReport(
-        'Reporte de Asistencia',
+        'Attendance Report',
         '/reports/attendance',
         'attendance-report.pdf'
       ),
     },
     {
-      title: 'Reporte de Asistencia Semanal',
-      description: 'Genera un reporte de asistencia semanal (usa fechas por defecto si no se selecciona rango)',
+      title: 'Weekly Attendance Report',
+      description: 'Generate a weekly attendance report (uses default dates if no range is selected)',
       icon: <CalendarOutlined style={{ fontSize: '24px', color: '#52c41a' }} />,
       action: () => handleGenerateReport(
-        'Reporte de Asistencia Semanal',
+        'Weekly Attendance Report',
         '/reports/attendance/weekly',
         'weekly-attendance-report.pdf'
       ),
     },
     {
-      title: 'Reporte de Asistencia Mensual',
-      description: 'Genera un reporte de asistencia mensual (usa fechas por defecto si no se selecciona rango)',
+      title: 'Monthly Attendance Report',
+      description: 'Generate a monthly attendance report (uses default dates if no range is selected)',
       icon: <CalendarOutlined style={{ fontSize: '24px', color: '#fa8c16' }} />,
       action: () => handleGenerateReport(
-        'Reporte de Asistencia Mensual',
+        'Monthly Attendance Report',
         '/reports/attendance/monthly',
         'monthly-attendance-report.pdf'
       ),
     },
     {
-      title: 'Alertas de Pago',
-      description: 'Genera un reporte de todos los niños con alertas de pago activas',
+      title: 'Payment Alerts',
+      description: 'Generate a report of all children with active payment alerts',
       icon: <FileTextOutlined style={{ fontSize: '24px', color: '#f5222d' }} />,
       action: handleGeneratePaymentAlerts,
       noDateRequired: true,
@@ -120,30 +124,30 @@ export const ReportList: React.FC = () => {
 
   return (
     <div style={{ padding: '24px' }}>
-      <Title level={2}>Generador de Reportes</Title>
+      <Title level={2}>Report Generator</Title>
       <Text type="secondary">
-        Seleccione un rango de fechas y genere los reportes que necesite. 
-        Algunos reportes tienen fechas por defecto si no se especifica un rango.
+        Select a date range and generate the reports you need. 
+        Some reports have default dates if no range is specified.
       </Text>
 
       <Divider />
 
       <Card style={{ marginBottom: '24px' }}>
-        <Title level={4}>Configuración de Fechas</Title>
+        <Title level={4}>Date Configuration</Title>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <div>
-            <Text strong>Rango de Fechas:</Text>
+            <Text strong>Date Range:</Text>
             <br />
             <RangePicker
               value={dateRange}
               onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs] | null)}
               format="YYYY-MM-DD"
-              placeholder={['Fecha inicio', 'Fecha fin']}
+              placeholder={['Start date', 'End date']}
               style={{ marginTop: '8px' }}
             />
           </div>
           <Text type="secondary">
-            * Los reportes de asistencia semanal y mensual usarán fechas por defecto si no se selecciona un rango.
+            * Weekly and monthly attendance reports will use default dates if no range is selected.
           </Text>
         </Space>
       </Card>
@@ -163,7 +167,7 @@ export const ReportList: React.FC = () => {
                   onClick={report.action}
                   disabled={!report.noDateRequired && !dateRange}
                 >
-                  Generar Reporte
+                  Generate Report
                 </Button>,
               ]}
             >
@@ -180,10 +184,10 @@ export const ReportList: React.FC = () => {
       <Divider />
 
       <Card>
-        <Title level={4}>Reportes por Niño</Title>
+        <Title level={4}>Reports by Child</Title>
         <Text type="secondary">
-          Para generar reportes individuales por niño, vaya a la sección de niños y seleccione "Generar Reporte" 
-          en el perfil del niño específico.
+          To generate individual reports by child, go to the children section and select "Generate Report" 
+          in the specific child's profile.
         </Text>
       </Card>
     </div>

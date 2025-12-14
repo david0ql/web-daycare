@@ -7,7 +7,7 @@ export const appResources: ResourceProps[] = [
     create: "/users/create",
     edit: "/users/edit/:id",
     meta: {
-      label: "Usuarios",
+      label: "Users",
       icon: "👥",
     },
   },
@@ -18,7 +18,7 @@ export const appResources: ResourceProps[] = [
     edit: "/children/edit/:id",
     show: "/children/show/:id",
     meta: {
-      label: "Niños",
+      label: "Children",
       icon: "👶",
     },
   },
@@ -29,7 +29,7 @@ export const appResources: ResourceProps[] = [
     show: "/attendance/show/:id",
     edit: "/attendance/edit/:id",
     meta: {
-      label: "Asistencia",
+      label: "Attendance",
       icon: "📋",
     },
   },
@@ -40,7 +40,7 @@ export const appResources: ResourceProps[] = [
     edit: "/attendance/activities/edit/:id",
     show: "/attendance/activities/show/:id",
     meta: {
-      label: "Actividades Diarias",
+      label: "Daily Activities",
       icon: "✅",
     },
   },
@@ -51,7 +51,7 @@ export const appResources: ResourceProps[] = [
     edit: "/attendance/observations/edit/:id",
     show: "/attendance/observations/show/:id",
     meta: {
-      label: "Observaciones",
+      label: "Observations",
       icon: "👁️",
     },
   },
@@ -62,7 +62,7 @@ export const appResources: ResourceProps[] = [
     edit: "/attendance/photos/edit/:id",
     show: "/attendance/photos/show/:id",
     meta: {
-      label: "Fotos de Actividades",
+      label: "Activity Photos",
       icon: "📷",
     },
   },
@@ -73,7 +73,7 @@ export const appResources: ResourceProps[] = [
     edit: "/incidents/edit/:id",
     show: "/incidents/show/:id",
     meta: {
-      label: "Incidentes",
+      label: "Incidents",
       icon: "⚠️",
     },
   },
@@ -83,7 +83,7 @@ export const appResources: ResourceProps[] = [
     create: "/calendar/create",
     edit: "/calendar/edit/:id",
     meta: {
-      label: "Calendario",
+      label: "Calendar",
       icon: "📅",
     },
   },
@@ -94,7 +94,7 @@ export const appResources: ResourceProps[] = [
     edit: "/documents/edit/:id",
     show: "/documents/show/:id",
     meta: {
-      label: "Documentos",
+      label: "Documents",
       icon: "📄",
     },
   },
@@ -102,7 +102,7 @@ export const appResources: ResourceProps[] = [
     name: "reports",
     list: "/reports",
     meta: {
-      label: "Reportes",
+      label: "Reports",
       icon: "📊",
     },
   },

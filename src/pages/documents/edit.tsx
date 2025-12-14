@@ -33,8 +33,8 @@ export const DocumentEdit: React.FC = () => {
 
       open?.({
         type: "success",
-        message: "Documento actualizado exitosamente",
-        description: "Los cambios se han guardado correctamente",
+        message: "Document updated successfully",
+        description: "Changes have been saved correctly",
       });
 
       // Navigate back to documents list
@@ -106,23 +106,23 @@ export const DocumentEdit: React.FC = () => {
     } catch (error: any) {
       open?.({
         type: "error",
-        message: "Error al actualizar el documento",
+        message: "Error updating document",
         description: error.response?.data?.message || error.message,
       });
     }
   };
 
   if (documentLoading) {
-    return <div>Cargando...</div>;
+    return <div>Loading...</div>;
   }
 
   if (!documentData) {
-    return <div>Documento no encontrado</div>;
+    return <div>Document not found</div>;
   }
 
   return (
     <Edit
-      title="Editar Documento"
+      title="Edit Document"
       saveButtonProps={{
         ...saveButtonProps,
         onClick: () => formProps.form?.submit(),
@@ -132,15 +132,15 @@ export const DocumentEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Niño"
+              label="Child"
               name="childId"
-              rules={[{ required: true, message: 'Por favor seleccione un niño' }]}
+              rules={[{ required: true, message: 'Please select a child' }]}
             >
               <Select
-                placeholder="Seleccione un niño"
+                placeholder="Select a child"
                 showSearch
                 loading={childrenLoading}
-                notFoundContent={childrenLoading ? "Cargando..." : "No hay niños disponibles"}
+                notFoundContent={childrenLoading ? "Loading..." : "No children available"}
                 filterOption={(input, option) =>
                   String(option?.children || "").toLowerCase().includes(input.toLowerCase())
                 }
@@ -156,14 +156,14 @@ export const DocumentEdit: React.FC = () => {
 
           <Col span={12}>
             <Form.Item
-              label="Tipo de Documento"
+              label="Document Type"
               name="documentTypeId"
-              rules={[{ required: true, message: 'Por favor seleccione un tipo de documento' }]}
+              rules={[{ required: true, message: 'Please select a document type' }]}
             >
               <Select
-                placeholder="Seleccione un tipo de documento"
+                placeholder="Select a document type"
                 loading={documentTypesLoading}
-                notFoundContent={documentTypesLoading ? "Cargando..." : "No hay tipos de documento disponibles"}
+                notFoundContent={documentTypesLoading ? "Loading..." : "No document types available"}
                 showSearch
                 filterOption={(input, option) =>
                   String(option?.children || "").toLowerCase().includes(input.toLowerCase())
@@ -180,24 +180,24 @@ export const DocumentEdit: React.FC = () => {
         </Row>
 
         <Form.Item
-          label="Fecha de Expiración"
+          label="Expiration Date"
           name="expiresAt"
         >
           <DatePicker
             style={{ width: '100%' }}
             format="DD/MM/YYYY"
-            placeholder="Seleccione fecha de expiración"
+            placeholder="Select expiration date"
           />
         </Form.Item>
 
         <Form.Item
-          label="Archivo Actual"
+          label="Current File"
         >
           <div style={{ padding: '8px 12px', background: '#f5f5f5', borderRadius: '6px' }}>
             <strong>{documentData.originalFilename}</strong>
             <br />
             <span style={{ color: '#666', fontSize: '12px' }}>
-              Tamaño: {(documentData.fileSize / 1024 / 1024).toFixed(2)} MB
+              Size: {(documentData.fileSize / 1024 / 1024).toFixed(2)} MB
             </span>
           </div>
         </Form.Item>

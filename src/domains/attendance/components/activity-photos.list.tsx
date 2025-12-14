@@ -19,10 +19,10 @@ export const ActivityPhotosList: React.FC<ActivityPhotosListProps> = ({
   const handleDelete = async (id: number) => {
     try {
       await deletePhoto(id);
-      message.success('Foto eliminada exitosamente');
+      message.success('Photo deleted successfully');
     } catch (error) {
       console.error('Error deleting photo:', error);
-      message.error('Error al eliminar la foto');
+      message.error('Error deleting photo');
     }
   };
 
@@ -39,7 +39,7 @@ export const ActivityPhotosList: React.FC<ActivityPhotosListProps> = ({
     return (
       <Card>
         <Empty 
-          description="No hay fotos registradas para este día"
+          description="No photos registered for this day"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         />
       </Card>
@@ -49,7 +49,7 @@ export const ActivityPhotosList: React.FC<ActivityPhotosListProps> = ({
   return (
     <Card>
       <Title level={5} style={{ marginBottom: '16px' }}>
-        Fotos de Actividades ({photos.length})
+        Activity Photos ({photos.length})
       </Title>
       
       <Row gutter={[16, 16]}>
@@ -59,7 +59,7 @@ export const ActivityPhotosList: React.FC<ActivityPhotosListProps> = ({
               hoverable
               cover={
                 <Image
-                  alt={photo.caption || 'Foto de actividad'}
+                  alt={photo.caption || 'Activity photo'}
                   src={getImageUrl(photo)}
                   style={{ height: 200, objectFit: 'cover' }}
                   fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
@@ -71,12 +71,12 @@ export const ActivityPhotosList: React.FC<ActivityPhotosListProps> = ({
                   icon={<EyeOutlined />}
                   size="small"
                 >
-                  Ver
+                  View
                 </Button>,
                 <Popconfirm
-                  title="¿Estás seguro de eliminar esta foto?"
+                  title="Are you sure you want to delete this photo?"
                   onConfirm={() => handleDelete(photo.id)}
-                  okText="Sí"
+                  okText="Yes"
                   cancelText="No"
                 >
                   <Button
@@ -85,7 +85,7 @@ export const ActivityPhotosList: React.FC<ActivityPhotosListProps> = ({
                     icon={<DeleteOutlined />}
                     size="small"
                   >
-                    Eliminar
+                    Delete
                   </Button>
                 </Popconfirm>,
               ]}
@@ -93,13 +93,13 @@ export const ActivityPhotosList: React.FC<ActivityPhotosListProps> = ({
               <Card.Meta
                 title={
                   <Text strong style={{ fontSize: '12px' }}>
-                    {photo.caption || 'Sin descripción'}
+                    {photo.caption || 'No description'}
                   </Text>
                 }
                 description={
                   <Space direction="vertical" size="small">
                     <Text type="secondary" style={{ fontSize: '11px' }}>
-                      Subido por: {photo.uploadedByUser?.firstName} {photo.uploadedByUser?.lastName}
+                      Uploaded by: {photo.uploadedByUser?.firstName} {photo.uploadedByUser?.lastName}
                     </Text>
                     <Text type="secondary" style={{ fontSize: '11px' }}>
                       {dayjs(photo.createdAt).format('DD/MM/YYYY HH:mm')}

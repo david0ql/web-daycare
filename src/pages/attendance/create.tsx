@@ -101,22 +101,22 @@ export const AttendanceCreate: React.FC = () => {
       notes: values.checkInNotes,
     }, {
       onSuccess: () => {
-        message.success("Check-in exitoso. El niño ha sido registrado correctamente.");
+        message.success("Check-in successful. The child has been registered correctly.");
         setSelectedChild(null);
       },
       onError: (error: any) => {
-        message.error("Error en check-in: " + (error?.response?.data?.message || "No se pudo registrar el check-in"));
+        message.error("Check-in error: " + (error?.response?.data?.message || "Could not register check-in"));
       }
     });
   };
 
   const handleCheckOut = (values: any) => {
     if (!values.pickedUpBy) {
-      message.error("Debe especificar quién recoge al niño");
+      message.error("You must specify who picks up the child");
       return;
     }
     if (!values.checkOutNotes) {
-      message.error("Las notas de salida son obligatorias");
+      message.error("Check-out notes are required");
       return;
     }
     
@@ -126,11 +126,11 @@ export const AttendanceCreate: React.FC = () => {
       notes: values.checkOutNotes,
     }, {
       onSuccess: () => {
-        message.success("Check-out exitoso. El niño ha sido registrado para salida correctamente.");
+        message.success("Check-out successful. The child has been registered for departure correctly.");
         setSelectedChild(null);
       },
       onError: (error: any) => {
-        message.error("Error en check-out: " + (error?.response?.data?.message || "No se pudo registrar el check-out"));
+        message.error("Check-out error: " + (error?.response?.data?.message || "Could not register check-out"));
       }
     });
   };
@@ -185,18 +185,18 @@ export const AttendanceCreate: React.FC = () => {
                   <Title level={4} style={{ margin: 0 }}>
                     {`${selectedChild.firstName} ${selectedChild.lastName}`}
                   </Title>
-                  <Text type="secondary">Seleccionado para check-in</Text>
+                  <Text type="secondary">Selected for check-in</Text>
                 </Col>
               </Row>
             </Card>
           )}
 
           <Form.Item
-            label="Entregado por (Opcional)"
+            label="Delivered by (Optional)"
             name="deliveredBy"
           >
             <Select
-              placeholder={selectedChild ? "¿Quién entrega al niño?" : "Primero seleccione un niño"}
+              placeholder={selectedChild ? "Who delivers the child?" : "First select a child"}
               allowClear
               showSearch
               optionFilterProp="children"
@@ -213,12 +213,12 @@ export const AttendanceCreate: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            label="Notas de Entrada (Opcional)"
+            label="Check-in Notes (Optional)"
             name="checkInNotes"
           >
             <TextArea
               rows={3}
-              placeholder="Observaciones sobre el estado del niño al llegar..."
+              placeholder="Observations about the child's condition upon arrival..."
             />
           </Form.Item>
 
@@ -231,7 +231,7 @@ export const AttendanceCreate: React.FC = () => {
               icon={<LoginOutlined />}
               block
             >
-              Registrar Check-in
+              Register Check-in
             </Button>
           </Form.Item>
         </Form>
@@ -281,19 +281,19 @@ export const AttendanceCreate: React.FC = () => {
                   <Title level={4} style={{ margin: 0 }}>
                     {`${selectedChild.firstName} ${selectedChild.lastName}`}
                   </Title>
-                  <Text type="secondary">Seleccionado para check-out</Text>
+                  <Text type="secondary">Selected for check-out</Text>
                 </Col>
               </Row>
             </Card>
           )}
 
           <Form.Item
-            label="Recogido por"
+            label="Picked up by"
             name="pickedUpBy"
-            rules={[{ required: true, message: "Debe especificar quién recoge al niño" }]}
+            rules={[{ required: true, message: "You must specify who picks up the child" }]}
           >
             <Select
-              placeholder={selectedChild ? "¿Quién recoge al niño?" : "Primero seleccione un niño"}
+              placeholder={selectedChild ? "Who picks up the child?" : "First select a child"}
               showSearch
               optionFilterProp="children"
               disabled={!selectedChild}
@@ -309,13 +309,13 @@ export const AttendanceCreate: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            label="Notas de Salida (Obligatorias)"
+            label="Check-out Notes (Required)"
             name="checkOutNotes"
-            rules={[{ required: true, message: "Las notas de salida son obligatorias" }]}
+            rules={[{ required: true, message: "Check-out notes are required" }]}
           >
             <TextArea
               rows={4}
-              placeholder="Resumen del día del niño, comportamiento, actividades realizadas, comidas, etc..."
+              placeholder="Summary of the child's day, behavior, activities performed, meals, etc..."
             />
           </Form.Item>
 
@@ -329,7 +329,7 @@ export const AttendanceCreate: React.FC = () => {
               block
               danger
             >
-              Registrar Check-out
+              Register Check-out
             </Button>
           </Form.Item>
         </Form>
@@ -340,7 +340,7 @@ export const AttendanceCreate: React.FC = () => {
   if (loadingChildren) {
     return (
       <Create
-        title="Gestión de Asistencia"
+        title="Attendance Management"
         breadcrumb={false}
         headerButtons={<></>}
         // saveButtonProps={{ style: { display: 'none' } }} // Comentado: el check-in y check-out tienen sus propios botones
@@ -350,7 +350,7 @@ export const AttendanceCreate: React.FC = () => {
           <div style={{ textAlign: 'center', padding: '50px' }}>
             <Spin size="large" />
             <div style={{ marginTop: 16 }}>
-              <Text>Cargando datos...</Text>
+              <Text>Loading data...</Text>
             </div>
           </div>
         </Card>
@@ -360,7 +360,7 @@ export const AttendanceCreate: React.FC = () => {
 
   return (
     <Create
-      title="Gestión de Asistencia"
+      title="Attendance Management"
       breadcrumb={false}
       headerButtons={<></>}
       // saveButtonProps={{ style: { display: 'none' } }} // Comentado: el check-in y check-out tienen sus propios botones

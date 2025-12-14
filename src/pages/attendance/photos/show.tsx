@@ -16,14 +16,14 @@ export const AttendancePhotosShow: React.FC = () => {
 
   return (
     <Show isLoading={isLoading}>
-      <Title level={5}>Información de Foto de Actividad</Title>
+      <Title level={5}>Activity Photo Information</Title>
       
       <Row gutter={16}>
         <Col span={12}>
-          <Card title="Información del Niño" size="small">
+          <Card title="Child Information" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Niño: </Text>
+                <Text strong>Child: </Text>
                 <Text>{record?.child?.firstName} {record?.child?.lastName}</Text>
               </div>
               <div>
@@ -35,14 +35,14 @@ export const AttendancePhotosShow: React.FC = () => {
         </Col>
         
         <Col span={12}>
-          <Card title="Información de la Foto" size="small">
+          <Card title="Photo Information" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Fecha: </Text>
+                <Text strong>Date: </Text>
                 <DateField value={record?.attendance?.attendanceDate} format="DD/MM/YYYY" />
               </div>
               <div>
-                <Text strong>Subido por: </Text>
+                <Text strong>Uploaded by: </Text>
                 <Text>{record?.uploadedByUser?.firstName} {record?.uploadedByUser?.lastName}</Text>
               </div>
             </Space>
@@ -52,7 +52,7 @@ export const AttendancePhotosShow: React.FC = () => {
 
       <Row gutter={16} style={{ marginTop: 16 }}>
         <Col span={24}>
-          <Card title="Foto" size="small">
+          <Card title="Photo" size="small">
             <div style={{ textAlign: 'center' }}>
               <Image
                 width={400}
@@ -68,18 +68,18 @@ export const AttendancePhotosShow: React.FC = () => {
 
       <Row gutter={16} style={{ marginTop: 16 }}>
         <Col span={24}>
-          <Card title="Descripción" size="small">
+          <Card title="Description" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Descripción: </Text>
-                <Text>{record?.caption || 'Sin descripción'}</Text>
+                <Text strong>Description: </Text>
+                <Text>{record?.caption || 'No description'}</Text>
               </div>
               <div>
-                <Text strong>Archivo: </Text>
+                <Text strong>File: </Text>
                 <Text>{record?.filename}</Text>
               </div>
               <div>
-                <Text strong>Subido: </Text>
+                <Text strong>Uploaded: </Text>
                 <DateField value={record?.createdAt} format="DD/MM/YYYY HH:mm" />
               </div>
             </Space>

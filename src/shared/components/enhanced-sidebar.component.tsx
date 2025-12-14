@@ -60,18 +60,18 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     {
       key: "users",
       icon: <TeamOutlined />,
-      label: "Usuarios",
+      label: "Users",
       children: [
         {
           key: "/users",
           icon: <UserOutlined />,
-          label: "Lista de Usuarios",
+          label: "User List",
           path: "/users",
         },
         ...(isAdmin() ? [{
           key: "/users/create",
           icon: <UserAddOutlined />,
-          label: "Crear Usuario",
+          label: "Create User",
           path: "/users/create",
         }] : []),
       ],
@@ -79,18 +79,18 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     {
       key: "children",
       icon: <UserOutlined />,
-      label: "Niños",
+      label: "Children",
       children: [
         {
           key: "/children",
           icon: <UserOutlined />,
-          label: "Lista de Niños",
+          label: "Children List",
           path: "/children",
         },
         ...((isAdmin() || isEducator()) ? [{
           key: "/children/create",
           icon: <UserAddOutlined />,
-          label: "Registrar Niño",
+          label: "Register Child",
           path: "/children/create",
         }] : []),
       ],
@@ -98,36 +98,36 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     {
       key: "attendance",
       icon: <FileTextOutlined />,
-      label: "Asistencia",
+      label: "Attendance",
       children: [
         {
           key: "/attendance",
           icon: <FileTextOutlined />,
-          label: "Registro de Asistencia",
+          label: "Attendance Record",
           path: "/attendance",
         },
         ...((isAdmin() || isEducator()) ? [{
           key: "/attendance/create",
           icon: <UserAddOutlined />,
-          label: "Marcar Asistencia",
+          label: "Mark Attendance",
           path: "/attendance/create",
         }] : []),
         {
           key: "/attendance/activities",
           icon: <CheckCircleOutlined />,
-          label: "Actividades Diarias",
+          label: "Daily Activities",
           path: "/attendance/activities",
         },
         {
           key: "/attendance/observations",
           icon: <EyeOutlined />,
-          label: "Observaciones",
+          label: "Observations",
           path: "/attendance/observations",
         },
         {
           key: "/attendance/photos",
           icon: <CameraOutlined />,
-          label: "Fotos de Actividades",
+          label: "Activity Photos",
           path: "/attendance/photos",
         },
       ],
@@ -135,18 +135,18 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     {
       key: "incidents",
       icon: <WarningOutlined />,
-      label: "Incidentes",
+      label: "Incidents",
       children: [
         {
           key: "/incidents",
           icon: <WarningOutlined />,
-          label: "Lista de Incidentes",
+          label: "Incidents List",
           path: "/incidents",
         },
         ...((isAdmin() || isEducator()) ? [{
           key: "/incidents/create",
           icon: <UserAddOutlined />,
-          label: "Reportar Incidente",
+          label: "Report Incident",
           path: "/incidents/create",
         }] : []),
       ],
@@ -154,18 +154,18 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     {
       key: "calendar",
       icon: <CalendarOutlined />,
-      label: "Calendario",
+      label: "Calendar",
       children: [
         {
           key: "/calendar",
           icon: <CalendarOutlined />,
-          label: "Vista de Calendario",
+          label: "Calendar View",
           path: "/calendar",
         },
         ...((isAdmin() || isEducator()) ? [{
           key: "/calendar/create",
           icon: <UserAddOutlined />,
-          label: "Crear Evento",
+          label: "Create Event",
           path: "/calendar/create",
         }] : []),
       ],
@@ -173,18 +173,18 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     {
       key: "documents",
       icon: <BookOutlined />,
-      label: "Documentos",
+      label: "Documents",
       children: [
         {
           key: "/documents",
           icon: <BookOutlined />,
-          label: "Lista de Documentos",
+          label: "Documents List",
           path: "/documents",
         },
         ...((isAdmin() || isEducator()) ? [{
           key: "/documents/create",
           icon: <UserAddOutlined />,
-          label: "Subir Documento",
+          label: "Upload Document",
           path: "/documents/create",
         }] : []),
       ],
@@ -192,12 +192,12 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     ...(isAdmin() ? [{
       key: "reports",
       icon: <BarChartOutlined />,
-      label: "Reportes",
+      label: "Reports",
       children: [
         {
           key: "/reports",
           icon: <BarChartOutlined />,
-          label: "Vista de Reportes",
+          label: "Reports View",
           path: "/reports",
         },
       ],
@@ -300,7 +300,7 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                 The Children's World
               </div>
               <div style={{ fontSize: "12px", opacity: 0.9 }}>
-                Sistema de Gestión
+                Management System
               </div>
             </>
           )}
@@ -405,7 +405,7 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
               e.currentTarget.style.color = colors.text.secondary;
             }}
           >
-            {!collapsed && "Cerrar Sesión"}
+            {!collapsed && "Log Out"}
           </Button>
         </div>
       </div>

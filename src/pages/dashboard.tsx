@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useCustom, useList } from "@refinedev/core";
 import { Card, Row, Col, Typography, Statistic, Space, Avatar, List as AntList } from "antd";
 import { 
@@ -44,6 +44,10 @@ interface AttendanceRecord {
 }
 
 export const Dashboard: React.FC = () => {
+  useEffect(() => {
+    document.title = "Dashboard | The Children's World";
+  }, []);
+
   // Get basic stats - using maximum allowed pageSize of 150
   const childrenQuery = useList({
     resource: "children",
@@ -112,10 +116,10 @@ export const Dashboard: React.FC = () => {
   return (
     <div style={{ padding: "24px" }}>
       <Title level={2}>
-        Bienvenido a The Children's World 🏫
+        Welcome to The Children's World 🏫
       </Title>
       <Text type="secondary">
-        Resumen del sistema - {moment().format("dddd, DD [de] MMMM [de] YYYY")}
+        System Summary - {moment().format("dddd, MMMM DD, YYYY")}
       </Text>
 
       {/* Main Stats */}
@@ -123,52 +127,52 @@ export const Dashboard: React.FC = () => {
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Total de Niños"
+              title="Total Children"
               value={stats.totalChildren}
               prefix={<TeamOutlined />}
               valueStyle={{ color: "#1890ff" }}
             />
             <Text type="secondary">
-              {stats.activeChildren} activos
+              {stats.activeChildren} active
             </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Usuarios del Sistema"
+              title="System Users"
               value={stats.totalUsers}
               prefix={<UserOutlined />}
               valueStyle={{ color: "#52c41a" }}
             />
             <Text type="secondary">
-              Registrados en el sistema
+              Registered in the system
             </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Asistencia Hoy"
+              title="Today's Attendance"
               value={stats.todayAttendance}
               prefix={<CalendarOutlined />}
               valueStyle={{ color: "#faad14" }}
             />
             <Text type="secondary">
-              {checkedIn} entradas, {checkedOut} salidas
+              {checkedIn} check-ins, {checkedOut} check-outs
             </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Alertas de Pago"
+              title="Payment Alerts"
               value={stats.paymentAlerts}
               prefix={<WarningOutlined />}
               valueStyle={{ color: stats.paymentAlerts > 0 ? "#ff4d4f" : "#52c41a" }}
             />
             <Text type="secondary">
-              {stats.paymentAlerts > 0 ? "Requieren atención" : "Todo al día"}
+              {stats.paymentAlerts > 0 ? "Requires attention" : "All up to date"}
             </Text>
           </Card>
         </Col>
@@ -179,13 +183,13 @@ export const Dashboard: React.FC = () => {
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Ausentes Hoy"
+              title="Absent Today"
               value={stats.absentToday}
               prefix={<CloseCircleOutlined />}
               valueStyle={{ color: "#ff4d4f" }}
             />
             <Text type="secondary">
-              {stats.attendanceRate}% tasa de asistencia
+              {stats.attendanceRate}% attendance rate
             </Text>
           </Card>
         </Col>
@@ -198,7 +202,7 @@ export const Dashboard: React.FC = () => {
               valueStyle={{ color: "#52c41a" }}
             />
             <Text type="secondary">
-              Entradas registradas
+              Check-ins recorded
             </Text>
           </Card>
         </Col>
@@ -211,14 +215,14 @@ export const Dashboard: React.FC = () => {
               valueStyle={{ color: "#1890ff" }}
             />
             <Text type="secondary">
-              Salidas registradas
+              Check-outs recorded
             </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Tasa de Asistencia"
+              title="Attendance Rate"
               value={stats.attendanceRate}
               suffix="%"
               prefix={<CalendarOutlined />}
@@ -238,10 +242,10 @@ export const Dashboard: React.FC = () => {
             title={
               <Space>
                 <ClockCircleOutlined />
-                Actividad de Hoy
+                Today's Activity
               </Space>
             }
-            extra={<Text type="secondary">{attendanceRecords.length} registros</Text>}
+            extra={<Text type="secondary">{attendanceRecords.length} records</Text>}
           >
             <AntList
               dataSource={attendanceRecords.slice(0, 5)}
@@ -259,12 +263,12 @@ export const Dashboard: React.FC = () => {
                       <Space>
                         {record.checkInTime && (
                           <Text type="success">
-                            <CheckCircleOutlined /> Entrada: {moment(record.checkInTime, "HH:mm:ss").format("HH:mm")}
+                            <CheckCircleOutlined /> Check-in: {moment(record.checkInTime, "HH:mm:ss").format("HH:mm")}
                           </Text>
                         )}
                         {record.checkOutTime && (
                           <Text type="warning">
-                            <ClockCircleOutlined /> Salida: {moment(record.checkOutTime, "HH:mm:ss").format("HH:mm")}
+                            <ClockCircleOutlined /> Check-out: {moment(record.checkOutTime, "HH:mm:ss").format("HH:mm")}
                           </Text>
                         )}
                       </Space>
@@ -272,12 +276,12 @@ export const Dashboard: React.FC = () => {
                   />
                 </AntList.Item>
               )}
-              locale={{ emptyText: "No hay registros de asistencia hoy" }}
+              locale={{ emptyText: "No attendance records today" }}
             />
             {attendanceRecords.length > 5 && (
               <div style={{ textAlign: "center", marginTop: 16 }}>
                 <Text type="secondary">
-                  Y {attendanceRecords.length - 5} más...
+                  And {attendanceRecords.length - 5} more...
                 </Text>
               </div>
             )}
@@ -289,10 +293,10 @@ export const Dashboard: React.FC = () => {
             title={
               <Space>
                 <WarningOutlined style={{ color: "#ff4d4f" }} />
-                Alertas de Pago
+                Payment Alerts
               </Space>
             }
-            extra={<Text type="secondary">{paymentAlerts.length} alertas</Text>}
+            extra={<Text type="secondary">{paymentAlerts.length} alerts</Text>}
           >
             <AntList
               dataSource={paymentAlerts.slice(0, 5)}
@@ -308,18 +312,18 @@ export const Dashboard: React.FC = () => {
                     title={`${child.firstName} ${child.lastName}`}
                     description={
                       <Text type="danger">
-                        <WarningOutlined /> Pagos pendientes
+                        <WarningOutlined /> Pending payments
                       </Text>
                     }
                   />
                 </AntList.Item>
               )}
-              locale={{ emptyText: "No hay alertas de pago activas" }}
+              locale={{ emptyText: "No active payment alerts" }}
             />
             {paymentAlerts.length > 5 && (
               <div style={{ textAlign: "center", marginTop: 16 }}>
                 <Text type="secondary">
-                  Y {paymentAlerts.length - 5} más...
+                  And {paymentAlerts.length - 5} more...
                 </Text>
               </div>
             )}
@@ -330,7 +334,7 @@ export const Dashboard: React.FC = () => {
       {/* Quick Actions */}
       <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
         <Col span={24}>
-          <Card title="Accesos Rápidos">
+          <Card title="Quick Access">
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={6}>
                 <Card 
@@ -339,7 +343,7 @@ export const Dashboard: React.FC = () => {
                   style={{ textAlign: "center", cursor: "pointer" }}
                 >
                   <CheckCircleOutlined style={{ fontSize: 32, color: "#52c41a", marginBottom: 8 }} />
-                  <div>Registrar Asistencia</div>
+                  <div>Register Attendance</div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} md={6}>
@@ -349,7 +353,7 @@ export const Dashboard: React.FC = () => {
                   style={{ textAlign: "center", cursor: "pointer" }}
                 >
                   <TeamOutlined style={{ fontSize: 32, color: "#1890ff", marginBottom: 8 }} />
-                  <div>Nuevo Niño</div>
+                  <div>New Child</div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} md={6}>
@@ -359,7 +363,7 @@ export const Dashboard: React.FC = () => {
                   style={{ textAlign: "center", cursor: "pointer" }}
                 >
                   <WarningOutlined style={{ fontSize: 32, color: "#faad14", marginBottom: 8 }} />
-                  <div>Reportar Incidente</div>
+                  <div>Report Incident</div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} md={6}>
@@ -369,7 +373,7 @@ export const Dashboard: React.FC = () => {
                   style={{ textAlign: "center", cursor: "pointer" }}
                 >
                   <UserOutlined style={{ fontSize: 32, color: "#722ed1", marginBottom: 8 }} />
-                  <div>Nuevo Usuario</div>
+                  <div>New User</div>
                 </Card>
               </Col>
             </Row>

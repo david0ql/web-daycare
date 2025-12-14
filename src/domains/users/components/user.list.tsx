@@ -34,7 +34,7 @@ export const UserList: React.FC = () => {
             icon={<UserAddOutlined />}
             onClick={() => navigate("/users/create")}
           >
-            Nuevo Usuario
+            New User
           </CreateButton>
         ) : undefined
       }
@@ -56,7 +56,7 @@ export const UserList: React.FC = () => {
         />
         <Table.Column
           dataIndex="firstName"
-          title="Nombre"
+          title="Name"
           render={(_, record: User) => (
             <div>
               <Text strong>{UserUtils.getFullName(record)}</Text>
@@ -69,7 +69,7 @@ export const UserList: React.FC = () => {
         />
         <Table.Column
           dataIndex="role"
-          title="Rol"
+          title="Role"
           render={(role) => (
             <Tag color={UserUtils.getRoleColor(role.name)}>
               {UserUtils.getRoleDisplayName(role.name)}
@@ -78,23 +78,23 @@ export const UserList: React.FC = () => {
         />
         <Table.Column
           dataIndex="phone"
-          title="Teléfono"
+          title="Phone"
           render={(phone) => (
             <Text>{UserUtils.formatPhoneNumber(phone)}</Text>
           )}
         />
         <Table.Column
           dataIndex="isActive"
-          title="Estado"
+          title="Status"
           render={(isActive) => (
             <Tag color={isActive ? "green" : "red"}>
-              {isActive ? "Activo" : "Inactivo"}
+              {isActive ? "Active" : "Inactive"}
             </Tag>
           )}
         />
         <Table.Column
           dataIndex="lastLogin"
-          title="Último Acceso"
+          title="Last Access"
           render={(lastLogin) => (
             <Text type="secondary" style={{ fontSize: "12px" }}>
               {UserUtils.getLastLoginDisplay(lastLogin)}
@@ -103,7 +103,7 @@ export const UserList: React.FC = () => {
         />
         <Table.Column
           dataIndex="createdAt"
-          title="Fecha de Registro"
+          title="Registration Date"
           render={(date) => (
             <Text type="secondary" style={{ fontSize: "12px" }}>
               {new Date(date).toLocaleDateString()}
@@ -111,7 +111,7 @@ export const UserList: React.FC = () => {
           )}
         />
         <Table.Column
-          title="Acciones"
+          title="Actions"
           dataIndex="actions"
           render={(_, record: User) => (
             <Space>

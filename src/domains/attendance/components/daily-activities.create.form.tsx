@@ -40,7 +40,7 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
 
       await createActivity(activityData);
       
-      message.success('Actividad registrada exitosamente');
+      message.success('Activity registered successfully');
       form.resetFields();
       setCompleted(false);
       
@@ -49,7 +49,7 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
       }
     } catch (error) {
       console.error('Error creating activity:', error);
-      message.error('Error al registrar la actividad');
+      message.error('Error registering activity');
     } finally {
       setIsSubmitting(false);
     }
@@ -65,7 +65,7 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
   return (
     <Card>
       <Title level={5} style={{ marginBottom: '16px' }}>
-        Registrar Actividad Diaria
+        Register Daily Activity
       </Title>
       
       <Form
@@ -79,11 +79,11 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Tipo de Actividad"
+              label="Activity Type"
               name="activityType"
-              rules={[{ required: true, message: 'Por favor seleccione el tipo de actividad' }]}
+              rules={[{ required: true, message: 'Please select the activity type' }]}
             >
-              <Select placeholder="Seleccione el tipo de actividad">
+              <Select placeholder="Select activity type">
                 {Object.values(ActivityTypeEnum).map((type) => (
                   <Option key={type} value={type}>
                     {ACTIVITY_TYPE_LABELS[type]}
@@ -95,7 +95,7 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
           
           <Col span={12}>
             <Form.Item
-              label="Completada"
+              label="Completed"
               name="completed"
               valuePropName="checked"
               getValueFromEvent={(checked) => Boolean(checked)}
@@ -113,14 +113,14 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="Hora de Completado"
+                label="Completion Time"
                 name="timeCompleted"
-                rules={[{ required: true, message: 'Por favor seleccione la hora de completado' }]}
+                rules={[{ required: true, message: 'Please select the completion time' }]}
               >
                 <TimePicker 
                   style={{ width: '100%' }}
                   format="HH:mm"
-                  placeholder="Seleccione la hora"
+                  placeholder="Select time"
                 />
               </Form.Item>
             </Col>
@@ -130,12 +130,12 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Notas"
+              label="Notes"
               name="notes"
             >
               <TextArea 
                 rows={3}
-                placeholder="Notas adicionales sobre la actividad (opcional)"
+                placeholder="Additional notes about the activity (optional)"
                 maxLength={500}
                 showCount
               />
@@ -150,7 +150,7 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
             loading={isSubmitting}
             block
           >
-            {isSubmitting ? 'Registrando...' : 'Registrar Actividad'}
+            {isSubmitting ? 'Registering...' : 'Register Activity'}
           </Button>
         </Form.Item>
       </Form>

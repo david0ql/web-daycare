@@ -24,14 +24,14 @@ export const AttendanceObservationsShow: React.FC = () => {
 
   return (
     <Show isLoading={isLoading}>
-      <Title level={5}>Información de Observación</Title>
+      <Title level={5}>Observation Information</Title>
       
       <Row gutter={16}>
         <Col span={12}>
-          <Card title="Información del Niño" size="small">
+          <Card title="Child Information" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Niño: </Text>
+                <Text strong>Child: </Text>
                 <Text>{record?.child?.firstName} {record?.child?.lastName}</Text>
               </div>
               <div>
@@ -43,14 +43,14 @@ export const AttendanceObservationsShow: React.FC = () => {
         </Col>
         
         <Col span={12}>
-          <Card title="Estado de Ánimo" size="small">
+          <Card title="Mood" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Estado: </Text>
+                <Text strong>Status: </Text>
                 {getMoodTag(record?.mood)}
               </div>
               <div>
-                <Text strong>Fecha: </Text>
+                <Text strong>Date: </Text>
                 <DateField value={record?.attendance?.attendanceDate} format="DD/MM/YYYY" />
               </div>
             </Space>
@@ -60,10 +60,10 @@ export const AttendanceObservationsShow: React.FC = () => {
 
       <Row gutter={16} style={{ marginTop: 16 }}>
         <Col span={24}>
-          <Card title="Observaciones" size="small">
+          <Card title="Observations" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Observaciones Generales: </Text>
+                <Text strong>General Observations: </Text>
                 <Text>{record?.generalObservations}</Text>
               </div>
             </Space>
@@ -73,14 +73,14 @@ export const AttendanceObservationsShow: React.FC = () => {
 
       <Row gutter={16} style={{ marginTop: 16 }}>
         <Col span={24}>
-          <Card title="Información Adicional" size="small">
+          <Card title="Additional Information" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Registrado por: </Text>
+                <Text strong>Registered by: </Text>
                 <Text>{record?.createdByUser?.firstName} {record?.createdByUser?.lastName}</Text>
               </div>
               <div>
-                <Text strong>Creado: </Text>
+                <Text strong>Created: </Text>
                 <DateField value={record?.createdAt} format="DD/MM/YYYY HH:mm" />
               </div>
             </Space>

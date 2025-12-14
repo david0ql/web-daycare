@@ -36,7 +36,7 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
 
       await createObservation(observationData);
       
-      message.success('Observación registrada exitosamente');
+      message.success('Observation registered successfully');
       form.resetFields();
       
       if (onSuccess) {
@@ -44,7 +44,7 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
       }
     } catch (error) {
       console.error('Error creating observation:', error);
-      message.error('Error al registrar la observación');
+      message.error('Error registering observation');
     } finally {
       setIsSubmitting(false);
     }
@@ -53,7 +53,7 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
   return (
     <Card>
       <Title level={5} style={{ marginBottom: '16px' }}>
-        Registrar Observación Diaria
+        Register Daily Observation
       </Title>
       
       <Form
@@ -64,11 +64,11 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Estado de Ánimo"
+              label="Mood"
               name="mood"
-              rules={[{ required: true, message: 'Por favor seleccione el estado de ánimo' }]}
+              rules={[{ required: true, message: 'Please select the mood' }]}
             >
-              <Select placeholder="Seleccione el estado de ánimo">
+              <Select placeholder="Select mood">
                 {Object.values(MoodEnum).map((mood) => (
                   <Option key={mood} value={mood}>
                     <Space>
@@ -85,13 +85,13 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Observaciones Generales"
+              label="General Observations"
               name="generalObservations"
-              rules={[{ required: true, message: 'Por favor ingrese las observaciones' }]}
+              rules={[{ required: true, message: 'Please enter the observations' }]}
             >
               <TextArea 
                 rows={4}
-                placeholder="Describe el comportamiento, actividades, interacciones y cualquier observación relevante del niño..."
+                placeholder="Describe the child's behavior, activities, interactions, and any relevant observations..."
                 maxLength={1000}
                 showCount
               />
@@ -106,7 +106,7 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
             loading={isSubmitting}
             block
           >
-            {isSubmitting ? 'Registrando...' : 'Registrar Observación'}
+            {isSubmitting ? 'Registering...' : 'Register Observation'}
           </Button>
         </Form.Item>
       </Form>

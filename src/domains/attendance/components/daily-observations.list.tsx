@@ -21,10 +21,10 @@ export const DailyObservationsList: React.FC<DailyObservationsListProps> = ({
   const handleDelete = async (id: number) => {
     try {
       await deleteObservation(id);
-      message.success('Observación eliminada exitosamente');
+      message.success('Observation deleted successfully');
     } catch (error) {
       console.error('Error deleting observation:', error);
-      message.error('Error al eliminar la observación');
+      message.error('Error deleting observation');
     }
   };
 
@@ -47,7 +47,7 @@ export const DailyObservationsList: React.FC<DailyObservationsListProps> = ({
     return (
       <Card>
         <Empty 
-          description="No hay observaciones registradas para este día"
+          description="No observations registered for this day"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         />
       </Card>
@@ -57,7 +57,7 @@ export const DailyObservationsList: React.FC<DailyObservationsListProps> = ({
   return (
     <Card>
       <Title level={5} style={{ marginBottom: '16px' }}>
-        Observaciones Diarias ({observations.length})
+        Daily Observations ({observations.length})
       </Title>
       
       <List
@@ -71,12 +71,12 @@ export const DailyObservationsList: React.FC<DailyObservationsListProps> = ({
                 onClick={() => onEdit?.(observation)}
                 size="small"
               >
-                Editar
+                Edit
               </Button>,
               <Popconfirm
-                title="¿Estás seguro de eliminar esta observación?"
+                title="Are you sure you want to delete this observation?"
                 onConfirm={() => handleDelete(observation.id)}
-                okText="Sí"
+                okText="Yes"
                 cancelText="No"
               >
                 <Button
@@ -85,7 +85,7 @@ export const DailyObservationsList: React.FC<DailyObservationsListProps> = ({
                   icon={<DeleteOutlined />}
                   size="small"
                 >
-                  Eliminar
+                  Delete
                 </Button>
               </Popconfirm>,
             ]}
@@ -93,7 +93,7 @@ export const DailyObservationsList: React.FC<DailyObservationsListProps> = ({
             <List.Item.Meta
               title={
                 <Space>
-                  <Text strong>Observación</Text>
+                  <Text strong>Observation</Text>
                   {getMoodTag(observation.mood)}
                 </Space>
               }
@@ -101,7 +101,7 @@ export const DailyObservationsList: React.FC<DailyObservationsListProps> = ({
                 <Space direction="vertical" size="small">
                   <Text>{observation.generalObservations}</Text>
                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                    Registrado por: {observation.createdByUser?.firstName} {observation.createdByUser?.lastName} • 
+                    Registered by: {observation.createdByUser?.firstName} {observation.createdByUser?.lastName} • 
                     {dayjs(observation.createdAt).format('DD/MM/YYYY HH:mm')}
                   </Text>
                 </Space>

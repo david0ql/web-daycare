@@ -61,8 +61,8 @@ export const IncidentsCreate: React.FC = () => {
         console.log('🔍 handleFinish - no incidentDate provided');
         open?.({
           type: "error",
-          message: "Error al crear el incidente",
-          description: "La fecha del incidente es requerida",
+          message: "Error creating incident",
+          description: "Incident date is required",
         });
         return;
       }
@@ -73,8 +73,8 @@ export const IncidentsCreate: React.FC = () => {
         console.log('🔍 handleFinish - invalid date format:', values.incidentDate);
         open?.({
           type: "error",
-          message: "Error al crear el incidente",
-          description: "La fecha del incidente no es válida",
+          message: "Error creating incident",
+          description: "Incident date is not valid",
         });
         return;
       }
@@ -109,14 +109,14 @@ export const IncidentsCreate: React.FC = () => {
 
               open?.({
                 type: "success",
-                message: "Incidente creado exitosamente",
-                description: "El incidente ha sido registrado correctamente. Ahora puedes agregar adjuntos.",
+                message: "Incident created successfully",
+                description: "The incident has been registered correctly. You can now add attachments.",
               });
             },
             onError: (error: any) => {
               open?.({
                 type: "error",
-                message: "Error al crear el incidente",
+                message: "Error creating incident",
                 description: error.response?.data?.message || error.message,
               });
             }
@@ -124,7 +124,7 @@ export const IncidentsCreate: React.FC = () => {
     } catch (error: any) {
       open?.({
         type: "error",
-        message: "Error al crear el incidente",
+        message: "Error creating incident",
         description: error.response?.data?.message || error.message,
       });
     }
@@ -132,7 +132,7 @@ export const IncidentsCreate: React.FC = () => {
 
   return (
     <Create
-      title="Crear Incidente"
+      title="Create Incident"
       saveButtonProps={{
         loading: createIncidentMutation.isPending,
         onClick: () => {
@@ -154,15 +154,15 @@ export const IncidentsCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Niño"
+              label="Child"
               name="childId"
-              rules={[{ required: true, message: 'Por favor seleccione un niño' }]}
+              rules={[{ required: true, message: 'Please select a child' }]}
             >
               <Select
-                placeholder="Seleccione un niño"
+                placeholder="Select a child"
                 showSearch
                 loading={childrenLoading}
-                notFoundContent={childrenLoading ? "Cargando..." : "No hay niños disponibles"}
+                notFoundContent={childrenLoading ? "Loading..." : "No children available"}
                 onChange={(value) => setSelectedChildId(value)}
                 filterOption={(input, option) =>
                   (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
@@ -179,14 +179,14 @@ export const IncidentsCreate: React.FC = () => {
 
           <Col span={12}>
             <Form.Item
-              label="Tipo de Incidente"
+              label="Incident Type"
               name="incidentTypeId"
-              rules={[{ required: true, message: 'Por favor seleccione un tipo de incidente' }]}
+              rules={[{ required: true, message: 'Please select an incident type' }]}
             >
               <Select
-                placeholder="Seleccione un tipo de incidente"
+                placeholder="Select an incident type"
                 loading={incidentTypesLoading}
-                notFoundContent={incidentTypesLoading ? "Cargando..." : "No hay tipos disponibles"}
+                notFoundContent={incidentTypesLoading ? "Loading..." : "No types available"}
               >
                 {(incidentTypesData || []).map((type: any) => (
                   <Option key={type.id} value={type.id}>
@@ -206,11 +206,11 @@ export const IncidentsCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Título del Incidente"
+              label="Incident Title"
               name="title"
-              rules={[{ required: true, message: 'Por favor ingrese el título del incidente' }]}
+              rules={[{ required: true, message: 'Please enter the incident title' }]}
             >
-              <Input placeholder="Título del incidente" maxLength={255} />
+              <Input placeholder="Incident title" maxLength={255} />
             </Form.Item>
           </Col>
         </Row>
@@ -218,13 +218,13 @@ export const IncidentsCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Descripción del Incidente"
+              label="Incident Description"
               name="description"
-              rules={[{ required: true, message: 'Por favor ingrese la descripción del incidente' }]}
+              rules={[{ required: true, message: 'Please enter the incident description' }]}
             >
               <TextArea
                 rows={4}
-                placeholder="Descripción detallada del incidente"
+                placeholder="Detailed incident description"
                 maxLength={1000}
                 showCount
               />
@@ -235,9 +235,9 @@ export const IncidentsCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Fecha y Hora del Incidente"
+              label="Incident Date and Time"
               name="incidentDate"
-              rules={[{ required: true, message: 'Por favor seleccione la fecha y hora del incidente' }]}
+              rules={[{ required: true, message: 'Please select the incident date and time' }]}
               getValueFromEvent={(date) => {
                 console.log("🔍 DatePicker getValueFromEvent:", date);
                 return date;
@@ -256,7 +256,7 @@ export const IncidentsCreate: React.FC = () => {
               <DatePicker
                 showTime
                 format="DD/MM/YYYY HH:mm"
-                placeholder="Seleccione fecha y hora"
+                placeholder="Select date and time"
                 style={{ width: '100%' }}
               />
             </Form.Item>
@@ -264,10 +264,10 @@ export const IncidentsCreate: React.FC = () => {
 
           <Col span={12}>
             <Form.Item
-              label="Ubicación"
+              label="Location"
               name="location"
             >
-              <Input placeholder="Ubicación donde ocurrió el incidente" maxLength={255} />
+              <Input placeholder="Location where the incident occurred" maxLength={255} />
             </Form.Item>
           </Col>
         </Row>
@@ -275,12 +275,12 @@ export const IncidentsCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Acción Tomada"
+              label="Action Taken"
               name="actionTaken"
             >
               <TextArea
                 rows={3}
-                placeholder="Acción tomada en respuesta al incidente (opcional)"
+                placeholder="Action taken in response to the incident (optional)"
                 maxLength={500}
                 showCount
               />
@@ -308,7 +308,7 @@ export const IncidentsCreate: React.FC = () => {
                 });
               }}
             >
-              Finalizar y volver a la lista
+              Finish and return to list
             </Button>
           </div>
         </div>

@@ -69,22 +69,22 @@ export const AttendanceObservationsCreate: React.FC = () => {
 
   return (
     <Create
-      title="Registrar Observación Diaria"
+      title="Register Daily Observation"
       saveButtonProps={saveButtonProps}
     >
       <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Row gutter={16}>
           <Col span={12}>
                 <Form.Item
-                  label="Niño"
+                  label="Child"
                   name="childId"
-                  rules={[{ required: true, message: 'Por favor seleccione un niño' }]}
+                  rules={[{ required: true, message: 'Please select a child' }]}
                 >
                   <Select 
-                    placeholder="Seleccione un niño" 
+                    placeholder="Select a child" 
                     showSearch
                     loading={childrenLoading}
-                    notFoundContent={childrenLoading ? "Cargando..." : "No hay niños disponibles"}
+                    notFoundContent={childrenLoading ? "Loading..." : "No children available"}
                     onChange={(value) => {
                       setSelectedChildId(value);
                       // Clear attendance selection when child changes
@@ -102,22 +102,22 @@ export const AttendanceObservationsCreate: React.FC = () => {
           
           <Col span={12}>
             <Form.Item
-              label="Registro de Asistencia"
+              label="Attendance Record"
               name="attendanceId"
-              rules={[{ required: true, message: 'Por favor seleccione un registro de asistencia' }]}
+              rules={[{ required: true, message: 'Please select an attendance record' }]}
               initialValue={attendanceId ? parseInt(attendanceId) : undefined}
             >
               <Select 
-                placeholder={selectedChildId ? "Seleccione un registro de asistencia" : "Primero seleccione un niño"} 
+                placeholder={selectedChildId ? "Select an attendance record" : "First select a child"} 
                 showSearch
                 loading={attendanceLoading}
                 disabled={!selectedChildId}
                 notFoundContent={
                   attendanceLoading 
-                    ? "Cargando..." 
+                    ? "Loading..." 
                     : !selectedChildId 
-                      ? "Primero seleccione un niño" 
-                      : "No hay registros de asistencia para hoy"
+                      ? "First select a child" 
+                      : "No attendance records for today"
                 }
               >
                 {(attendanceData || []).map((attendance: any) => (
@@ -133,11 +133,11 @@ export const AttendanceObservationsCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Estado de Ánimo"
+              label="Mood"
               name="mood"
-              rules={[{ required: true, message: 'Por favor seleccione el estado de ánimo' }]}
+              rules={[{ required: true, message: 'Please select the mood' }]}
             >
-              <Select placeholder="Seleccione el estado de ánimo">
+              <Select placeholder="Select mood">
                 {Object.values(MoodEnum).map((mood) => (
                   <Option key={mood} value={mood}>
                     <span style={{ marginRight: 8, fontSize: '16px' }}>{MOOD_ICONS[mood]}</span>
@@ -152,13 +152,13 @@ export const AttendanceObservationsCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Observaciones Generales"
+              label="General Observations"
               name="generalObservations"
-              rules={[{ required: true, message: 'Por favor ingrese las observaciones' }]}
+              rules={[{ required: true, message: 'Please enter observations' }]}
             >
               <TextArea 
                 rows={4}
-                placeholder="Describe el comportamiento, actividades, interacciones y cualquier observación relevante del niño..."
+                placeholder="Describe the child's behavior, activities, interactions, and any relevant observations..."
                 maxLength={1000}
                 showCount
               />

@@ -60,8 +60,8 @@ export const ChildEdit: React.FC = () => {
       // Show success notification
       open?.({
         type: "success",
-        message: "Niño actualizado exitosamente",
-        description: "Los cambios se han guardado correctamente",
+        message: "Child updated successfully",
+        description: "Changes have been saved correctly",
       });
       
       // Navigate back to children list with a small delay for better UX
@@ -87,8 +87,8 @@ export const ChildEdit: React.FC = () => {
       }
       open?.({ 
         type: "error", 
-        message: "Error al actualizar el niño", 
-        description: "No se pudo actualizar el niño. Verifica los datos e intenta nuevamente." 
+        message: "Error updating child", 
+        description: "Could not update the child. Please verify the data and try again." 
       });
     }
   });
@@ -167,7 +167,7 @@ export const ChildEdit: React.FC = () => {
     // Validar que haya al menos un padre asignado
     const parentRelationships = values.parentRelationships || [];
     if (parentRelationships.length === 0) {
-      message.error("Debe tener al menos un padre o madre asignado");
+      message.error("You must have at least one parent assigned");
       form.scrollToField("parentRelationships");
       return;
     }
@@ -201,27 +201,27 @@ export const ChildEdit: React.FC = () => {
   };
 
   return (
-    <Edit saveButtonProps={customSaveButtonProps}>
+    <Edit title="Edit Child" saveButtonProps={customSaveButtonProps}>
       <Form {...formProps} form={form} layout="vertical" onFinish={handleFinish}>
-        {/* Información Básica */}
-        <Card title="Información Básica" style={{ marginBottom: 16 }}>
+        {/* Basic Information */}
+        <Card title="Basic Information" style={{ marginBottom: 16 }}>
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Nombre"
+              label="First Name"
               name="firstName"
-              rules={[{ required: true, message: "El nombre es requerido" }]}
+              rules={[{ required: true, message: "First name is required" }]}
             >
-              <Input placeholder="Nombre del niño" />
+              <Input placeholder="Child's first name" />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
-              label="Apellido"
+              label="Last Name"
               name="lastName"
-              rules={[{ required: true, message: "El apellido es requerido" }]}
+              rules={[{ required: true, message: "Last name is required" }]}
             >
-              <Input placeholder="Apellido del niño" />
+              <Input placeholder="Child's last name" />
             </Form.Item>
           </Col>
         </Row>
@@ -229,25 +229,25 @@ export const ChildEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Fecha de Nacimiento"
+              label="Birth Date"
               name="birthDate"
-              rules={[{ required: true, message: "La fecha de nacimiento es requerida" }]}
+              rules={[{ required: true, message: "Birth date is required" }]}
               getValueFromEvent={(date) => date ? dayjs(date).format("YYYY-MM-DD") : undefined}
               getValueProps={(value) => ({ value: value ? dayjs(value) : undefined })}
             >
               <DatePicker
                 style={{ width: "100%" }}
-                placeholder="Seleccione la fecha de nacimiento"
+                placeholder="Select birth date"
                 format="YYYY-MM-DD"
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
-              label="Ciudad de Nacimiento"
+              label="Birth City"
               name="birthCity"
             >
-                <Input placeholder="Ciudad de nacimiento (opcional)" />
+                <Input placeholder="Birth city (optional)" />
             </Form.Item>
           </Col>
         </Row>
@@ -255,11 +255,11 @@ export const ChildEdit: React.FC = () => {
           <Row gutter={16}>
             <Col span={24}>
         <Form.Item
-          label="Dirección"
+          label="Address"
           name="address"
         >
                 <TextArea 
-                  placeholder="Dirección del niño (opcional)"
+                  placeholder="Child's address (optional)"
             rows={3}
           />
         </Form.Item>
@@ -269,16 +269,16 @@ export const ChildEdit: React.FC = () => {
           <Row gutter={16}>
             <Col span={12}>
         <Form.Item
-          label="Foto de Perfil"
+          label="Profile Picture"
           name="profilePicture"
         >
-          <Input placeholder="URL de la imagen (opcional)" />
+          <Input placeholder="Image URL (optional)" />
         </Form.Item>
             </Col>
           <Col span={12}>
               <Space direction="vertical" style={{ width: "100%" }}>
             <Form.Item
-              label="Alerta de Pago"
+              label="Payment Alert"
               name="hasPaymentAlert"
               valuePropName="checked"
                   getValueFromEvent={(checked) => {
@@ -293,7 +293,7 @@ export const ChildEdit: React.FC = () => {
                   <BooleanSwitch />
             </Form.Item>
             <Form.Item
-              label="Estado Activo"
+              label="Active Status"
               name="isActive"
               valuePropName="checked"
                   getValueFromEvent={(checked) => {
@@ -312,12 +312,12 @@ export const ChildEdit: React.FC = () => {
           </Row>
         </Card>
 
-        {/* Relaciones Padre-Hijo */}
+        {/* Parent-Child Relationships */}
         <Card 
           title={
             <Space>
-              <span>Relaciones Padre-Hijo</span>
-              <Text type="danger" style={{ fontSize: '14px' }}>(Obligatorio - Mínimo 1)</Text>
+              <span>Parent-Child Relationships</span>
+              <Text type="danger" style={{ fontSize: '14px' }}>(Required - Minimum 1)</Text>
             </Space>
           } 
           style={{ marginBottom: 16 }}
@@ -332,11 +332,11 @@ export const ChildEdit: React.FC = () => {
                         <Form.Item
                           {...restField}
                           name={[name, "parentId"]}
-                          label="Padre/Madre"
-                          rules={[{ required: true, message: "Seleccione un padre/madre" }]}
+                          label="Parent"
+                          rules={[{ required: true, message: "Select a parent" }]}
                         >
                           <Select
-                            placeholder="Seleccione padre/madre"
+                            placeholder="Select parent"
                             loading={loadingParents}
                             showSearch
                             optionFilterProp="children"
@@ -356,14 +356,14 @@ export const ChildEdit: React.FC = () => {
                         <Form.Item
                           {...restField}
                           name={[name, "relationshipType"]}
-                          label="Tipo de Relación"
-                          rules={[{ required: true, message: "Seleccione el tipo de relación" }]}
+                          label="Relationship Type"
+                          rules={[{ required: true, message: "Select the relationship type" }]}
                         >
-                          <Select placeholder="Tipo de relación">
-                            <Option value="father">Padre</Option>
-                            <Option value="mother">Madre</Option>
-                            <Option value="guardian">Tutor</Option>
-                            <Option value="other">Otro</Option>
+                          <Select placeholder="Relationship type">
+                            <Option value="father">Father</Option>
+                            <Option value="mother">Mother</Option>
+                            <Option value="guardian">Guardian</Option>
+                            <Option value="other">Other</Option>
                           </Select>
                         </Form.Item>
                       </Col>
@@ -392,7 +392,7 @@ export const ChildEdit: React.FC = () => {
                           onClick={() => remove(name)}
                           style={{ marginTop: 30 }}
                         >
-                          Eliminar
+                          Delete
                         </Button>
                       </Col>
                     </Row>
@@ -400,7 +400,7 @@ export const ChildEdit: React.FC = () => {
                 ))}
                 <Form.Item>
                   <Button type="dashed" onClick={() => add()} block>
-                    + Agregar Relación Padre-Hijo
+                    + Add Parent-Child Relationship
                   </Button>
                 </Form.Item>
               </>
@@ -408,8 +408,8 @@ export const ChildEdit: React.FC = () => {
           </Form.List>
         </Card>
 
-        {/* Contactos de Emergencia */}
-        <Card title="Contactos de Emergencia" style={{ marginBottom: 16 }}>
+        {/* Emergency Contacts */}
+        <Card title="Emergency Contacts" style={{ marginBottom: 16 }}>
           <Form.List name="emergencyContacts">
             {(fields, { add, remove }) => (
               <>
@@ -420,37 +420,37 @@ export const ChildEdit: React.FC = () => {
                         <Form.Item
                           {...restField}
                           name={[name, "name"]}
-                          label="Nombre"
-                          rules={[{ required: true, message: "El nombre es requerido" }]}
+                          label="Name"
+                          rules={[{ required: true, message: "Name is required" }]}
                         >
-                          <Input placeholder="Nombre completo" />
+                          <Input placeholder="Full name" />
                         </Form.Item>
                       </Col>
                       <Col span={6}>
                         <Form.Item
                           {...restField}
                           name={[name, "relationship"]}
-                          label="Relación"
-                          rules={[{ required: true, message: "La relación es requerida" }]}
+                          label="Relationship"
+                          rules={[{ required: true, message: "Relationship is required" }]}
                         >
-                          <Input placeholder="Ej: Abuela, Tío" />
+                          <Input placeholder="E.g.: Grandmother, Uncle" />
                         </Form.Item>
                       </Col>
                       <Col span={6}>
                         <Form.Item
                           {...restField}
                           name={[name, "phone"]}
-                          label="Teléfono"
-                          rules={[{ required: true, message: "El teléfono es requerido" }]}
+                          label="Phone"
+                          rules={[{ required: true, message: "Phone is required" }]}
                         >
-                          <Input placeholder="+57 300 123 4567" />
+                          <Input placeholder="+1 300 123 4567" />
                         </Form.Item>
                       </Col>
                       <Col span={4}>
                         <Form.Item
                           {...restField}
                           name={[name, "isPrimary"]}
-                          label="Principal"
+                          label="Primary"
                           valuePropName="checked"
                           getValueFromEvent={(checked) => {
                             console.log("🔍 isPrimary getValueFromEvent:", checked);
@@ -471,7 +471,7 @@ export const ChildEdit: React.FC = () => {
                           onClick={() => remove(name)}
                           style={{ marginTop: 30 }}
                         >
-                          Eliminar
+                          Delete
                         </Button>
                       </Col>
                     </Row>
@@ -480,9 +480,9 @@ export const ChildEdit: React.FC = () => {
                         <Form.Item
                           {...restField}
                           name={[name, "email"]}
-                          label="Email (Opcional)"
+                          label="Email (Optional)"
                         >
-                          <Input placeholder="email@ejemplo.com" />
+                          <Input placeholder="email@example.com" />
                         </Form.Item>
                       </Col>
                     </Row>
@@ -490,7 +490,7 @@ export const ChildEdit: React.FC = () => {
                 ))}
                 <Form.Item>
                   <Button type="dashed" onClick={() => add()} block>
-                    + Agregar Contacto de Emergencia
+                    + Add Emergency Contact
                   </Button>
                 </Form.Item>
               </>
@@ -498,8 +498,8 @@ export const ChildEdit: React.FC = () => {
           </Form.List>
         </Card>
 
-        {/* Personas Autorizadas para Recoger */}
-        <Card title="Personas Autorizadas para Recoger" style={{ marginBottom: 16 }}>
+        {/* Authorized Pickup Persons */}
+        <Card title="Authorized Pickup Persons" style={{ marginBottom: 16 }}>
           <Form.List name="authorizedPickupPersons">
             {(fields, { add, remove }) => (
               <>
@@ -510,39 +510,39 @@ export const ChildEdit: React.FC = () => {
                         <Form.Item
                           {...restField}
                           name={[name, "name"]}
-                          label="Nombre"
-                          rules={[{ required: true, message: "El nombre es requerido" }]}
+                          label="Name"
+                          rules={[{ required: true, message: "Name is required" }]}
                         >
-                          <Input placeholder="Nombre completo" />
+                          <Input placeholder="Full name" />
                         </Form.Item>
                       </Col>
                       <Col span={6}>
                         <Form.Item
                           {...restField}
                           name={[name, "relationship"]}
-                          label="Relación"
-                          rules={[{ required: true, message: "La relación es requerida" }]}
+                          label="Relationship"
+                          rules={[{ required: true, message: "Relationship is required" }]}
                         >
-                          <Input placeholder="Ej: Tío, Abuela" />
+                          <Input placeholder="E.g.: Uncle, Grandmother" />
                         </Form.Item>
                       </Col>
                       <Col span={6}>
                         <Form.Item
                           {...restField}
                           name={[name, "phone"]}
-                          label="Teléfono"
-                          rules={[{ required: true, message: "El teléfono es requerido" }]}
+                          label="Phone"
+                          rules={[{ required: true, message: "Phone is required" }]}
                         >
-                          <Input placeholder="+57 300 123 4567" />
+                          <Input placeholder="+1 300 123 4567" />
                         </Form.Item>
                       </Col>
                       <Col span={6}>
                         <Form.Item
                           {...restField}
                           name={[name, "idDocument"]}
-                          label="Cédula"
+                          label="ID Document"
                         >
-                          <Input placeholder="Número de cédula" />
+                          <Input placeholder="ID document number" />
                         </Form.Item>
                       </Col>
                     </Row>
@@ -551,18 +551,18 @@ export const ChildEdit: React.FC = () => {
                         <Form.Item
                           {...restField}
                           name={[name, "email"]}
-                          label="Email (Opcional)"
+                          label="Email (Optional)"
                         >
-                          <Input placeholder="email@ejemplo.com" />
+                          <Input placeholder="email@example.com" />
                         </Form.Item>
                       </Col>
                       <Col span={12}>
                         <Form.Item
                           {...restField}
                           name={[name, "photo"]}
-                          label="Foto (Opcional)"
+                          label="Photo (Optional)"
                         >
-                          <Input placeholder="URL de la foto" />
+                          <Input placeholder="Photo URL" />
                         </Form.Item>
                       </Col>
                     </Row>
@@ -573,7 +573,7 @@ export const ChildEdit: React.FC = () => {
                           danger
                           onClick={() => remove(name)}
                         >
-                          Eliminar
+                          Delete
                         </Button>
                       </Col>
                     </Row>
@@ -581,7 +581,7 @@ export const ChildEdit: React.FC = () => {
                 ))}
                 <Form.Item>
                   <Button type="dashed" onClick={() => add()} block>
-                    + Agregar Persona Autorizada
+                    + Add Authorized Person
                   </Button>
                 </Form.Item>
               </>
@@ -589,8 +589,8 @@ export const ChildEdit: React.FC = () => {
           </Form.List>
         </Card>
 
-        {/* Información Médica */}
-        <Card title="Información Médica" style={{ marginBottom: 16 }}>
+        {/* Medical Information */}
+        <Card title="Medical Information" style={{ marginBottom: 16 }}>
           <Form.List name="medicalInformation">
             {(fields, { add, remove }) => (
               <>
@@ -601,10 +601,10 @@ export const ChildEdit: React.FC = () => {
                         <Form.Item
                           {...restField}
                           name={[name, "allergies"]}
-                          label="Alergias"
+                          label="Allergies"
                         >
                           <TextArea 
-                            placeholder="Describa las alergias conocidas"
+                            placeholder="Describe known allergies"
                             rows={2}
                           />
                         </Form.Item>
@@ -613,10 +613,10 @@ export const ChildEdit: React.FC = () => {
                         <Form.Item
                           {...restField}
                           name={[name, "medications"]}
-                          label="Medicamentos"
+                          label="Medications"
                         >
                           <TextArea 
-                            placeholder="Medicamentos actuales"
+                            placeholder="Current medications"
                             rows={2}
                           />
                         </Form.Item>
@@ -627,27 +627,27 @@ export const ChildEdit: React.FC = () => {
                         <Form.Item
                           {...restField}
                           name={[name, "insuranceCompany"]}
-                          label="Aseguradora"
+                          label="Insurance Company"
                         >
-                          <Input placeholder="Nombre de la aseguradora" />
+                          <Input placeholder="Insurance company name" />
                         </Form.Item>
                       </Col>
                       <Col span={8}>
                         <Form.Item
                           {...restField}
                           name={[name, "insuranceNumber"]}
-                          label="Número de Póliza"
+                          label="Policy Number"
                         >
-                          <Input placeholder="Número de póliza" />
+                          <Input placeholder="Policy number" />
                         </Form.Item>
                       </Col>
                       <Col span={8}>
                         <Form.Item
                           {...restField}
                           name={[name, "pediatricianName"]}
-                          label="Pediatra"
+                          label="Pediatrician"
                         >
-                          <Input placeholder="Nombre del pediatra" />
+                          <Input placeholder="Pediatrician name" />
                         </Form.Item>
                       </Col>
                     </Row>
@@ -656,19 +656,19 @@ export const ChildEdit: React.FC = () => {
                         <Form.Item
                           {...restField}
                           name={[name, "pediatricianPhone"]}
-                          label="Teléfono del Pediatra"
+                          label="Pediatrician Phone"
                         >
-                          <Input placeholder="+57 300 123 4567" />
+                          <Input placeholder="+1 300 123 4567" />
                         </Form.Item>
                       </Col>
                       <Col span={12}>
                         <Form.Item
                           {...restField}
                           name={[name, "additionalNotes"]}
-                          label="Notas Adicionales"
+                          label="Additional Notes"
                         >
                           <TextArea 
-                            placeholder="Información médica adicional"
+                            placeholder="Additional medical information"
                             rows={2}
                           />
             </Form.Item>
@@ -681,7 +681,7 @@ export const ChildEdit: React.FC = () => {
                           danger
                           onClick={() => remove(name)}
                         >
-                          Eliminar
+                          Delete
                         </Button>
                       </Col>
                     </Row>
@@ -689,7 +689,7 @@ export const ChildEdit: React.FC = () => {
                 ))}
                 <Form.Item>
                   <Button type="dashed" onClick={() => add()} block>
-                    + Agregar Información Médica
+                    + Add Medical Information
                   </Button>
                 </Form.Item>
               </>

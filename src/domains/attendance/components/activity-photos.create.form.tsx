@@ -26,7 +26,7 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
 
   const handleSubmit = async (values: any) => {
     if (fileList.length === 0) {
-      message.error('Por favor seleccione una foto');
+      message.error('Please select a photo');
       return;
     }
 
@@ -41,7 +41,7 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
 
       await createPhoto(photoData, fileList[0].originFileObj);
       
-      message.success('Foto subida exitosamente');
+      message.success('Photo uploaded successfully');
       form.resetFields();
       setFileList([]);
       
@@ -50,7 +50,7 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
       }
     } catch (error) {
       console.error('Error uploading photo:', error);
-      message.error('Error al subir la foto');
+      message.error('Error uploading photo');
     } finally {
       setIsSubmitting(false);
     }
@@ -63,13 +63,13 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
   const beforeUpload = (file: File) => {
     const isImage = file.type.startsWith('image/');
     if (!isImage) {
-      message.error('Solo se permiten archivos de imagen');
+      message.error('Only image files are allowed');
       return false;
     }
 
     const isLt5M = file.size / 1024 / 1024 < 5;
     if (!isLt5M) {
-      message.error('La imagen debe ser menor a 5MB');
+      message.error('The image must be less than 5MB');
       return false;
     }
 
@@ -79,7 +79,7 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
   return (
     <Card>
       <Title level={5} style={{ marginBottom: '16px' }}>
-        Subir Foto de Actividad
+        Upload Activity Photo
       </Title>
       
       <Form
@@ -90,7 +90,7 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Seleccionar Foto"
+              label="Select Photo"
               required
             >
               <Upload
@@ -107,7 +107,7 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
                 {fileList.length >= 1 ? null : (
                   <div>
                     <CameraOutlined style={{ fontSize: '24px', color: '#999' }} />
-                    <div style={{ marginTop: 8 }}>Subir Foto</div>
+                    <div style={{ marginTop: 8 }}>Upload Photo</div>
                   </div>
                 )}
               </Upload>
@@ -118,12 +118,12 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Descripción de la Foto"
+              label="Photo Description"
               name="caption"
             >
               <TextArea 
                 rows={3}
-                placeholder="Describe qué se ve en la foto o qué actividad se está realizando..."
+                placeholder="Describe what is seen in the photo or what activity is being performed..."
                 maxLength={300}
                 showCount
               />
@@ -139,7 +139,7 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
             block
             icon={<UploadOutlined />}
           >
-            {isSubmitting ? 'Subiendo...' : 'Subir Foto'}
+            {isSubmitting ? 'Uploading...' : 'Upload Photo'}
           </Button>
         </Form.Item>
       </Form>

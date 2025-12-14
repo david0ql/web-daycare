@@ -12,12 +12,12 @@ interface ErrorComponentProps {
 }
 
 export const ErrorComponent: React.FC<ErrorComponentProps> = ({
-  title = 'Algo salió mal',
-  message = 'Ha ocurrido un error inesperado. Por favor, intenta nuevamente.',
+  title = 'Something went wrong',
+  message = 'An unexpected error occurred. Please try again.',
   status = 'error',
   onRetry,
   showRetry = true,
-  retryText = 'Reintentar',
+  retryText = 'Retry',
 }) => {
   const getIcon = () => {
     switch (status) {

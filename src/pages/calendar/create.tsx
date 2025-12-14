@@ -6,7 +6,7 @@ export const CalendarCreate: React.FC = () => {
   console.log('🔍 CalendarCreate: Componente montado');
   
   return (
-    <Create>
+    <Create title="Create Event">
       <CalendarCreateForm />
     </Create>
   );

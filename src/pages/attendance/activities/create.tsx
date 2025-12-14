@@ -87,22 +87,22 @@ export const AttendanceActivitiesCreate: React.FC = () => {
 
   return (
     <Create
-      title="Registrar Actividad Diaria"
+      title="Register Daily Activity"
       saveButtonProps={saveButtonProps}
     >
       <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Row gutter={16}>
           <Col span={12}>
                 <Form.Item
-                  label="Niño"
+                  label="Child"
                   name="childId"
-                  rules={[{ required: true, message: 'Por favor seleccione un niño' }]}
+                  rules={[{ required: true, message: 'Please select a child' }]}
                 >
                   <Select 
-                    placeholder="Seleccione un niño" 
+                    placeholder="Select a child" 
                     showSearch
                     loading={childrenLoading}
-                    notFoundContent={childrenLoading ? "Cargando..." : "No hay niños disponibles"}
+                    notFoundContent={childrenLoading ? "Loading..." : "No children available"}
                     onChange={(value) => {
                       setSelectedChildId(value);
                       // Clear attendance selection when child changes
@@ -120,13 +120,13 @@ export const AttendanceActivitiesCreate: React.FC = () => {
           
           <Col span={12}>
             <Form.Item
-              label="Registro de Asistencia"
+              label="Attendance Record"
               name="attendanceId"
-              rules={[{ required: true, message: 'Por favor seleccione un registro de asistencia' }]}
+              rules={[{ required: true, message: 'Please select an attendance record' }]}
               initialValue={attendanceId ? parseInt(attendanceId) : undefined}
             >
               <Select 
-                placeholder={selectedChildId ? "Seleccione un registro de asistencia" : "Primero seleccione un niño"} 
+                placeholder={selectedChildId ? "Select an attendance record" : "First select a child"} 
                 showSearch
                 loading={attendanceLoading}
                 disabled={!selectedChildId}
@@ -137,10 +137,10 @@ export const AttendanceActivitiesCreate: React.FC = () => {
                 }}
                 notFoundContent={
                   attendanceLoading 
-                    ? "Cargando..." 
+                    ? "Loading..." 
                     : !selectedChildId 
-                      ? "Primero seleccione un niño" 
-                      : "No hay registros de asistencia para hoy"
+                      ? "First select a child" 
+                      : "No attendance records for today"
                 }
               >
                 {(attendanceData || []).map((attendance: any) => (
@@ -156,17 +156,17 @@ export const AttendanceActivitiesCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
                 <Form.Item
-                  label="Tipo de Actividad"
+                  label="Activity Type"
                   name="activityType"
-                  rules={[{ required: true, message: 'Por favor seleccione el tipo de actividad' }]}
+                  rules={[{ required: true, message: 'Please select activity type' }]}
                 >
                   <Select 
-                    placeholder="Seleccione el tipo de actividad"
+                    placeholder="Select activity type"
                     disabled={!selectedAttendanceId}
                     notFoundContent={
                       !selectedAttendanceId 
-                        ? "Primero seleccione un registro de asistencia" 
-                        : "No hay tipos de actividad disponibles"
+                        ? "First select an attendance record" 
+                        : "No activity types available"
                     }
                   >
                     {Object.values(ActivityTypeEnum)
@@ -186,7 +186,7 @@ export const AttendanceActivitiesCreate: React.FC = () => {
           
           <Col span={12}>
             <Form.Item
-              label="Completada"
+              label="Completed"
               name="completed"
               valuePropName="checked"
               getValueFromEvent={(checked) => Boolean(checked)}
@@ -207,14 +207,14 @@ export const AttendanceActivitiesCreate: React.FC = () => {
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item
-                    label="Hora de Completado"
+                    label="Completion Time"
                     name="timeCompleted"
-                    rules={[{ required: true, message: 'Por favor seleccione la hora de completado' }]}
+                    rules={[{ required: true, message: 'Please select completion time' }]}
                   >
                     <TimePicker 
                       style={{ width: '100%' }}
                       format="HH:mm"
-                      placeholder="Seleccione la hora"
+                      placeholder="Select time"
                     />
                   </Form.Item>
                 </Col>
@@ -226,12 +226,12 @@ export const AttendanceActivitiesCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Notas"
+              label="Notes"
               name="notes"
             >
               <TextArea 
                 rows={3}
-                placeholder="Notas adicionales sobre la actividad (opcional)"
+                placeholder="Additional notes about the activity (optional)"
                 maxLength={500}
                 showCount
               />

@@ -16,13 +16,13 @@ export const AttendanceActivitiesShow: React.FC = () => {
     if (!record?.completed) {
       return (
         <Tag color="orange" icon={<ClockCircleOutlined />}>
-          Pendiente
+          Pending
         </Tag>
       );
     }
     return (
       <Tag color="green" icon={<CheckCircleOutlined />}>
-        Completada
+        Completed
       </Tag>
     );
   };
@@ -36,14 +36,14 @@ export const AttendanceActivitiesShow: React.FC = () => {
 
   return (
     <Show isLoading={isLoading}>
-      <Title level={5}>Información de Actividad</Title>
+      <Title level={5}>Activity Information</Title>
       
       <Row gutter={16}>
         <Col span={12}>
-          <Card title="Información del Niño" size="small">
+          <Card title="Child Information" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Niño: </Text>
+                <Text strong>Child: </Text>
                 <Text>{record?.child?.firstName} {record?.child?.lastName}</Text>
               </div>
               <div>
@@ -55,14 +55,14 @@ export const AttendanceActivitiesShow: React.FC = () => {
         </Col>
         
         <Col span={12}>
-          <Card title="Estado de Actividad" size="small">
+          <Card title="Activity Status" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Estado: </Text>
+                <Text strong>Status: </Text>
                 {getActivityStatus()}
               </div>
               <div>
-                <Text strong>Fecha: </Text>
+                <Text strong>Date: </Text>
                 <DateField value={record?.attendance?.attendanceDate} format="DD/MM/YYYY" />
               </div>
             </Space>
@@ -72,10 +72,10 @@ export const AttendanceActivitiesShow: React.FC = () => {
 
       <Row gutter={16} style={{ marginTop: 16 }}>
         <Col span={12}>
-          <Card title="Detalles de la Actividad" size="small">
+          <Card title="Activity Details" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Tipo: </Text>
+                <Text strong>Type: </Text>
                 <Space>
                   <span style={{ fontSize: '16px' }}>
                     {ACTIVITY_TYPE_ICONS[record?.activityType as keyof typeof ACTIVITY_TYPE_ICONS]}
@@ -85,7 +85,7 @@ export const AttendanceActivitiesShow: React.FC = () => {
               </div>
               {record?.completed && record?.timeCompleted && (
                 <div>
-                  <Text strong>Hora Completado: </Text>
+                  <Text strong>Completion Time: </Text>
                   <Text>{getTimeCompleted()}</Text>
                 </div>
               )}
@@ -94,18 +94,18 @@ export const AttendanceActivitiesShow: React.FC = () => {
         </Col>
         
         <Col span={12}>
-          <Card title="Información Adicional" size="small">
+          <Card title="Additional Information" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Notas: </Text>
-                <Text>{record?.notes || 'Sin notas'}</Text>
+                <Text strong>Notes: </Text>
+                <Text>{record?.notes || 'No notes'}</Text>
               </div>
               <div>
-                <Text strong>Registrado por: </Text>
+                <Text strong>Registered by: </Text>
                 <Text>{record?.createdByUser?.firstName} {record?.createdByUser?.lastName}</Text>
               </div>
               <div>
-                <Text strong>Creado: </Text>
+                <Text strong>Created: </Text>
                 <DateField value={record?.createdAt} format="DD/MM/YYYY HH:mm" />
               </div>
             </Space>

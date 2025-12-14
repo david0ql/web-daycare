@@ -45,7 +45,7 @@ export const AttendanceObservations: React.FC = () => {
 
   return (
     <List
-      title="Observaciones Diarias"
+      title="Daily Observations"
       headerButtons={[
         <Button 
           type="primary" 
@@ -53,14 +53,14 @@ export const AttendanceObservations: React.FC = () => {
           icon={<PlusOutlined />}
           onClick={() => navigate('/attendance/observations/create')}
         >
-          Registrar Observación
+          Register Observation
         </Button>,
       ]}
     >
       <Table {...tableProps} rowKey="id">
         <Table.Column
           dataIndex="child"
-          title="Niño"
+          title="Child"
           render={(child: any) => (
             <Space>
               <Avatar 
@@ -75,12 +75,12 @@ export const AttendanceObservations: React.FC = () => {
         />
         <Table.Column
           dataIndex="mood"
-          title="Estado de Ánimo"
+          title="Mood"
           render={(mood: string) => getMoodTag(mood)}
         />
         <Table.Column
           dataIndex="generalObservations"
-          title="Observaciones"
+          title="Observations"
           render={(observations: string) => (
             <Tooltip title={observations}>
               <Text ellipsis style={{ maxWidth: 300 }}>
@@ -91,14 +91,14 @@ export const AttendanceObservations: React.FC = () => {
         />
         <Table.Column
           dataIndex="attendance"
-          title="Fecha"
+          title="Date"
           render={(attendance: any) => (
             <DateField value={attendance?.attendanceDate} format="DD/MM/YYYY" />
           )}
         />
         <Table.Column
           dataIndex="createdBy2"
-          title="Registrado por"
+          title="Registered by"
           render={(user: any) => (
             <Text type="secondary">
               {user?.firstName} {user?.lastName}
@@ -107,13 +107,13 @@ export const AttendanceObservations: React.FC = () => {
         />
         <Table.Column
           dataIndex="createdAt"
-          title="Creado"
+          title="Created"
           render={(value: string) => (
             <DateField value={value} format="DD/MM/YYYY HH:mm" />
           )}
         />
         <Table.Column
-          title="Acciones"
+          title="Actions"
           dataIndex="actions"
           render={(_, record: any) => (
             <Space>

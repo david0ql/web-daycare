@@ -42,7 +42,7 @@ const GlobalLoading: React.FC = () => {
           indicator={<LoadingOutlined style={{ fontSize: 32, color: "#1890ff" }} spin />}
         />
         <div style={{ marginTop: "16px", fontSize: "16px", color: "#666" }}>
-          Cargando...
+          Loading...
         </div>
       </div>
     </div>

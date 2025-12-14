@@ -61,10 +61,10 @@ export const Register: React.FC = () => {
     
     try {
       const response = await axiosInstance.post("/auth/register", formData);
-      message.success("Cuenta creada exitosamente. Ahora puedes iniciar sesión.");
+      message.success("Account created successfully. You can now log in.");
       navigate("/login");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Error de conexión. Verifica que la API esté funcionando.");
+      setError(err.response?.data?.message || "Connection error. Please verify that the API is running.");
     } finally {
       setIsLoading(false);
     }
@@ -75,14 +75,14 @@ export const Register: React.FC = () => {
     return (
       <div style={{ padding: "24px", textAlign: "center" }}>
         <Alert
-          message="Acceso Denegado"
-          description="Solo los administradores pueden crear nuevas cuentas de usuario."
+          message="Access Denied"
+          description="Only administrators can create new user accounts."
           type="warning"
           showIcon
           style={{ marginBottom: "16px" }}
         />
         <Button onClick={() => navigate("/users")} icon={<ArrowLeftOutlined />}>
-          Volver a Usuarios
+          Back to Users
         </Button>
       </div>
     );
@@ -105,14 +105,14 @@ export const Register: React.FC = () => {
             onClick={() => navigate("/users")}
             style={{ marginRight: '16px' }}
           >
-            Volver
+            Back
           </Button>
           <div>
             <Title level={3} style={{ margin: 0, color: colors.text.primary }}>
-              Crear Nuevo Usuario
+              Create New User
             </Title>
             <Text type="secondary" style={{ color: colors.text.secondary }}>
-              Registrar una nueva cuenta en el sistema
+              Register a new account in the system
             </Text>
           </div>
         </div>
@@ -132,8 +132,8 @@ export const Register: React.FC = () => {
 
         {error && (
           <Alert
-            message="Error en el registro"
-            description="No se pudo crear la cuenta. Verifica los datos ingresados."
+            message="Registration Error"
+            description="Could not create account. Please check the entered data."
             type="error"
             style={{ marginBottom: "16px" }}
           />
@@ -149,69 +149,69 @@ export const Register: React.FC = () => {
             name="email"
             label="Email"
             rules={[
-              { required: true, message: "Por favor ingresa tu email" },
-              { type: "email", message: "Ingresa un email válido" },
+              { required: true, message: "Please enter your email" },
+              { type: "email", message: "Enter a valid email" },
             ]}
           >
             <Input
               prefix={<MailOutlined />}
-              placeholder="tu@email.com"
+              placeholder="your@email.com"
               size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="password"
-            label="Contraseña"
+            label="Password"
             rules={[
-              { required: true, message: "Por favor ingresa tu contraseña" },
-              { min: 6, message: "La contraseña debe tener al menos 6 caracteres" },
+              { required: true, message: "Please enter your password" },
+              { min: 6, message: "Password must be at least 6 characters long" },
             ]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Tu contraseña"
+              placeholder="Your password"
               size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="firstName"
-            label="Nombre"
+            label="First Name"
             rules={[
-              { required: true, message: "Por favor ingresa tu nombre" },
+              { required: true, message: "Please enter your first name" },
             ]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="Tu nombre"
+              placeholder="Your first name"
               size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="lastName"
-            label="Apellido"
+            label="Last Name"
             rules={[
-              { required: true, message: "Por favor ingresa tu apellido" },
+              { required: true, message: "Please enter your last name" },
             ]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="Tu apellido"
+              placeholder="Your last name"
               size="large"
             />
           </Form.Item>
 
           <Form.Item
-            label="Teléfono (Opcional)"
+            label="Phone (Optional)"
             style={{ marginBottom: 0 }}
           >
             <div style={{ position: 'relative' }}>
               <PhoneInput
                 value={phoneValue}
                 onChange={setPhoneValue}
-                placeholder="Ingresa tu número de teléfono"
+                placeholder="Enter your phone number"
                 defaultCountry="US"
                 className="custom-phone-input"
                 international
@@ -223,13 +223,13 @@ export const Register: React.FC = () => {
 
           <Form.Item
             name="roleId"
-            label="Tipo de Usuario"
+            label="User Type"
             rules={[
-              { required: true, message: "Por favor selecciona el tipo de usuario" },
+              { required: true, message: "Please select user type" },
             ]}
           >
             <Select
-              placeholder="Selecciona el rol del usuario"
+              placeholder="Select user role"
               size="large"
               loading={loadingRoles}
               options={roles.map(role => ({
@@ -253,14 +253,14 @@ export const Register: React.FC = () => {
                 fontWeight: 500,
               }}
             >
-              Crear Cuenta
+              Create Account
             </Button>
           </Form.Item>
         </Form>
 
         <div style={{ textAlign: "center", marginTop: "16px" }}>
           <Text type="secondary" style={{ color: colors.text.secondary }}>
-            El usuario recibirá las credenciales por email
+            The user will receive credentials by email
           </Text>
         </div>
       </Card>

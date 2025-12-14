@@ -27,6 +27,11 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
   
   const { event, isLoading, error } = useCalendarEvent(eventId);
 
+  // Set document title
+  useEffect(() => {
+    document.title = "Edit Event | The Children's World";
+  }, []);
+
   // Update form when event data is loaded
   useEffect(() => {
     if (event) {
@@ -72,7 +77,7 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
 
       await axiosInstance.patch(`/calendar/events/${eventId}`, eventData);
       
-      message.success('Evento actualizado exitosamente');
+      message.success('Event updated successfully');
       
       if (onSuccess) {
         onSuccess();
@@ -81,7 +86,7 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
       }
     } catch (error) {
       console.error('Error updating event:', error);
-      message.error('Error al actualizar el evento');
+      message.error('Error updating event');
     } finally {
       setIsSubmitting(false);
     }
@@ -94,8 +99,8 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
   if (error || !event) {
     return (
       <Card>
-        <Title level={4}>Evento no encontrado</Title>
-        <p>No se pudo cargar el evento o no existe.</p>
+        <Title level={4}>Event Not Found</Title>
+        <p>Could not load the event or it does not exist.</p>
       </Card>
     );
   }
@@ -103,7 +108,7 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
   return (
     <Card>
       <Title level={4} style={{ marginBottom: '24px' }}>
-        Editar Evento
+        Edit Event
       </Title>
       
       <Form
@@ -114,14 +119,14 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Título del Evento"
+              label="Event Title"
               name="title"
               rules={[
-                { required: true, message: 'Por favor ingrese el título del evento' },
-                { max: 255, message: 'El título no puede exceder 255 caracteres' }
+                { required: true, message: 'Please enter the event title' },
+                { max: 255, message: 'Title cannot exceed 255 characters' }
               ]}
             >
-              <Input placeholder="Ingrese el título del evento" />
+              <Input placeholder="Enter event title" />
             </Form.Item>
           </Col>
         </Row>
@@ -129,11 +134,11 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Tipo de Evento"
+              label="Event Type"
               name="eventType"
-              rules={[{ required: true, message: 'Por favor seleccione el tipo de evento' }]}
+              rules={[{ required: true, message: 'Please select the event type' }]}
             >
-              <Select placeholder="Seleccione el tipo de evento">
+              <Select placeholder="Select event type">
                 {Object.values(EventTypeEnum).map((type) => (
                   <Option key={type} value={type}>
                     {EVENT_TYPE_LABELS[type]}
@@ -145,7 +150,7 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
           
           <Col span={12}>
             <Form.Item
-              label="Todo el día"
+              label="All Day"
               name="isAllDay"
               valuePropName="checked"
               getValueFromEvent={(checked) => Boolean(checked)}
@@ -162,28 +167,28 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Fecha de Inicio"
+              label="Start Date"
               name="startDate"
-              rules={[{ required: true, message: 'Por favor seleccione la fecha de inicio' }]}
+              rules={[{ required: true, message: 'Please select the start date' }]}
             >
               <DatePicker 
                 style={{ width: '100%' }}
                 format="DD/MM/YYYY"
-                placeholder="Seleccione la fecha de inicio"
+                placeholder="Select start date"
               />
             </Form.Item>
           </Col>
           
           <Col span={12}>
             <Form.Item
-              label="Fecha de Fin"
+              label="End Date"
               name="endDate"
-              rules={[{ required: true, message: 'Por favor seleccione la fecha de fin' }]}
+              rules={[{ required: true, message: 'Please select the end date' }]}
             >
               <DatePicker 
                 style={{ width: '100%' }}
                 format="DD/MM/YYYY"
-                placeholder="Seleccione la fecha de fin"
+                placeholder="Select end date"
               />
             </Form.Item>
           </Col>
@@ -193,28 +198,28 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="Hora de Inicio"
+                label="Start Time"
                 name="startTime"
-                rules={[{ required: true, message: 'Por favor seleccione la hora de inicio' }]}
+                rules={[{ required: true, message: 'Please select the start time' }]}
               >
                 <TimePicker 
                   style={{ width: '100%' }}
                   format="HH:mm"
-                  placeholder="Seleccione la hora de inicio"
+                  placeholder="Select start time"
                 />
               </Form.Item>
             </Col>
             
             <Col span={12}>
               <Form.Item
-                label="Hora de Fin"
+                label="End Time"
                 name="endTime"
-                rules={[{ required: true, message: 'Por favor seleccione la hora de fin' }]}
+                rules={[{ required: true, message: 'Please select the end time' }]}
               >
                 <TimePicker 
                   style={{ width: '100%' }}
                   format="HH:mm"
-                  placeholder="Seleccione la hora de fin"
+                  placeholder="Select end time"
                 />
               </Form.Item>
             </Col>
@@ -224,12 +229,12 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Descripción"
+              label="Description"
               name="description"
             >
               <TextArea 
                 rows={4}
-                placeholder="Ingrese una descripción del evento (opcional)"
+                placeholder="Enter event description (optional)"
                 maxLength={1000}
                 showCount
               />
@@ -243,14 +248,14 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
               type="default"
               onClick={() => navigate('/calendar')}
             >
-              Cancelar
+              Cancel
             </Button>
             <Button
               type="primary"
               htmlType="submit"
               loading={isSubmitting}
             >
-              {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </Form.Item>

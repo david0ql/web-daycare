@@ -15,7 +15,7 @@ export const AttendanceShow: React.FC = () => {
     if (!record?.isPresent) {
       return (
         <Tag color="red" icon={<CloseCircleOutlined />}>
-          Ausente
+          Absent
         </Tag>
       );
     }
@@ -23,7 +23,7 @@ export const AttendanceShow: React.FC = () => {
     if (record?.checkOutTime) {
       return (
         <Tag color="green" icon={<CheckCircleOutlined />}>
-          Salida
+          Checked Out
         </Tag>
       );
     }
@@ -31,25 +31,25 @@ export const AttendanceShow: React.FC = () => {
     if (record?.checkInTime) {
       return (
         <Tag color="blue" icon={<ClockCircleOutlined />}>
-          Presente
+          Present
         </Tag>
       );
     }
 
     return (
       <Tag color="orange">
-        Presente (Sin check-in)
+        Present (No check-in)
       </Tag>
     );
   };
 
   return (
-    <Show isLoading={isLoading}>
-      <Title level={5}>Información de Asistencia</Title>
+    <Show title="Attendance Details" isLoading={isLoading}>
+      <Title level={5}>Attendance Information</Title>
       
       <Row gutter={16}>
         <Col span={12}>
-          <Card title="Información del Niño" size="small">
+          <Card title="Child Information" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
                 <Avatar 
@@ -68,14 +68,14 @@ export const AttendanceShow: React.FC = () => {
         </Col>
         
         <Col span={12}>
-          <Card title="Estado de Asistencia" size="small">
+          <Card title="Attendance Status" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Estado: </Text>
+                <Text strong>Status: </Text>
                 {getStatusTag()}
               </div>
               <div>
-                <Text strong>Fecha: </Text>
+                <Text strong>Date: </Text>
                 <DateField value={record?.attendanceDate} format="DD/MM/YYYY" />
               </div>
             </Space>
@@ -87,10 +87,10 @@ export const AttendanceShow: React.FC = () => {
 
       <Row gutter={16}>
         <Col span={12}>
-          <Card title="Horarios" size="small">
+          <Card title="Schedule" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Hora de Entrada: </Text>
+                <Text strong>Check-in Time: </Text>
                 {record?.checkInTime ? (
                   <Text>{new Date(record.checkInTime).toLocaleTimeString('es-CO', { 
                     hour: '2-digit', 
@@ -101,7 +101,7 @@ export const AttendanceShow: React.FC = () => {
                 )}
               </div>
               <div>
-                <Text strong>Hora de Salida: </Text>
+                <Text strong>Check-out Time: </Text>
                 {record?.checkOutTime ? (
                   <Text>{new Date(record.checkOutTime).toLocaleTimeString('es-CO', { 
                     hour: '2-digit', 
@@ -116,10 +116,10 @@ export const AttendanceShow: React.FC = () => {
         </Col>
         
         <Col span={12}>
-          <Card title="Personas Responsables" size="small">
+          <Card title="Responsible Persons" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Entregado por: </Text>
+                <Text strong>Delivered by: </Text>
                 {record?.deliveredBy2 ? (
                   <div>
                     <Text>{record.deliveredBy2.name}</Text>
@@ -133,7 +133,7 @@ export const AttendanceShow: React.FC = () => {
                 )}
               </div>
               <div>
-                <Text strong>Recogido por: </Text>
+                <Text strong>Picked up by: </Text>
                 {record?.pickedUpBy2 ? (
                   <div>
                     <Text>{record.pickedUpBy2.name}</Text>
@@ -155,10 +155,10 @@ export const AttendanceShow: React.FC = () => {
 
       <Row gutter={16}>
         <Col span={24}>
-          <Card title="Notas" size="small">
+          <Card title="Notes" size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Notas de Entrada: </Text>
+                <Text strong>Check-in Notes: </Text>
                 {record?.checkInNotes ? (
                   <Text>{record.checkInNotes}</Text>
                 ) : (
@@ -166,7 +166,7 @@ export const AttendanceShow: React.FC = () => {
                 )}
               </div>
               <div>
-                <Text strong>Notas de Salida: </Text>
+                <Text strong>Check-out Notes: </Text>
                 {record?.checkOutNotes ? (
                   <Text>{record.checkOutNotes}</Text>
                 ) : (

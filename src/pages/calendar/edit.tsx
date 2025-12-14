@@ -9,7 +9,7 @@ export const CalendarEdit: React.FC = () => {
   if (isNaN(eventId)) {
     return (
       <div>
-        <h2>ID de evento inválido</h2>
+        <h2>Invalid event ID</h2>
       </div>
     );
   }

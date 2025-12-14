@@ -70,7 +70,7 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
   return (
     <Card>
       <Title level={4} style={{ marginBottom: '24px' }}>
-        Crear Nuevo Evento
+        Create New Event
       </Title>
       
       <Form
@@ -85,14 +85,14 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Título del Evento"
+              label="Event Title"
               name="title"
               rules={[
-                { required: true, message: 'Por favor ingrese el título del evento' },
-                { max: 255, message: 'El título no puede exceder 255 caracteres' }
+                { required: true, message: 'Please enter the event title' },
+                { max: 255, message: 'Title cannot exceed 255 characters' }
               ]}
             >
-              <Input placeholder="Ingrese el título del evento" />
+              <Input placeholder="Enter event title" />
             </Form.Item>
           </Col>
         </Row>
@@ -100,11 +100,11 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Tipo de Evento"
+              label="Event Type"
               name="eventType"
-              rules={[{ required: true, message: 'Por favor seleccione el tipo de evento' }]}
+              rules={[{ required: true, message: 'Please select the event type' }]}
             >
-              <Select placeholder="Seleccione el tipo de evento">
+              <Select placeholder="Select event type">
                 {Object.values(EventTypeEnum).map((type) => (
                   <Option key={type} value={type}>
                     {EVENT_TYPE_LABELS[type]}
@@ -116,7 +116,7 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
           
           <Col span={12}>
             <Form.Item
-              label="Todo el día"
+              label="All Day"
               name="isAllDay"
               valuePropName="checked"
               getValueFromEvent={(checked) => Boolean(checked)}
@@ -133,28 +133,28 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Fecha de Inicio"
+              label="Start Date"
               name="startDate"
-              rules={[{ required: true, message: 'Por favor seleccione la fecha de inicio' }]}
+              rules={[{ required: true, message: 'Please select the start date' }]}
             >
               <DatePicker 
                 style={{ width: '100%' }}
                 format="DD/MM/YYYY"
-                placeholder="Seleccione la fecha de inicio"
+                placeholder="Select start date"
               />
             </Form.Item>
           </Col>
           
           <Col span={12}>
             <Form.Item
-              label="Fecha de Fin"
+              label="End Date"
               name="endDate"
-              rules={[{ required: true, message: 'Por favor seleccione la fecha de fin' }]}
+              rules={[{ required: true, message: 'Please select the end date' }]}
             >
               <DatePicker 
                 style={{ width: '100%' }}
                 format="DD/MM/YYYY"
-                placeholder="Seleccione la fecha de fin"
+                placeholder="Select end date"
               />
             </Form.Item>
           </Col>
@@ -164,28 +164,28 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="Hora de Inicio"
+                label="Start Time"
                 name="startTime"
-                rules={[{ required: true, message: 'Por favor seleccione la hora de inicio' }]}
+                rules={[{ required: true, message: 'Please select the start time' }]}
               >
                 <TimePicker 
                   style={{ width: '100%' }}
                   format="HH:mm"
-                  placeholder="Seleccione la hora de inicio"
+                  placeholder="Select start time"
                 />
               </Form.Item>
             </Col>
             
             <Col span={12}>
               <Form.Item
-                label="Hora de Fin"
+                label="End Time"
                 name="endTime"
-                rules={[{ required: true, message: 'Por favor seleccione la hora de fin' }]}
+                rules={[{ required: true, message: 'Please select the end time' }]}
               >
                 <TimePicker 
                   style={{ width: '100%' }}
                   format="HH:mm"
-                  placeholder="Seleccione la hora de fin"
+                  placeholder="Select end time"
                 />
               </Form.Item>
             </Col>
@@ -195,12 +195,12 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Descripción"
+              label="Description"
               name="description"
             >
               <TextArea 
                 rows={4}
-                placeholder="Ingrese una descripción del evento (opcional)"
+                placeholder="Enter event description (optional)"
                 maxLength={1000}
                 showCount
               />
@@ -222,7 +222,7 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
                   cursor: 'pointer',
                 }}
               >
-                Cancelar
+                Cancel
               </button>
             </Form.Item>
             <Form.Item style={{ margin: 0 }}>
@@ -238,7 +238,7 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
                   cursor: 'pointer',
                 }}
               >
-                {isLoading ? 'Creando...' : 'Crear Evento'}
+                {isLoading ? 'Creating...' : 'Create Event'}
               </button>
             </Form.Item>
           </div>

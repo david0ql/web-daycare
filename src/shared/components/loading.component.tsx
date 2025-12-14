@@ -11,7 +11,7 @@ interface LoadingComponentProps {
 
 export const LoadingComponent: React.FC<LoadingComponentProps> = ({
   size = 'default',
-  tip = 'Cargando...',
+  tip = 'Loading...',
   fullScreen = false,
   height = 200,
 }) => {

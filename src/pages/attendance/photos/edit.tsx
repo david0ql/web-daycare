@@ -42,8 +42,8 @@ export const AttendancePhotosEdit: React.FC = () => {
       // Show success notification
       open?.({
         type: "success",
-        message: "Foto actualizada exitosamente",
-        description: "Los cambios se han guardado correctamente",
+        message: "Photo updated successfully",
+        description: "Changes have been saved correctly",
       });
       
       // Navigate back to photos list with a small delay for better UX
@@ -66,8 +66,8 @@ export const AttendancePhotosEdit: React.FC = () => {
       }
       open?.({ 
         type: "error", 
-        message: "Error al actualizar la foto", 
-        description: "No se pudo actualizar la foto. Verifica los datos e intenta nuevamente." 
+        message: "Error updating photo", 
+        description: "Could not update photo. Please verify the data and try again." 
       });
     }
   });
@@ -97,13 +97,13 @@ export const AttendancePhotosEdit: React.FC = () => {
   const beforeUpload = (file: File) => {
     const isImage = file.type.startsWith('image/');
     if (!isImage) {
-      message.error('Solo se permiten archivos de imagen');
+      message.error('Only image files are allowed');
       return false;
     }
 
     const isLt5M = file.size / 1024 / 1024 < 5;
     if (!isLt5M) {
-      message.error('La imagen debe ser menor a 5MB');
+      message.error('Image must be less than 5MB');
       return false;
     }
 
@@ -141,7 +141,7 @@ export const AttendancePhotosEdit: React.FC = () => {
         if (Object.keys(updateData).length > 0) {
           await axiosInstance.patch(`/attendance/activity-photos/${id}`, updateData);
         } else {
-          message.warning('Debe seleccionar una nueva foto o mantener la actual');
+          message.warning('You must select a new photo or keep the current one');
           setIsSubmitting(false);
           return;
         }
@@ -157,7 +157,7 @@ export const AttendancePhotosEdit: React.FC = () => {
         }
       }
 
-      message.success('Foto actualizada exitosamente');
+      message.success('Photo updated successfully');
       
       // Invalidate cache
       await queryClient.invalidateQueries({
@@ -177,7 +177,7 @@ export const AttendancePhotosEdit: React.FC = () => {
       
     } catch (error: any) {
       console.error('Error updating photo:', error);
-      message.error('Error al actualizar la foto: ' + (error.response?.data?.message || error.message));
+      message.error('Error updating photo: ' + (error.response?.data?.message || error.message));
     } finally {
       setIsSubmitting(false);
     }
@@ -185,7 +185,7 @@ export const AttendancePhotosEdit: React.FC = () => {
 
   return (
     <Edit
-      title="Editar Foto de Actividad"
+      title="Edit Activity Photo"
       saveButtonProps={{
         ...saveButtonProps,
         loading: isSubmitting,
@@ -196,7 +196,7 @@ export const AttendancePhotosEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Foto Actual"
+              label="Current Photo"
             >
               <Upload
                 listType="picture-card"
@@ -212,7 +212,7 @@ export const AttendancePhotosEdit: React.FC = () => {
                 {fileList.length >= 1 ? null : (
                   <div>
                     <CameraOutlined style={{ fontSize: '24px', color: '#999' }} />
-                    <div style={{ marginTop: 8 }}>Cambiar Foto</div>
+                    <div style={{ marginTop: 8 }}>Change Photo</div>
                   </div>
                 )}
               </Upload>
@@ -223,12 +223,12 @@ export const AttendancePhotosEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Descripción"
+              label="Description"
               name="caption"
             >
               <TextArea 
                 rows={3}
-                placeholder="Descripción de la foto (opcional)"
+                placeholder="Photo description (optional)"
                 maxLength={500}
                 showCount
               />

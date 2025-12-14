@@ -32,7 +32,7 @@ export const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
     {
       key: "logout",
       icon: <LogoutOutlined />,
-      label: "Cerrar Sesión",
+      label: "Log Out",
       onClick: logout,
     },
   ];

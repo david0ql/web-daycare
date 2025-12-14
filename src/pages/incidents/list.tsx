@@ -47,15 +47,15 @@ export const IncidentsList: React.FC = () => {
       
       open?.({
         type: "success",
-        message: "Incidente marcado como notificado a padres",
-        description: "El padre ha sido notificado correctamente",
+        message: "Incident marked as notified to parents",
+        description: "The parent has been notified correctly",
       });
     } catch (error) {
       console.log('🔍 Mark parent notified - error:', error);
       open?.({
         type: "error",
-        message: "Error al marcar como notificado",
-        description: "No se pudo notificar al padre. Intenta nuevamente.",
+        message: "Error marking as notified",
+        description: "Could not notify the parent. Please try again.",
       });
     }
   };
@@ -76,15 +76,15 @@ export const IncidentsList: React.FC = () => {
       
       open?.({
         type: "success",
-        message: "Incidente eliminado exitosamente",
-        description: "El incidente ha sido eliminado correctamente",
+        message: "Incident deleted successfully",
+        description: "The incident has been deleted correctly",
       });
     } catch (error) {
       console.log('🔍 Delete incident - error:', error);
       open?.({
         type: "error",
-        message: "Error al eliminar el incidente",
-        description: "No se pudo eliminar el incidente. Intenta nuevamente.",
+        message: "Error deleting incident",
+        description: "Could not delete the incident. Please try again.",
       });
     }
   };
@@ -97,13 +97,13 @@ export const IncidentsList: React.FC = () => {
       width: 60,
     },
     {
-      title: 'Título',
+      title: 'Title',
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
     },
     {
-      title: 'Niño',
+      title: 'Child',
       key: 'child',
       render: (record: any) => (
         <Text>
@@ -112,7 +112,7 @@ export const IncidentsList: React.FC = () => {
       ),
     },
     {
-      title: 'Tipo',
+      title: 'Type',
       key: 'incidentType',
       render: (record: any) => (
         <div>
@@ -125,20 +125,20 @@ export const IncidentsList: React.FC = () => {
       ),
     },
     {
-      title: 'Fecha del Incidente',
+      title: 'Incident Date',
       dataIndex: 'incidentDate',
       key: 'incidentDate',
       render: (date: string) => formatIncidentDate(date),
       sorter: true,
     },
     {
-      title: 'Ubicación',
+      title: 'Location',
       dataIndex: 'location',
       key: 'location',
       ellipsis: true,
     },
     {
-      title: 'Estado',
+      title: 'Status',
       key: 'parentNotified',
       render: (record: any) => {
         const status = getIncidentStatus(record.parentNotified);
@@ -150,12 +150,12 @@ export const IncidentsList: React.FC = () => {
       },
     },
     {
-      title: 'Adjuntos',
+      title: 'Attachments',
       key: 'attachments',
       render: (record: any) => {
         const attachments = record.incidentAttachments || [];
         if (attachments.length === 0) {
-          return <Text type="secondary">Sin adjuntos</Text>;
+          return <Text type="secondary">No attachments</Text>;
         }
         
         return (
@@ -183,7 +183,7 @@ export const IncidentsList: React.FC = () => {
       },
     },
     {
-      title: 'Reportado por',
+      title: 'Reported by',
       key: 'reportedBy2',
       render: (record: any) => (
         <Text>
@@ -192,14 +192,14 @@ export const IncidentsList: React.FC = () => {
       ),
     },
     {
-      title: 'Acciones',
+      title: 'Actions',
       key: 'actions',
       render: (record: any) => (
         <Space>
           <ShowButton hideText size="small" recordItemId={record.id} />
           <EditButton hideText size="small" recordItemId={record.id} />
           {!record.parentNotified && (
-            <Tooltip title="Marcar como notificado a padres">
+            <Tooltip title="Mark as notified to parents">
               <Button
                 type="link"
                 size="small"
@@ -212,9 +212,9 @@ export const IncidentsList: React.FC = () => {
             hideText
             size="small"
             recordItemId={record.id}
-            confirmTitle="¿Está seguro de que desea eliminar este incidente?"
-            confirmOkText="Sí, eliminar"
-            confirmCancelText="Cancelar"
+            confirmTitle="Are you sure you want to delete this incident?"
+            confirmOkText="Yes, delete"
+            confirmCancelText="Cancel"
           />
         </Space>
       ),
@@ -223,10 +223,10 @@ export const IncidentsList: React.FC = () => {
 
   return (
     <List
-      title="Incidentes"
+      title="Incident List"
       headerButtons={[
         <CreateButton key="create" icon={<PlusOutlined />}>
-          Crear Incidente
+          Create Incident
         </CreateButton>,
       ]}
     >

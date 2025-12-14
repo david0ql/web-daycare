@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Calendar, Card, Tag, Space, Typography, Button, Tooltip, Badge, Empty } from 'antd';
 import { PlusOutlined, CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
@@ -100,7 +100,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
         ))}
         {dateEvents.length > 2 && (
           <div style={{ fontSize: '10px', color: '#666', textAlign: 'center' }}>
-            +{dateEvents.length - 2} más
+            +{dateEvents.length - 2} more
           </div>
         )}
       </div>
@@ -139,11 +139,15 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
   // Get events for selected date
   const selectedDateEvents = getEventsForDate(selectedDate);
 
+  useEffect(() => {
+    document.title = "Event Calendar | The Children's World";
+  }, []);
+
   return (
     <div style={{ padding: '24px' }}>
       <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Title level={2} style={{ margin: 0 }}>
-          <CalendarOutlined /> Calendario de Eventos
+          <CalendarOutlined /> Event Calendar
         </Title>
         <Button
           type="primary"
@@ -151,7 +155,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
           onClick={() => navigate('/calendar/create')}
           size="large"
         >
-          Crear Evento
+          Create Event
         </Button>
       </div>
 
@@ -169,11 +173,11 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
         </Card>
 
         {/* Selected Date Events */}
-        <Card title={`Eventos del ${selectedDate.format('DD [de] MMMM [de] YYYY')}`}>
+        <Card title={`Events for ${selectedDate.format('MMMM DD, YYYY')}`}>
           {selectedDateEvents.length === 0 ? (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No hay eventos para esta fecha"
+              description="No events for this date"
             />
           ) : (
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
@@ -209,14 +213,14 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
                     )}
                     
                     {event.isAllDay && (
-                      <Tag>Todo el día</Tag>
+                      <Tag>All Day</Tag>
                     )}
                   </Space>
                   
                   {event.createdByUser && (
                     <div style={{ marginTop: '8px' }}>
                       <Text type="secondary" style={{ fontSize: '11px' }}>
-                        Creado por: {event.createdByUser.firstName} {event.createdByUser.lastName}
+                        Created by: {event.createdByUser.firstName} {event.createdByUser.lastName}
                       </Text>
                     </div>
                   )}
@@ -228,7 +232,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
       </div>
 
       {/* Event Type Legend */}
-      <Card title="Leyenda de Tipos de Evento" style={{ marginTop: '24px' }}>
+      <Card title="Event Type Legend" style={{ marginTop: '24px' }}>
         <Space wrap>
           {Object.values(EventTypeEnum).map((eventType) => (
             <Tag

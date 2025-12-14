@@ -52,8 +52,8 @@ export const UserEdit: React.FC = () => {
       // Show success notification
       open?.({
         type: "success",
-        message: "Usuario actualizado exitosamente",
-        description: "Los cambios se han guardado correctamente",
+        message: "User updated successfully",
+        description: "Changes have been saved correctly",
       });
       
       // Navigate back to users list with a small delay for better UX
@@ -102,59 +102,59 @@ export const UserEdit: React.FC = () => {
   };
 
   return (
-    <Edit saveButtonProps={saveButtonProps}>
+    <Edit title="Edit User" saveButtonProps={saveButtonProps}>
       <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Form.Item
           label="Email"
           name="email"
           rules={[
-            { required: true, message: "El email es requerido" },
-            { type: "email", message: "Ingrese un email válido" },
+            { required: true, message: "Email is required" },
+            { type: "email", message: "Please enter a valid email" },
           ]}
         >
           <Input placeholder="usuario@ejemplo.com" />
         </Form.Item>
 
         <Form.Item
-          label="Nueva Contraseña"
+          label="New Password"
           name="password"
           rules={[
-            { min: 6, message: "La contraseña debe tener al menos 6 caracteres" },
+            { min: 6, message: "Password must be at least 6 characters" },
           ]}
         >
-          <Input.Password placeholder="Dejar vacío para mantener la actual" />
+          <Input.Password placeholder="Leave empty to keep current password" />
         </Form.Item>
 
         <Form.Item
-          label="Nombre"
+          label="First Name"
           name="firstName"
-          rules={[{ required: true, message: "El nombre es requerido" }]}
+          rules={[{ required: true, message: "First name is required" }]}
         >
-          <Input placeholder="Nombre" />
+          <Input placeholder="First name" />
         </Form.Item>
 
         <Form.Item
-          label="Apellido"
+          label="Last Name"
           name="lastName"
-          rules={[{ required: true, message: "El apellido es requerido" }]}
+          rules={[{ required: true, message: "Last name is required" }]}
         >
-          <Input placeholder="Apellido" />
+          <Input placeholder="Last name" />
         </Form.Item>
 
         <Form.Item
-          label="Teléfono"
+          label="Phone"
           name="phone"
         >
           <Input placeholder="+1234567890" />
         </Form.Item>
 
         <Form.Item
-          label="Rol"
+          label="Role"
           name="roleId"
-          rules={[{ required: true, message: "El rol es requerido" }]}
+          rules={[{ required: true, message: "Role is required" }]}
         >
           <Select
-            placeholder="Seleccione un rol"
+            placeholder="Select a role"
             options={roles.map((role: UserRole) => ({
               label: role.name.charAt(0).toUpperCase() + role.name.slice(1),
               value: role.id,
@@ -163,17 +163,17 @@ export const UserEdit: React.FC = () => {
         </Form.Item>
 
         <Form.Item
-          label="Estado Activo"
+          label="Active Status"
           name="isActive"
         >
           <BooleanSwitch />
         </Form.Item>
 
         <Form.Item
-          label="Foto de Perfil"
+          label="Profile Picture"
           name="profilePicture"
         >
-          <Input placeholder="URL de la imagen (opcional)" />
+          <Input placeholder="Image URL (optional)" />
         </Form.Item>
       </Form>
     </Edit>

@@ -36,13 +36,13 @@ export const AttendanceActivities: React.FC = () => {
     if (record.completed) {
       return (
         <Tag color="green" icon={<CheckCircleOutlined />}>
-          Completada
+          Completed
         </Tag>
       );
     }
     return (
       <Tag color="orange" icon={<ClockCircleOutlined />}>
-        Pendiente
+        Pending
       </Tag>
     );
   };
@@ -56,7 +56,7 @@ export const AttendanceActivities: React.FC = () => {
 
   return (
     <List
-      title="Actividades Diarias"
+      title="Daily Activities"
       headerButtons={[
         <Button 
           type="primary" 
@@ -64,14 +64,14 @@ export const AttendanceActivities: React.FC = () => {
           icon={<PlusOutlined />}
           onClick={() => navigate('/attendance/activities/create')}
         >
-          Registrar Actividad
+          Register Activity
         </Button>,
       ]}
     >
       <Table {...tableProps} rowKey="id">
         <Table.Column
           dataIndex="child"
-          title="Niño"
+          title="Child"
           render={(child: any) => (
             <Space>
               <Avatar 
@@ -86,7 +86,7 @@ export const AttendanceActivities: React.FC = () => {
         />
         <Table.Column
           dataIndex="activityType"
-          title="Actividad"
+          title="Activity"
           render={(activityType: string) => (
             <Space>
               <span style={{ fontSize: '16px' }}>
@@ -98,24 +98,24 @@ export const AttendanceActivities: React.FC = () => {
         />
         <Table.Column
           dataIndex="completed"
-          title="Estado"
+          title="Status"
           render={(_, record: any) => getActivityStatus(record)}
         />
         <Table.Column
           dataIndex="timeCompleted"
-          title="Hora Completado"
+          title="Completion Time"
           render={(_, record: any) => getTimeCompleted(record)}
         />
         <Table.Column
           dataIndex="attendance"
-          title="Fecha"
+          title="Date"
           render={(attendance: any) => (
             <DateField value={attendance?.attendanceDate} format="DD/MM/YYYY" />
           )}
         />
         <Table.Column
           dataIndex="notes"
-          title="Notas"
+          title="Notes"
           render={(notes: string) => (
             <Tooltip title={notes}>
               <Text ellipsis style={{ maxWidth: 200 }}>
@@ -126,7 +126,7 @@ export const AttendanceActivities: React.FC = () => {
         />
         <Table.Column
           dataIndex="createdBy2"
-          title="Registrado por"
+          title="Registered by"
           render={(user: any) => (
             <Text type="secondary">
               {user?.firstName} {user?.lastName}
@@ -135,13 +135,13 @@ export const AttendanceActivities: React.FC = () => {
         />
         <Table.Column
           dataIndex="createdAt"
-          title="Creado"
+          title="Created"
           render={(value: string) => (
             <DateField value={value} format="DD/MM/YYYY HH:mm" />
           )}
         />
         <Table.Column
-          title="Acciones"
+          title="Actions"
           dataIndex="actions"
           render={(_, record: any) => (
             <Space>

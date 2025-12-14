@@ -60,6 +60,7 @@ export const UserList: React.FC = () => {
 
   return (
     <List
+      title="User List"
       headerButtons={
         isAdmin() ? (
           <Button
@@ -67,7 +68,7 @@ export const UserList: React.FC = () => {
             icon={<UserAddOutlined />}
             onClick={() => navigate("/users/register")}
           >
-            Registrar Usuario
+            Register User
           </Button>
         ) : undefined
       }
@@ -87,7 +88,7 @@ export const UserList: React.FC = () => {
         />
         <Table.Column
           dataIndex="firstName"
-          title="Nombre Completo"
+          title="Full Name"
           render={(value, record: User) => (
             <Space direction="vertical" size={0}>
               <Text strong>{`${record.firstName} ${record.lastName}`}</Text>
@@ -97,12 +98,12 @@ export const UserList: React.FC = () => {
         />
         <Table.Column
           dataIndex="phone"
-          title="Teléfono"
-          render={(value) => value || "No especificado"}
+          title="Phone"
+          render={(value) => value || "Not specified"}
         />
         <Table.Column
           dataIndex={["role", "description"]}
-          title="Rol"
+          title="Role"
           render={(value, record: User) => (
             <Tag color={getRoleColor(record.role.name)}>
               {record.role.description || record.role.name}
@@ -111,19 +112,19 @@ export const UserList: React.FC = () => {
         />
         <Table.Column
           dataIndex="isActive"
-          title="Estado"
+          title="Status"
           render={(value) => (
             <TagField
-              value={value ? "Activo" : "Inactivo"}
+              value={value ? "Active" : "Inactive"}
               color={value ? "green" : "red"}
             />
           )}
         />
         <Table.Column
           dataIndex="lastLogin"
-          title="Último Acceso"
+          title="Last Access"
           render={(value) => {
-            if (!value) return "Nunca";
+            if (!value) return "Never";
             return new Date(value).toLocaleDateString("es-ES", {
               year: "numeric",
               month: "short",
@@ -134,7 +135,7 @@ export const UserList: React.FC = () => {
           }}
         />
         <Table.Column
-          title="Acciones"
+          title="Actions"
           dataIndex="actions"
           render={(_, record: User) => (
             <Space>

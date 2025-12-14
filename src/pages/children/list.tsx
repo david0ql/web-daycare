@@ -45,15 +45,15 @@ export const ChildList: React.FC = () => {
     if (years > 0) {
       return `${years}a ${months}m`;
     }
-    return `${months} meses`;
+    return `${months} months`;
   };
 
   return (
-    <List>
+    <List title="Children List">
       <Table {...tableProps} rowKey="id">
         <Table.Column
           dataIndex="profilePicture"
-          title="Foto"
+          title="Photo"
           render={(value, record: Child) => (
             <Avatar
               src={value}
@@ -65,35 +65,35 @@ export const ChildList: React.FC = () => {
         />
         <Table.Column
           dataIndex="firstName"
-          title="Nombre Completo"
+          title="Full Name"
           render={(value, record: Child) => (
             <Space direction="vertical" size={0}>
               <Text strong>{`${record.firstName} ${record.lastName}`}</Text>
               <Text type="secondary">
-                {calculateAge(record.birthDate)} • {record.birthCity || "No especificado"}
+                {calculateAge(record.birthDate)} • {record.birthCity || "Not specified"}
               </Text>
             </Space>
           )}
         />
         <Table.Column
           dataIndex="birthDate"
-          title="Fecha de Nacimiento"
+          title="Birth Date"
           render={(value) => moment(value).format("DD/MM/YYYY")}
         />
         <Table.Column
           dataIndex="address"
-          title="Dirección"
-          render={(value) => value || "No especificado"}
+          title="Address"
+          render={(value) => value || "Not specified"}
           ellipsis
         />
         <Table.Column
           dataIndex="hasPaymentAlert"
-          title="Alerta de Pago"
+          title="Payment Alert"
           render={(value) => (
             <Space>
               {value && <WarningOutlined style={{ color: "#ff4d4f" }} />}
               <TagField
-                value={value ? "Pendiente" : "Al día"}
+                value={value ? "Pending" : "Up to date"}
                 color={value ? "red" : "green"}
               />
             </Space>
@@ -101,16 +101,16 @@ export const ChildList: React.FC = () => {
         />
         <Table.Column
           dataIndex="isActive"
-          title="Estado"
+          title="Status"
           render={(value) => (
             <TagField
-              value={value ? "Activo" : "Inactivo"}
+              value={value ? "Active" : "Inactive"}
               color={value ? "green" : "red"}
             />
           )}
         />
         <Table.Column
-          title="Acciones"
+          title="Actions"
           dataIndex="actions"
           render={(_, record: Child) => (
             <Space>

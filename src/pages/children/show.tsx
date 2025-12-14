@@ -8,7 +8,7 @@ const { Title, Text } = Typography;
 
 export const ChildShow: React.FC = () => {
   return (
-    <Show>
+    <Show title="Child Details">
       <Card>
         <Row gutter={[16, 16]}>
           <Col span={24}>
@@ -32,20 +32,20 @@ export const ChildShow: React.FC = () => {
 
         <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
           <Col span={12}>
-            <Card size="small" title="Información Personal">
+            <Card size="small" title="Personal Information">
               <Space direction="vertical" style={{ width: "100%" }}>
                 <div>
-                  <Text strong>Fecha de Nacimiento:</Text>
+                  <Text strong>Birth Date:</Text>
                   <br />
                   <DateField value="birthDate" format="YYYY-MM-DD" />
                 </div>
                 <div>
-                  <Text strong>Ciudad de Nacimiento:</Text>
+                  <Text strong>Birth City:</Text>
                   <br />
                   <TextField value="birthCity" />
                 </div>
                 <div>
-                  <Text strong>Dirección:</Text>
+                  <Text strong>Address:</Text>
                   <br />
                   <TextField value="address" />
                 </div>
@@ -54,24 +54,24 @@ export const ChildShow: React.FC = () => {
           </Col>
 
           <Col span={12}>
-            <Card size="small" title="Estado">
+            <Card size="small" title="Status">
               <Space direction="vertical" style={{ width: "100%" }}>
                 <div>
-                  <Text strong>Estado de Pago:</Text>
+                  <Text strong>Payment Status:</Text>
                   <br />
                   <Tag color={ChildUtils.getPaymentAlertColor(false)}>
                     <BooleanField value="hasPaymentAlert" />
                   </Tag>
                 </div>
                 <div>
-                  <Text strong>Estado Activo:</Text>
+                  <Text strong>Active Status:</Text>
                   <br />
                   <Tag color={ChildUtils.getActiveStatusColor(true)}>
                     <BooleanField value="isActive" />
                   </Tag>
                 </div>
                 <div>
-                  <Text strong>Fecha de Registro:</Text>
+                  <Text strong>Registration Date:</Text>
                   <br />
                   <DateField value="createdAt" format="YYYY-MM-DD HH:mm" />
                 </div>

@@ -20,27 +20,27 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({ child, visible, onClos
     try {
       const qrUrl = await generateQRCode(child);
       setQrCodeUrl(qrUrl);
-      message.success('Codigo QR generado exitosamente');
+      message.success('QR code generated successfully');
     } catch (error) {
-      message.error('Error al generar el codigo QR');
+      message.error('Error generating QR code');
     }
   };
 
   const handleDownloadPNG = async () => {
     try {
       await downloadQRAsPNG(child);
-      message.success('Codigo QR descargado como PNG');
+      message.success('QR code downloaded as PNG');
     } catch (error) {
-      message.error('Error al descargar el codigo QR como PNG');
+      message.error('Error downloading QR code as PNG');
     }
   };
 
   const handleDownloadPDF = async () => {
     try {
       await downloadQRAsPDF(child);
-      message.success('Codigo QR descargado como PDF');
+      message.success('QR code downloaded as PDF');
     } catch (error) {
-      message.error('Error al descargar el codigo QR como PDF');
+      message.error('Error downloading QR code as PDF');
     }
   };
 
@@ -54,14 +54,14 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({ child, visible, onClos
       title={
         <Space>
           <QrcodeOutlined />
-          <span>Generar Codigo QR - {child.firstName} {child.lastName}</span>
+          <span>Generate QR Code - {child.firstName} {child.lastName}</span>
         </Space>
       }
       open={visible}
       onCancel={handleClose}
       footer={[
         <Button key="close" onClick={handleClose}>
-          Cerrar
+          Close
         </Button>,
       ]}
       width={600}
@@ -70,14 +70,14 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({ child, visible, onClos
         <Card>
           <Row gutter={[16, 16]}>
             <Col span={24}>
-              <Title level={4}>Informacion del Nino</Title>
+              <Title level={4}>Child Information</Title>
               <Text strong>ID: </Text>
               <Text>{child.id}</Text>
               <br />
-              <Text strong>Nombre: </Text>
+              <Text strong>Name: </Text>
               <Text>{child.firstName} {child.lastName}</Text>
               <br />
-              <Text strong>Fecha de Nacimiento: </Text>
+              <Text strong>Birth Date: </Text>
               <Text>{new Date(child.birthDate).toLocaleDateString()}</Text>
             </Col>
 
@@ -90,7 +90,7 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({ child, visible, onClos
                   loading={isGenerating}
                   size="large"
                 >
-                  Generar Codigo QR
+                  Generate QR Code
                 </Button>
 
                 {qrCodeUrl && (
@@ -98,7 +98,7 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({ child, visible, onClos
                     <Card style={{ backgroundColor: '#f5f5f5' }}>
                       <img 
                         src={qrCodeUrl} 
-                        alt="Codigo QR" 
+                        alt="QR Code" 
                         style={{ 
                           maxWidth: '100%', 
                           height: 'auto',
@@ -114,14 +114,14 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({ child, visible, onClos
                         onClick={handleDownloadPNG}
                         loading={isGenerating}
                       >
-                        Descargar PNG
+                        Download PNG
                       </Button>
                       <Button
                         icon={<FilePdfOutlined />}
                         onClick={handleDownloadPDF}
                         loading={isGenerating}
                       >
-                        Descargar PDF
+                        Download PDF
                       </Button>
                     </Space>
                   </>

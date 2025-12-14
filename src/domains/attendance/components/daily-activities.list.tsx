@@ -21,10 +21,10 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
   const handleDelete = async (id: number) => {
     try {
       await deleteActivity(id);
-      message.success('Actividad eliminada exitosamente');
+      message.success('Activity deleted successfully');
     } catch (error) {
       console.error('Error deleting activity:', error);
-      message.error('Error al eliminar la actividad');
+      message.error('Error deleting activity');
     }
   };
 
@@ -38,7 +38,7 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
     }
     return (
       <Tag color="orange" icon={<ClockCircleOutlined />}>
-        Pendiente
+        Pending
       </Tag>
     );
   };
@@ -58,7 +58,7 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
     return (
       <Card>
         <Empty 
-          description="No hay actividades registradas para este día"
+          description="No activities registered for this day"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         />
       </Card>
@@ -68,7 +68,7 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
   return (
     <Card>
       <Title level={5} style={{ marginBottom: '16px' }}>
-        Actividades Diarias ({activities.length})
+        Daily Activities ({activities.length})
       </Title>
       
       <List
@@ -82,12 +82,12 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
                 onClick={() => onEdit?.(activity)}
                 size="small"
               >
-                Editar
+                Edit
               </Button>,
               <Popconfirm
-                title="¿Estás seguro de eliminar esta actividad?"
+                title="Are you sure you want to delete this activity?"
                 onConfirm={() => handleDelete(activity.id)}
-                okText="Sí"
+                okText="Yes"
                 cancelText="No"
               >
                 <Button
@@ -96,7 +96,7 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
                   icon={<DeleteOutlined />}
                   size="small"
                 >
-                  Eliminar
+                  Delete
                 </Button>
               </Popconfirm>,
             ]}
@@ -117,14 +117,14 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
                 <Space direction="vertical" size="small">
                   {activity.completed && activity.timeCompleted && (
                     <Text type="secondary">
-                      Completada a las: {getTimeCompleted(activity)}
+                      Completed at: {getTimeCompleted(activity)}
                     </Text>
                   )}
                   {activity.notes && (
                     <Text>{activity.notes}</Text>
                   )}
                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                    Registrado por: {activity.createdByUser?.firstName} {activity.createdByUser?.lastName}
+                    Registered by: {activity.createdByUser?.firstName} {activity.createdByUser?.lastName}
                   </Text>
                 </Space>
               }

@@ -46,7 +46,7 @@ export interface UpdateDailyObservationData extends Partial<CreateDailyObservati
 export const MOOD_LABELS = {
   [MoodEnum.HAPPY]: 'Happy',
   [MoodEnum.SAD]: 'Sad',
-  [MoodEnum.TIRED]: 'Cansado',
+  [MoodEnum.TIRED]: 'Tired',
   [MoodEnum.ENERGETIC]: 'Energetic',
   [MoodEnum.CALM]: 'Calm',
   [MoodEnum.CRANKY]: 'Cranky',
