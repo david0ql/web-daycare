@@ -18,13 +18,13 @@ export const getSeverityColor = (severityLevel: 'low' | 'medium' | 'high' | 'cri
 export const getSeverityLabel = (severityLevel: 'low' | 'medium' | 'high' | 'critical') => {
   switch (severityLevel) {
     case 'low':
-      return 'Bajo';
+      return 'Low';
     case 'medium':
-      return 'Medio';
+      return 'Medium';
     case 'high':
-      return 'Alto';
+      return 'High';
     case 'critical':
-      return 'Crítico';
+      return 'Critical';
     default:
       return severityLevel;
   }
@@ -40,11 +40,11 @@ export const formatIncidentDateShort = (date: string) => {
 
 export const getIncidentStatus = (parentNotified: boolean | null) => {
   if (parentNotified === null) {
-    return { status: 'default', text: 'Pendiente' };
+    return { status: 'default', text: 'Pending' };
   }
   return parentNotified 
-    ? { status: 'success', text: 'Notificado' }
-    : { status: 'warning', text: 'No notificado' };
+    ? { status: 'success', text: 'Notified' }
+    : { status: 'warning', text: 'Not notified' };
 };
 
 export const getFileTypeIcon = (fileType: 'image' | 'document') => {
@@ -61,11 +61,11 @@ export const getFileTypeIcon = (fileType: 'image' | 'document') => {
 export const getFileTypeLabel = (fileType: 'image' | 'document') => {
   switch (fileType) {
     case 'image':
-      return 'Imagen';
+      return 'Image';
     case 'document':
-      return 'Documento';
+      return 'Document';
     default:
-      return 'Archivo';
+      return 'File';
   }
 };
 

@@ -152,12 +152,12 @@ export const AttendanceCreate: React.FC = () => {
       children: (
         <Form layout="vertical" onFinish={handleCheckIn}>
           <Form.Item
-            label="Seleccionar Niño"
+            label="Select Child"
             name="childId"
-            rules={[{ required: true, message: "Debe seleccionar un niño" }]}
+            rules={[{ required: true, message: "You must select a child" }]}
           >
             <Select
-              placeholder="Buscar y seleccionar niño"
+              placeholder="Search and select child"
               showSearch
               optionFilterProp="children"
               onChange={handleChildSelect}
@@ -248,12 +248,12 @@ export const AttendanceCreate: React.FC = () => {
       children: (
         <Form layout="vertical" onFinish={handleCheckOut}>
           <Form.Item
-            label="Seleccionar Niño"
+            label="Select Child"
             name="childId"
-            rules={[{ required: true, message: "Debe seleccionar un niño" }]}
+            rules={[{ required: true, message: "You must select a child" }]}
           >
             <Select
-              placeholder="Buscar y seleccionar niño"
+              placeholder="Search and select child"
               showSearch
               optionFilterProp="children"
               onChange={handleChildSelect}

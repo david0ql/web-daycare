@@ -40,16 +40,16 @@ export class ChildUtils {
     const { years, months } = this.calculateAge(birthDate);
     
     if (years > 0) {
-      return `${years}a ${months}m`;
+      return `${years}y ${months}m`;
     }
-    return `${months} meses`;
+    return `${months} months`;
   }
 
   /**
    * Format birth date for display
    */
   static formatBirthDate(birthDate: string): string {
-    return new Date(birthDate).toLocaleDateString("es-ES", {
+    return new Date(birthDate).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -67,7 +67,7 @@ export class ChildUtils {
    * Get status text for payment alert
    */
   static getPaymentAlertText(hasPaymentAlert: boolean): string {
-    return hasPaymentAlert ? "Alerta de Pago" : "Al Día";
+    return hasPaymentAlert ? "Payment Alert" : "Up to Date";
   }
 
   /**
@@ -81,14 +81,14 @@ export class ChildUtils {
    * Get status text for active status
    */
   static getActiveStatusText(isActive: boolean): string {
-    return isActive ? "Activo" : "Inactivo";
+    return isActive ? "Active" : "Inactive";
   }
 
   /**
    * Format address for display
    */
   static formatAddress(address?: string): string {
-    if (!address) return "No especificado";
+    if (!address) return "Not specified";
     return address.length > 50 ? `${address.substring(0, 50)}...` : address;
   }
 
@@ -96,6 +96,6 @@ export class ChildUtils {
    * Format birth city for display
    */
   static formatBirthCity(birthCity?: string): string {
-    return birthCity || "No especificado";
+    return birthCity || "Not specified";
   }
 }

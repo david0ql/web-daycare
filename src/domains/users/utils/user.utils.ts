@@ -46,23 +46,23 @@ export class UserUtils {
   }
 
   static getLastLoginDisplay(lastLogin?: string): string {
-    if (!lastLogin) return "Nunca";
-    
+    if (!lastLogin) return "Never";
+
     const date = new Date(lastLogin);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return "Hace menos de 1 hora";
-    if (diffInHours < 24) return `Hace ${diffInHours} horas`;
-    
+
+    if (diffInHours < 1) return "Less than 1 hour ago";
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `Hace ${diffInDays} días`;
-    
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+
     return date.toLocaleDateString();
   }
 
   static formatPhoneNumber(phone?: string): string {
-    if (!phone) return "No especificado";
+    if (!phone) return "Not specified";
     return phone;
   }
 
@@ -75,19 +75,19 @@ export class UserUtils {
     const errors: string[] = [];
     
     if (password.length < 8) {
-      errors.push("La contraseña debe tener al menos 8 caracteres");
+      errors.push("Password must be at least 8 characters");
     }
-    
+
     if (!/[A-Z]/.test(password)) {
-      errors.push("La contraseña debe contener al menos una letra mayúscula");
+      errors.push("Password must contain at least one uppercase letter");
     }
-    
+
     if (!/[a-z]/.test(password)) {
-      errors.push("La contraseña debe contener al menos una letra minúscula");
+      errors.push("Password must contain at least one lowercase letter");
     }
-    
+
     if (!/\d/.test(password)) {
-      errors.push("La contraseña debe contener al menos un número");
+      errors.push("Password must contain at least one number");
     }
     
     return {

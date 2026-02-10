@@ -89,9 +89,9 @@ export const EVENT_TYPE_COLORS = {
 
 // Event type labels
 export const EVENT_TYPE_LABELS = {
-  [EventTypeEnum.HOLIDAY]: 'Día Festivo',
-  [EventTypeEnum.VACATION]: 'Vacaciones',
-  [EventTypeEnum.MEETING]: 'Reunión',
-  [EventTypeEnum.EVENT]: 'Evento',
-  [EventTypeEnum.CLOSURE]: 'Cierre',
+  [EventTypeEnum.HOLIDAY]: 'Holiday',
+  [EventTypeEnum.VACATION]: 'Vacation',
+  [EventTypeEnum.MEETING]: 'Meeting',
+  [EventTypeEnum.EVENT]: 'Event',
+  [EventTypeEnum.CLOSURE]: 'Closure',
 } as const;
