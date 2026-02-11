@@ -75,14 +75,14 @@ export const useQRGenerator = () => {
 
       // Add title
       pdf.setFontSize(20);
-      pdf.text(`Codigo QR - ${child.firstName} ${child.lastName}`, 20, 20);
+      pdf.text(`QR Code - ${child.firstName} ${child.lastName}`, 20, 20);
 
       // Add child information
       pdf.setFontSize(12);
       pdf.text(`ID: ${child.id}`, 20, 35);
-      pdf.text(`Nombre: ${child.firstName} ${child.lastName}`, 20, 45);
-      pdf.text(`Fecha de Nacimiento: ${new Date(child.birthDate).toLocaleDateString()}`, 20, 55);
-      pdf.text(`Generado el: ${new Date().toLocaleDateString()}`, 20, 65);
+      pdf.text(`Name: ${child.firstName} ${child.lastName}`, 20, 45);
+      pdf.text(`Date of Birth: ${new Date(child.birthDate).toLocaleDateString()}`, 20, 55);
+      pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 65);
 
       // Add QR code
       const imgWidth = 60;
@@ -94,8 +94,8 @@ export const useQRGenerator = () => {
 
       // Add instructions
       pdf.setFontSize(10);
-      pdf.text('Este codigo QR contiene informacion del nino para identificacion rapida.', 20, 160);
-      pdf.text('Escanea el codigo para acceder a la informacion del nino.', 20, 170);
+      pdf.text('This QR code contains the child\'s information for quick identification.', 20, 160);
+      pdf.text('Scan the code to access the child\'s information.', 20, 170);
 
       // Download PDF
       pdf.save(`QR_${child.firstName}_${child.lastName}_${child.id}.pdf`);
