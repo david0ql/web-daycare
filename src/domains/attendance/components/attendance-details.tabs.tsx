@@ -7,6 +7,7 @@ import { DailyObservationsCreateForm } from './daily-observations.create.form';
 import { DailyObservationsList } from './daily-observations.list';
 import { ActivityPhotosCreateForm } from './activity-photos.create.form';
 import { ActivityPhotosList } from './activity-photos.list';
+import { useLanguage } from '../../../shared/contexts/language.context';
 
 const { Title } = Typography;
 
@@ -15,10 +16,43 @@ interface AttendanceDetailsTabsProps {
   attendanceId: number;
 }
 
+const ATTENDANCE_DETAILS_TRANSLATIONS = {
+  english: {
+    activities: "Activities",
+    observations: "Observations",
+    photos: "Photos",
+    dailyActivities: "Daily Activities",
+    dailyObservations: "Daily Observations",
+    activityPhotos: "Activity Photos",
+    registerActivity: "Register Activity",
+    registerObservation: "Register Observation",
+    uploadPhoto: "Upload Photo",
+    modalRegisterActivity: "Register Activity",
+    modalRegisterObservation: "Register Observation",
+    modalUploadPhoto: "Upload Photo",
+  },
+  spanish: {
+    activities: "Actividades",
+    observations: "Observaciones",
+    photos: "Fotos",
+    dailyActivities: "Actividades diarias",
+    dailyObservations: "Observaciones diarias",
+    activityPhotos: "Fotos de actividades",
+    registerActivity: "Registrar actividad",
+    registerObservation: "Registrar observación",
+    uploadPhoto: "Subir foto",
+    modalRegisterActivity: "Registrar actividad",
+    modalRegisterObservation: "Registrar observación",
+    modalUploadPhoto: "Subir foto",
+  },
+} as const;
+
 export const AttendanceDetailsTabs: React.FC<AttendanceDetailsTabsProps> = ({
   childId,
   attendanceId,
 }) => {
+  const { language } = useLanguage();
+  const t = ATTENDANCE_DETAILS_TRANSLATIONS[language];
   const [activeTab, setActiveTab] = useState('activities');
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [createModalType, setCreateModalType] = useState<'activity' | 'observation' | 'photo'>('activity');
@@ -35,9 +69,9 @@ export const AttendanceDetailsTabs: React.FC<AttendanceDetailsTabsProps> = ({
 
   const renderCreateModal = () => {
     const modalTitle = {
-      activity: 'Register Activity',
-      observation: 'Register Observation',
-      photo: 'Upload Photo',
+      activity: t.modalRegisterActivity,
+      observation: t.modalRegisterObservation,
+      photo: t.modalUploadPhoto,
     };
 
     return (
@@ -76,17 +110,17 @@ export const AttendanceDetailsTabs: React.FC<AttendanceDetailsTabsProps> = ({
   const tabItems = [
     {
       key: 'activities',
-      label: 'Activities',
+      label: t.activities,
       children: (
         <Space direction="vertical" style={{ width: '100%' }} size="large">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Title level={4} style={{ margin: 0 }}>Daily Activities</Title>
+            <Title level={4} style={{ margin: 0 }}>{t.dailyActivities}</Title>
             <Button
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => handleCreateClick('activity')}
             >
-              Register Activity
+              {t.registerActivity}
             </Button>
           </div>
           <DailyActivitiesList
@@ -97,17 +131,17 @@ export const AttendanceDetailsTabs: React.FC<AttendanceDetailsTabsProps> = ({
     },
     {
       key: 'observations',
-      label: 'Observations',
+      label: t.observations,
       children: (
         <Space direction="vertical" style={{ width: '100%' }} size="large">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Title level={4} style={{ margin: 0 }}>Daily Observations</Title>
+            <Title level={4} style={{ margin: 0 }}>{t.dailyObservations}</Title>
             <Button
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => handleCreateClick('observation')}
             >
-              Register Observation
+              {t.registerObservation}
             </Button>
           </div>
           <DailyObservationsList
@@ -118,17 +152,17 @@ export const AttendanceDetailsTabs: React.FC<AttendanceDetailsTabsProps> = ({
     },
     {
       key: 'photos',
-      label: 'Photos',
+      label: t.photos,
       children: (
         <Space direction="vertical" style={{ width: '100%' }} size="large">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Title level={4} style={{ margin: 0 }}>Activity Photos</Title>
+            <Title level={4} style={{ margin: 0 }}>{t.activityPhotos}</Title>
             <Button
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => handleCreateClick('photo')}
             >
-              Upload Photo
+              {t.uploadPhoto}
             </Button>
           </div>
           <ActivityPhotosList

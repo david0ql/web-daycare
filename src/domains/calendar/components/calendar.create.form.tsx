@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import { Form, Input, Select, DatePicker, TimePicker, Switch, Card, Row, Col, Typography } from 'antd';
 import { useCreate } from '@refinedev/core';
 import { useNavigate } from 'react-router';
-import { CreateCalendarEventData, EventTypeEnum, EVENT_TYPE_LABELS } from '../types/calendar.types';
+import { CreateCalendarEventData, EventTypeEnum, EVENT_TYPE_LABELS_BY_LANGUAGE } from '../types/calendar.types';
 import dayjs from 'dayjs';
-import 'dayjs/locale/es';
-
-// Set Spanish locale for dayjs
-dayjs.locale('es');
+import { useLanguage } from '../../../shared/contexts/language.context';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -17,10 +14,71 @@ interface CalendarCreateFormProps {
   onSuccess?: () => void;
 }
 
+const CALENDAR_CREATE_FORM_TRANSLATIONS = {
+  english: {
+    header: "Create New Event",
+    eventTitle: "Event Title",
+    eventTitleRequired: "Please enter the event title",
+    titleTooLong: "Title cannot exceed 255 characters",
+    titlePlaceholder: "Enter event title",
+    eventType: "Event Type",
+    eventTypeRequired: "Please select the event type",
+    eventTypePlaceholder: "Select event type",
+    allDay: "All Day",
+    startDate: "Start Date",
+    startDateRequired: "Please select the start date",
+    startDatePlaceholder: "Select start date",
+    endDate: "End Date",
+    endDateRequired: "Please select the end date",
+    endDatePlaceholder: "Select end date",
+    startTime: "Start Time",
+    startTimeRequired: "Please select the start time",
+    startTimePlaceholder: "Select start time",
+    endTime: "End Time",
+    endTimeRequired: "Please select the end time",
+    endTimePlaceholder: "Select end time",
+    description: "Description",
+    descriptionPlaceholder: "Enter event description (optional)",
+    cancel: "Cancel",
+    creating: "Creating...",
+    createEvent: "Create Event",
+  },
+  spanish: {
+    header: "Crear nuevo evento",
+    eventTitle: "Título del evento",
+    eventTitleRequired: "Por favor ingresa el título del evento",
+    titleTooLong: "El título no puede superar 255 caracteres",
+    titlePlaceholder: "Ingresa el título del evento",
+    eventType: "Tipo de evento",
+    eventTypeRequired: "Por favor selecciona el tipo de evento",
+    eventTypePlaceholder: "Selecciona tipo de evento",
+    allDay: "Todo el día",
+    startDate: "Fecha inicio",
+    startDateRequired: "Por favor selecciona la fecha de inicio",
+    startDatePlaceholder: "Selecciona fecha de inicio",
+    endDate: "Fecha fin",
+    endDateRequired: "Por favor selecciona la fecha de fin",
+    endDatePlaceholder: "Selecciona fecha de fin",
+    startTime: "Hora inicio",
+    startTimeRequired: "Por favor selecciona la hora de inicio",
+    startTimePlaceholder: "Selecciona hora de inicio",
+    endTime: "Hora fin",
+    endTimeRequired: "Por favor selecciona la hora de fin",
+    endTimePlaceholder: "Selecciona hora de fin",
+    description: "Descripción",
+    descriptionPlaceholder: "Ingresa la descripción del evento (opcional)",
+    cancel: "Cancelar",
+    creating: "Creando...",
+    createEvent: "Crear evento",
+  },
+} as const;
+
 export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSuccess }) => {
   console.log('🔍 CalendarCreateForm: Componente montado');
   
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = CALENDAR_CREATE_FORM_TRANSLATIONS[language];
   const [form] = Form.useForm();
   const [isAllDay, setIsAllDay] = useState(true);
   
@@ -70,7 +128,7 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
   return (
     <Card>
       <Title level={4} style={{ marginBottom: '24px' }}>
-        Create New Event
+        {t.header}
       </Title>
       
       <Form
@@ -85,14 +143,14 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Event Title"
+              label={t.eventTitle}
               name="title"
               rules={[
-                { required: true, message: 'Please enter the event title' },
-                { max: 255, message: 'Title cannot exceed 255 characters' }
+                { required: true, message: t.eventTitleRequired },
+                { max: 255, message: t.titleTooLong }
               ]}
             >
-              <Input placeholder="Enter event title" />
+              <Input placeholder={t.titlePlaceholder} />
             </Form.Item>
           </Col>
         </Row>
@@ -100,14 +158,14 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Event Type"
+              label={t.eventType}
               name="eventType"
-              rules={[{ required: true, message: 'Please select the event type' }]}
+              rules={[{ required: true, message: t.eventTypeRequired }]}
             >
-              <Select placeholder="Select event type">
+              <Select placeholder={t.eventTypePlaceholder}>
                 {Object.values(EventTypeEnum).map((type) => (
                   <Option key={type} value={type}>
-                    {EVENT_TYPE_LABELS[type]}
+                    {EVENT_TYPE_LABELS_BY_LANGUAGE[language][type]}
                   </Option>
                 ))}
               </Select>
@@ -116,7 +174,7 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
           
           <Col span={12}>
             <Form.Item
-              label="All Day"
+              label={t.allDay}
               name="isAllDay"
               valuePropName="checked"
               getValueFromEvent={(checked) => Boolean(checked)}
@@ -133,28 +191,28 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Start Date"
+              label={t.startDate}
               name="startDate"
-              rules={[{ required: true, message: 'Please select the start date' }]}
+              rules={[{ required: true, message: t.startDateRequired }]}
             >
               <DatePicker 
                 style={{ width: '100%' }}
                 format="DD/MM/YYYY"
-                placeholder="Select start date"
+                placeholder={t.startDatePlaceholder}
               />
             </Form.Item>
           </Col>
           
           <Col span={12}>
             <Form.Item
-              label="End Date"
+              label={t.endDate}
               name="endDate"
-              rules={[{ required: true, message: 'Please select the end date' }]}
+              rules={[{ required: true, message: t.endDateRequired }]}
             >
               <DatePicker 
                 style={{ width: '100%' }}
                 format="DD/MM/YYYY"
-                placeholder="Select end date"
+                placeholder={t.endDatePlaceholder}
               />
             </Form.Item>
           </Col>
@@ -164,28 +222,28 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="Start Time"
+                label={t.startTime}
                 name="startTime"
-                rules={[{ required: true, message: 'Please select the start time' }]}
+                rules={[{ required: true, message: t.startTimeRequired }]}
               >
                 <TimePicker 
                   style={{ width: '100%' }}
                   format="HH:mm"
-                  placeholder="Select start time"
+                  placeholder={t.startTimePlaceholder}
                 />
               </Form.Item>
             </Col>
             
             <Col span={12}>
               <Form.Item
-                label="End Time"
+                label={t.endTime}
                 name="endTime"
-                rules={[{ required: true, message: 'Please select the end time' }]}
+                rules={[{ required: true, message: t.endTimeRequired }]}
               >
                 <TimePicker 
                   style={{ width: '100%' }}
                   format="HH:mm"
-                  placeholder="Select end time"
+                  placeholder={t.endTimePlaceholder}
                 />
               </Form.Item>
             </Col>
@@ -195,12 +253,12 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Description"
+              label={t.description}
               name="description"
             >
               <TextArea 
                 rows={4}
-                placeholder="Enter event description (optional)"
+                placeholder={t.descriptionPlaceholder}
                 maxLength={1000}
                 showCount
               />
@@ -222,7 +280,7 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
                   cursor: 'pointer',
                 }}
               >
-                Cancel
+                {t.cancel}
               </button>
             </Form.Item>
             <Form.Item style={{ margin: 0 }}>
@@ -238,7 +296,7 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
                   cursor: 'pointer',
                 }}
               >
-                {isLoading ? 'Creating...' : 'Create Event'}
+                {isLoading ? t.creating : t.createEvent}
               </button>
             </Form.Item>
           </div>

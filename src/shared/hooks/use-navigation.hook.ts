@@ -1,14 +1,32 @@
 import { useMemo } from "react";
 import { 
-  useNavigation,
-  useGo,
-  useBack,
-  useParsed,
-  useLink,
-  useGetToPath,
-  useResourceParams,
-  useNotification
-} from "@refinedev/core";
+	  useNavigation,
+	  useGo,
+	  useBack,
+	  useParsed,
+	  useLink,
+	  useGetToPath,
+	  useResourceParams,
+	  useNotification
+	} from "@refinedev/core";
+import { useLanguage } from "../contexts/language.context";
+
+const NAVIGATION_TRANSLATIONS = {
+  english: {
+    navigationError: "Navigation error",
+    navigationErrorDescription: "Could not navigate to the requested route",
+    backErrorDescription: "Could not go back",
+    accessDenied: "Access denied",
+    accessDeniedDescription: "You don't have permission to access this section",
+  },
+  spanish: {
+    navigationError: "Error de navegación",
+    navigationErrorDescription: "No se pudo navegar a la ruta solicitada",
+    backErrorDescription: "No se pudo volver atrás",
+    accessDenied: "Acceso denegado",
+    accessDeniedDescription: "No tienes permisos para acceder a esta sección",
+  },
+} as const;
 
 /**
  * Hook personalizado para operaciones de navegación
@@ -16,6 +34,8 @@ import {
  */
 export const useAppNavigation = () => {
   const { open: openNotification } = useNotification();
+  const { language } = useLanguage();
+  const t = NAVIGATION_TRANSLATIONS[language];
   const navigation = useNavigation();
   const go = useGo();
   const back = useBack();
@@ -35,8 +55,8 @@ export const useAppNavigation = () => {
     } catch (error) {
       openNotification?.({
         type: "error",
-        message: "Error de navegación",
-        description: "No se pudo navegar a la ruta solicitada",
+        message: t.navigationError,
+        description: t.navigationErrorDescription,
       });
     }
   };
@@ -99,8 +119,8 @@ export const useAppNavigation = () => {
     } catch (error) {
       openNotification?.({
         type: "error",
-        message: "Error de navegación",
-        description: "No se pudo volver atrás",
+        message: t.navigationError,
+        description: t.backErrorDescription,
       });
     }
   };
@@ -241,8 +261,8 @@ export const useAppNavigation = () => {
     } else {
       openNotification?.({
         type: "error",
-        message: "Acceso denegado",
-        description: "No tienes permisos para acceder a esta sección",
+        message: t.accessDenied,
+        description: t.accessDeniedDescription,
       });
     }
   };

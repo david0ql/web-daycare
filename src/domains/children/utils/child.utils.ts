@@ -1,4 +1,5 @@
 import { Child } from "../types/child.types";
+import type { Language } from "../../../shared/contexts/language.context";
 
 export class ChildUtils {
   /**
@@ -36,20 +37,20 @@ export class ChildUtils {
   /**
    * Get age display string
    */
-  static getAgeDisplay(birthDate: string): string {
+  static getAgeDisplay(birthDate: string, language: Language = "english"): string {
     const { years, months } = this.calculateAge(birthDate);
     
     if (years > 0) {
-      return `${years}y ${months}m`;
+      return language === "spanish" ? `${years}a ${months}m` : `${years}y ${months}m`;
     }
-    return `${months} months`;
+    return language === "spanish" ? `${months} meses` : `${months} months`;
   }
 
   /**
    * Format birth date for display
    */
-  static formatBirthDate(birthDate: string): string {
-    return new Date(birthDate).toLocaleDateString("en-US", {
+  static formatBirthDate(birthDate: string, language: Language = "english"): string {
+    return new Date(birthDate).toLocaleDateString(language === "spanish" ? "es-CO" : "en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -66,7 +67,10 @@ export class ChildUtils {
   /**
    * Get status text for payment alert
    */
-  static getPaymentAlertText(hasPaymentAlert: boolean): string {
+  static getPaymentAlertText(hasPaymentAlert: boolean, language: Language = "english"): string {
+    if (language === "spanish") {
+      return hasPaymentAlert ? "Alerta de pago" : "Al día";
+    }
     return hasPaymentAlert ? "Payment Alert" : "Up to Date";
   }
 
@@ -80,22 +84,25 @@ export class ChildUtils {
   /**
    * Get status text for active status
    */
-  static getActiveStatusText(isActive: boolean): string {
+  static getActiveStatusText(isActive: boolean, language: Language = "english"): string {
+    if (language === "spanish") {
+      return isActive ? "Activo" : "Inactivo";
+    }
     return isActive ? "Active" : "Inactive";
   }
 
   /**
    * Format address for display
    */
-  static formatAddress(address?: string): string {
-    if (!address) return "Not specified";
+  static formatAddress(address?: string, language: Language = "english"): string {
+    if (!address) return language === "spanish" ? "No especificado" : "Not specified";
     return address.length > 50 ? `${address.substring(0, 50)}...` : address;
   }
 
   /**
    * Format birth city for display
    */
-  static formatBirthCity(birthCity?: string): string {
-    return birthCity || "Not specified";
+  static formatBirthCity(birthCity?: string, language: Language = "english"): string {
+    return birthCity || (language === "spanish" ? "No especificado" : "Not specified");
   }
 }

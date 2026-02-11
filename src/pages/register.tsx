@@ -7,11 +7,81 @@ import 'react-phone-number-input/style.css';
 import '../styles/phone-input.css';
 import { colors } from "../styles/colors";
 import { axiosInstance } from "../shared";
+import { useLanguage } from "../shared/contexts/language.context";
 
 const { Title, Text } = Typography;
 
+const REGISTER_TRANSLATIONS = {
+  english: {
+    subtitle: "Create new account",
+    successMessage: "Account created successfully. You can now sign in.",
+    connectionError: "Connection error. Please verify that the API is working.",
+    regError: "Registration Error",
+    regErrorDesc: "Could not create account. Please verify the entered data.",
+    email: "Email",
+    emailRequired: "Please enter your email",
+    emailInvalid: "Please enter a valid email",
+    emailPlaceholder: "your@email.com",
+    password: "Password",
+    passwordRequired: "Please enter your password",
+    passwordMin: "Password must be at least 6 characters",
+    passwordPlaceholder: "Your password",
+    firstName: "First Name",
+    firstNameRequired: "Please enter your first name",
+    firstNamePlaceholder: "Your first name",
+    lastName: "Last Name",
+    lastNameRequired: "Please enter your last name",
+    lastNamePlaceholder: "Your last name",
+    phoneOptional: "Phone (Optional)",
+    phonePlaceholder: "Enter your phone number",
+    userType: "User Type",
+    userTypeRequired: "Please select your user type",
+    userTypePlaceholder: "Select your role",
+    roleParent: "Parent",
+    roleEducator: "Educator",
+    roleAdministrator: "Administrator",
+    createAccount: "Create Account",
+    alreadyHaveAccount: "Already have an account?",
+    signInHere: "Sign in here",
+  },
+  spanish: {
+    subtitle: "Crear nueva cuenta",
+    successMessage: "Cuenta creada correctamente. Ya puedes iniciar sesión.",
+    connectionError: "Error de conexión. Por favor verifica que la API esté funcionando.",
+    regError: "Error de registro",
+    regErrorDesc: "No se pudo crear la cuenta. Por favor verifica los datos ingresados.",
+    email: "Correo electrónico",
+    emailRequired: "Por favor ingresa tu correo",
+    emailInvalid: "Por favor ingresa un correo válido",
+    emailPlaceholder: "tu@email.com",
+    password: "Contraseña",
+    passwordRequired: "Por favor ingresa tu contraseña",
+    passwordMin: "La contraseña debe tener al menos 6 caracteres",
+    passwordPlaceholder: "Tu contraseña",
+    firstName: "Nombre",
+    firstNameRequired: "Por favor ingresa tu nombre",
+    firstNamePlaceholder: "Tu nombre",
+    lastName: "Apellido",
+    lastNameRequired: "Por favor ingresa tu apellido",
+    lastNamePlaceholder: "Tu apellido",
+    phoneOptional: "Teléfono (Opcional)",
+    phonePlaceholder: "Ingresa tu número de teléfono",
+    userType: "Tipo de usuario",
+    userTypeRequired: "Por favor selecciona tu tipo de usuario",
+    userTypePlaceholder: "Selecciona tu rol",
+    roleParent: "Padre/Madre",
+    roleEducator: "Educador",
+    roleAdministrator: "Administrador",
+    createAccount: "Crear cuenta",
+    alreadyHaveAccount: "¿Ya tienes una cuenta?",
+    signInHere: "Inicia sesión aquí",
+  },
+} as const;
+
 export const Register: React.FC = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = REGISTER_TRANSLATIONS[language];
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [phoneValue, setPhoneValue] = useState<string | undefined>();
@@ -28,10 +98,10 @@ export const Register: React.FC = () => {
     
     try {
       const response = await axiosInstance.post("/auth/register", formData);
-      message.success("Account created successfully. You can now sign in.");
+      message.success(t.successMessage);
       navigate("/login");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Connection error. Please verify that the API is working.");
+      setError(err.response?.data?.message || t.connectionError);
     } finally {
       setIsLoading(false);
     }
@@ -61,13 +131,13 @@ export const Register: React.FC = () => {
           <Title level={2} style={{ color: colors.text.primary, marginBottom: "8px" }}>
             🏫 The Children's World
           </Title>
-          <Text type="secondary" style={{ color: colors.text.secondary }}>Create new account</Text>
+          <Text type="secondary" style={{ color: colors.text.secondary }}>{t.subtitle}</Text>
         </div>
 
         {error && (
           <Alert
-            message="Registration Error"
-            description="Could not create account. Please verify the entered data."
+            message={t.regError}
+            description={t.regErrorDesc}
             type="error"
             style={{ marginBottom: "16px" }}
           />
@@ -81,71 +151,71 @@ export const Register: React.FC = () => {
         >
           <Form.Item
             name="email"
-            label="Email"
+            label={t.email}
             rules={[
-              { required: true, message: "Please enter your email" },
-              { type: "email", message: "Please enter a valid email" },
+              { required: true, message: t.emailRequired },
+              { type: "email", message: t.emailInvalid },
             ]}
           >
             <Input
               prefix={<MailOutlined />}
-              placeholder="tu@email.com"
+              placeholder={t.emailPlaceholder}
               size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="password"
-            label="Password"
+            label={t.password}
             rules={[
-              { required: true, message: "Please enter your password" },
-              { min: 6, message: "Password must be at least 6 characters" },
+              { required: true, message: t.passwordRequired },
+              { min: 6, message: t.passwordMin },
             ]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Your password"
+              placeholder={t.passwordPlaceholder}
               size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="firstName"
-            label="First Name"
+            label={t.firstName}
             rules={[
-              { required: true, message: "Please enter your first name" },
+              { required: true, message: t.firstNameRequired },
             ]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="Your first name"
+              placeholder={t.firstNamePlaceholder}
               size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="lastName"
-            label="Last Name"
+            label={t.lastName}
             rules={[
-              { required: true, message: "Please enter your last name" },
+              { required: true, message: t.lastNameRequired },
             ]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="Your last name"
+              placeholder={t.lastNamePlaceholder}
               size="large"
             />
           </Form.Item>
 
           <Form.Item
-            label="Phone (Optional)"
+            label={t.phoneOptional}
             style={{ marginBottom: 0 }}
           >
             <div style={{ position: 'relative' }}>
               <PhoneInput
                 value={phoneValue}
                 onChange={setPhoneValue}
-                placeholder="Enter your phone number"
+                placeholder={t.phonePlaceholder}
                 defaultCountry="US"
                 className="custom-phone-input"
                 international
@@ -157,18 +227,18 @@ export const Register: React.FC = () => {
 
           <Form.Item
             name="role"
-            label="User Type"
+            label={t.userType}
             rules={[
-              { required: true, message: "Please select your user type" },
+              { required: true, message: t.userTypeRequired },
             ]}
           >
             <Select
-              placeholder="Select your role"
+              placeholder={t.userTypePlaceholder}
               size="large"
               options={[
-                { label: "Parent", value: "parent" },
-                { label: "Educator", value: "educator" },
-                { label: "Administrator", value: "administrator" },
+                { label: t.roleParent, value: "parent" },
+                { label: t.roleEducator, value: "educator" },
+                { label: t.roleAdministrator, value: "administrator" },
               ]}
             />
           </Form.Item>
@@ -187,16 +257,16 @@ export const Register: React.FC = () => {
                 fontWeight: 500,
               }}
             >
-              Create Account
+              {t.createAccount}
             </Button>
           </Form.Item>
         </Form>
 
         <div style={{ textAlign: "center", marginTop: "16px" }}>
           <Text type="secondary" style={{ color: colors.text.secondary }}>
-            Already have an account?{" "}
+            {t.alreadyHaveAccount}{" "}
             <Button type="link" href="/login" style={{ padding: 0, color: colors.secondary.main }}>
-              Sign in here
+              {t.signInHere}
             </Button>
           </Text>
         </div>

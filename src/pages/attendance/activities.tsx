@@ -2,14 +2,50 @@ import React from "react";
 import { List, useTable, DateField, TextField, EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Table, Avatar, Tooltip, Tag, Space, Button, Card, Typography } from "antd";
 import { CheckCircleOutlined, ClockCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { ACTIVITY_TYPE_LABELS, ACTIVITY_TYPE_ICONS } from "../../domains/attendance/types/daily-activities.types";
+import { ACTIVITY_TYPE_LABELS_BY_LANGUAGE, ACTIVITY_TYPE_ICONS } from "../../domains/attendance/types/daily-activities.types";
 import { useNavigate } from "react-router";
 import dayjs from 'dayjs';
+import { useLanguage } from "../../shared/contexts/language.context";
 
 const { Title, Text } = Typography;
 
+const ATTENDANCE_ACTIVITIES_TRANSLATIONS = {
+  english: {
+    title: "Daily Activities",
+    registerActivity: "Register Activity",
+    child: "Child",
+    activity: "Activity",
+    status: "Status",
+    completionTime: "Completion Time",
+    date: "Date",
+    notes: "Notes",
+    registeredBy: "Registered by",
+    created: "Created",
+    actions: "Actions",
+    completed: "Completed",
+    pending: "Pending",
+  },
+  spanish: {
+    title: "Actividades diarias",
+    registerActivity: "Registrar actividad",
+    child: "Niño",
+    activity: "Actividad",
+    status: "Estado",
+    completionTime: "Hora de finalización",
+    date: "Fecha",
+    notes: "Notas",
+    registeredBy: "Registrado por",
+    created: "Creado",
+    actions: "Acciones",
+    completed: "Completada",
+    pending: "Pendiente",
+  },
+} as const;
+
 export const AttendanceActivities: React.FC = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = ATTENDANCE_ACTIVITIES_TRANSLATIONS[language];
   const today = dayjs().format('YYYY-MM-DD');
   const { tableProps } = useTable({
     resource: "attendance/daily-activities",
@@ -36,13 +72,13 @@ export const AttendanceActivities: React.FC = () => {
     if (record.completed) {
       return (
         <Tag color="green" icon={<CheckCircleOutlined />}>
-          Completed
+          {t.completed}
         </Tag>
       );
     }
     return (
       <Tag color="orange" icon={<ClockCircleOutlined />}>
-        Pending
+        {t.pending}
       </Tag>
     );
   };
@@ -56,7 +92,7 @@ export const AttendanceActivities: React.FC = () => {
 
   return (
     <List
-      title="Daily Activities"
+      title={t.title}
       headerButtons={[
         <Button 
           type="primary" 
@@ -64,14 +100,14 @@ export const AttendanceActivities: React.FC = () => {
           icon={<PlusOutlined />}
           onClick={() => navigate('/attendance/activities/create')}
         >
-          Register Activity
+          {t.registerActivity}
         </Button>,
       ]}
     >
       <Table {...tableProps} rowKey="id">
         <Table.Column
           dataIndex="child"
-          title="Child"
+          title={t.child}
           render={(child: any) => (
             <Space>
               <Avatar 
@@ -86,36 +122,36 @@ export const AttendanceActivities: React.FC = () => {
         />
         <Table.Column
           dataIndex="activityType"
-          title="Activity"
+          title={t.activity}
           render={(activityType: string) => (
             <Space>
               <span style={{ fontSize: '16px' }}>
                 {ACTIVITY_TYPE_ICONS[activityType as keyof typeof ACTIVITY_TYPE_ICONS]}
               </span>
-              {ACTIVITY_TYPE_LABELS[activityType as keyof typeof ACTIVITY_TYPE_LABELS]}
+              {ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][activityType as keyof typeof ACTIVITY_TYPE_LABELS_BY_LANGUAGE.english]}
             </Space>
           )}
         />
         <Table.Column
           dataIndex="completed"
-          title="Status"
+          title={t.status}
           render={(_, record: any) => getActivityStatus(record)}
         />
         <Table.Column
           dataIndex="timeCompleted"
-          title="Completion Time"
+          title={t.completionTime}
           render={(_, record: any) => getTimeCompleted(record)}
         />
         <Table.Column
           dataIndex="attendance"
-          title="Date"
+          title={t.date}
           render={(attendance: any) => (
             <DateField value={attendance?.attendanceDate} format="DD/MM/YYYY" />
           )}
         />
         <Table.Column
           dataIndex="notes"
-          title="Notes"
+          title={t.notes}
           render={(notes: string) => (
             <Tooltip title={notes}>
               <Text ellipsis style={{ maxWidth: 200 }}>
@@ -126,7 +162,7 @@ export const AttendanceActivities: React.FC = () => {
         />
         <Table.Column
           dataIndex="createdBy2"
-          title="Registered by"
+          title={t.registeredBy}
           render={(user: any) => (
             <Text type="secondary">
               {user?.firstName} {user?.lastName}
@@ -135,13 +171,13 @@ export const AttendanceActivities: React.FC = () => {
         />
         <Table.Column
           dataIndex="createdAt"
-          title="Created"
+          title={t.created}
           render={(value: string) => (
             <DateField value={value} format="DD/MM/YYYY HH:mm" />
           )}
         />
         <Table.Column
-          title="Actions"
+          title={t.actions}
           dataIndex="actions"
           render={(_, record: any) => (
             <Space>

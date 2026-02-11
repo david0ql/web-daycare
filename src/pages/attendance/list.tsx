@@ -1,49 +1,98 @@
 import React from "react";
-import { List, useTable, DateField, BooleanField, TextField, EditButton, DeleteButton } from "@refinedev/antd";
+import { List, useTable, DateField, EditButton, DeleteButton } from "@refinedev/antd";
 import { Table, Space, Tag, Typography, Card, Row, Col, Statistic, Avatar, Tooltip } from "antd";
 import { 
   useTodayAttendance, 
   useChildrenWithStatus, 
   useAttendanceStats,
-  ChildWithStatus,
   AttendanceStatus
 } from "../../domains/attendance";
 import { CheckCircleOutlined, ClockCircleOutlined, UserOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { useLanguage } from "../../shared/contexts/language.context";
+import { getIntlLocale } from "../../shared/i18n/locale";
 
 const { Title, Text } = Typography;
 
-const AttendanceStatusComponent: React.FC<{ status: AttendanceStatus }> = ({ status }) => {
-  // Determine presence based on check-in/check-out times, not isPresent field
+const ATTENDANCE_LIST_TRANSLATIONS = {
+  english: {
+    title: "Attendance Record",
+    totalChildren: "Total Children",
+    presentToday: "Present Today",
+    absentToday: "Absent Today",
+    attendanceRate: "Attendance Rate",
+    child: "Child",
+    date: "Date",
+    checkIn: "Check-in",
+    checkOut: "Check-out",
+    status: "Status",
+    deliveredBy: "Delivered by",
+    pickedUpBy: "Picked up by",
+    notes: "Notes",
+    actions: "Actions",
+    id: "ID",
+    absent: "Absent",
+    checkedOut: "Checked Out",
+    present: "Present",
+    recordsOf: "records",
+    of: "of",
+    notAvailable: "N/A",
+  },
+  spanish: {
+    title: "Registro de asistencia",
+    totalChildren: "Total niños",
+    presentToday: "Presentes hoy",
+    absentToday: "Ausentes hoy",
+    attendanceRate: "Tasa de asistencia",
+    child: "Niño",
+    date: "Fecha",
+    checkIn: "Entrada",
+    checkOut: "Salida",
+    status: "Estado",
+    deliveredBy: "Entregado por",
+    pickedUpBy: "Recogido por",
+    notes: "Notas",
+    actions: "Acciones",
+    id: "ID",
+    absent: "Ausente",
+    checkedOut: "Retirado",
+    present: "Presente",
+    recordsOf: "registros",
+    of: "de",
+    notAvailable: "N/D",
+  },
+} as const;
+
+type AttendanceListTranslations = (typeof ATTENDANCE_LIST_TRANSLATIONS)[keyof typeof ATTENDANCE_LIST_TRANSLATIONS];
+
+const AttendanceStatusComponent: React.FC<{ status: AttendanceStatus; t: AttendanceListTranslations }> = ({ status, t }) => {
   const hasCheckIn = !!status.isCheckedIn;
   const hasCheckOut = !!status.isCheckedOut;
   
-  // If no check-in time, consider absent
   if (!hasCheckIn) {
     return (
       <Tag color="red" icon={<CloseCircleOutlined />}>
-        Absent
+        {t.absent}
       </Tag>
     );
   }
-
-  // If has check-out, show as "Salida" (checked out)
   if (hasCheckOut) {
     return (
       <Tag color="green" icon={<CheckCircleOutlined />}>
-        Checked Out
+        {t.checkedOut}
       </Tag>
     );
   }
-
-  // If has check-in but no check-out, show as "Presente"
   return (
     <Tag color="blue" icon={<ClockCircleOutlined />}>
-        Present
+      {t.present}
     </Tag>
   );
 };
 
 export const AttendanceList: React.FC = () => {
+  const { language } = useLanguage();
+  const t = ATTENDANCE_LIST_TRANSLATIONS[language];
+  const intlLocale = getIntlLocale(language);
   const { tableProps } = useTable();
   const { data: todayAttendance, isLoading: loadingAttendance } = useTodayAttendance();
   const { data: childrenWithStatus, isLoading: loadingChildren } = useChildrenWithStatus();
@@ -57,7 +106,7 @@ export const AttendanceList: React.FC = () => {
 
   const columns = [
     {
-      title: "Child",
+      title: t.child,
       dataIndex: ["child", "firstName"],
       key: "child",
       render: (_: any, record: any) => (
@@ -70,42 +119,42 @@ export const AttendanceList: React.FC = () => {
           <div>
             <div>{record.child?.firstName} {record.child?.lastName}</div>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              ID: {record.childId}
+              {t.id}: {record.childId}
             </Text>
           </div>
         </Space>
       ),
     },
     {
-      title: "Date",
+      title: t.date,
       dataIndex: "attendanceDate",
       key: "attendanceDate",
       render: (value: string) => <DateField value={value} format="DD/MM/YYYY" />,
     },
     {
-      title: "Check-in",
+      title: t.checkIn,
       dataIndex: "checkInTime",
       key: "checkInTime",
       render: (value: string) => value ? (
-        <Text>{new Date(value).toLocaleTimeString('es-CO', { 
+        <Text>{new Date(value).toLocaleTimeString(intlLocale, { 
           hour: '2-digit', 
           minute: '2-digit' 
         })}</Text>
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: "Check-out",
+      title: t.checkOut,
       dataIndex: "checkOutTime",
       key: "checkOutTime",
       render: (value: string) => value ? (
-        <Text>{new Date(value).toLocaleTimeString('es-CO', { 
+        <Text>{new Date(value).toLocaleTimeString(intlLocale, { 
           hour: '2-digit', 
           minute: '2-digit' 
         })}</Text>
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: "Status",
+      title: t.status,
       dataIndex: "isPresent",
       key: "isPresent",
       render: (_: any, record: any) => {
@@ -115,11 +164,11 @@ export const AttendanceList: React.FC = () => {
           isCheckedOut: !!record.checkOutTime,
           attendance: record
         };
-        return <AttendanceStatusComponent status={status} />;
+        return <AttendanceStatusComponent status={status} t={t} />;
       },
     },
     {
-      title: "Delivered by",
+      title: t.deliveredBy,
       dataIndex: ["deliveredBy2", "name"],
       key: "deliveredBy",
       render: (value: string, record: any) => value ? (
@@ -129,7 +178,7 @@ export const AttendanceList: React.FC = () => {
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: "Picked up by",
+      title: t.pickedUpBy,
       dataIndex: ["pickedUpBy2", "name"],
       key: "pickedUpBy",
       render: (value: string, record: any) => value ? (
@@ -139,12 +188,12 @@ export const AttendanceList: React.FC = () => {
       ) : <Text type="secondary">-</Text>,
     },
     {
-      title: "Notes",
+      title: t.notes,
       key: "notes",
       render: (_: any, record: any) => {
-        const checkInNotes = record.checkInNotes || 'N/A';
-        const checkOutNotes = record.checkOutNotes || 'N/A';
-        const notesText = `Check-in: ${checkInNotes} / Check-out: ${checkOutNotes}`;
+        const checkInNotes = record.checkInNotes || t.notAvailable;
+        const checkOutNotes = record.checkOutNotes || t.notAvailable;
+        const notesText = `${t.checkIn}: ${checkInNotes} / ${t.checkOut}: ${checkOutNotes}`;
         
         return (
           <Tooltip title={notesText}>
@@ -156,7 +205,7 @@ export const AttendanceList: React.FC = () => {
       },
     },
     {
-      title: "Actions",
+      title: t.actions,
       key: "actions",
       render: (_: any, record: any) => {
         console.log("🔍 Attendance List - record for actions:", record);
@@ -182,7 +231,7 @@ export const AttendanceList: React.FC = () => {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Total Children"
+              title={t.totalChildren}
               value={stats?.totalChildren || 0}
               loading={loadingStats}
               prefix={<UserOutlined />}
@@ -192,7 +241,7 @@ export const AttendanceList: React.FC = () => {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Present Today"
+              title={t.presentToday}
               value={stats?.presentToday || 0}
               loading={loadingStats}
               valueStyle={{ color: '#52c41a' }}
@@ -203,7 +252,7 @@ export const AttendanceList: React.FC = () => {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Absent Today"
+              title={t.absentToday}
               value={stats?.absentToday || 0}
               loading={loadingStats}
               valueStyle={{ color: '#ff4d4f' }}
@@ -214,7 +263,7 @@ export const AttendanceList: React.FC = () => {
         <Col span={6}>
           <Card>
             <Statistic
-              title="Attendance Rate"
+              title={t.attendanceRate}
               value={stats?.attendanceRate || 0}
               loading={loadingStats}
               suffix="%"
@@ -225,7 +274,7 @@ export const AttendanceList: React.FC = () => {
       </Row>
 
       {/* Attendance List */}
-      <List title="Attendance Record">
+      <List title={t.title}>
         <Table
           {...tableProps}
           columns={columns}
@@ -236,7 +285,7 @@ export const AttendanceList: React.FC = () => {
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} records`,
+              `${range[0]}-${range[1]} ${t.of} ${total} ${t.recordsOf}`,
           }}
         />
       </List>

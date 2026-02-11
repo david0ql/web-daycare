@@ -6,14 +6,62 @@ import { useGo, useInvalidate, useNotification, useOne } from '@refinedev/core';
 import { axiosInstance } from '../../shared';
 import { useUpdateDocument } from '../../domains/documents';
 import dayjs from 'dayjs';
+import { useLanguage } from '../../shared/contexts/language.context';
 
 const { Title } = Typography;
 const { Option } = Select;
+
+const DOCUMENT_EDIT_TRANSLATIONS = {
+  english: {
+    title: "Edit Document",
+    save: "Save",
+    updateSuccess: "Document updated successfully",
+    updateSuccessDesc: "Changes have been saved correctly",
+    updateError: "Error updating document",
+    loading: "Loading...",
+    notFound: "Document not found",
+    child: "Child",
+    selectChild: "Select a child",
+    selectChildRequired: "Please select a child",
+    noChildren: "No children available",
+    documentType: "Document Type",
+    selectDocType: "Select a document type",
+    selectDocTypeRequired: "Please select a document type",
+    noDocTypes: "No document types available",
+    expirationDate: "Expiration Date",
+    expirationPlaceholder: "Select expiration date",
+    currentFile: "Current File",
+    size: "Size",
+  },
+  spanish: {
+    title: "Editar documento",
+    save: "Guardar",
+    updateSuccess: "Documento actualizado correctamente",
+    updateSuccessDesc: "Los cambios han sido guardados correctamente",
+    updateError: "Error al actualizar documento",
+    loading: "Cargando...",
+    notFound: "Documento no encontrado",
+    child: "Niño",
+    selectChild: "Selecciona un niño",
+    selectChildRequired: "Por favor selecciona un niño",
+    noChildren: "No hay niños disponibles",
+    documentType: "Tipo de documento",
+    selectDocType: "Selecciona un tipo de documento",
+    selectDocTypeRequired: "Por favor selecciona un tipo de documento",
+    noDocTypes: "No hay tipos de documento disponibles",
+    expirationDate: "Fecha de vencimiento",
+    expirationPlaceholder: "Selecciona fecha de vencimiento",
+    currentFile: "Archivo actual",
+    size: "Tamaño",
+  },
+} as const;
 
 export const DocumentEdit: React.FC = () => {
   const go = useGo();
   const invalidate = useInvalidate();
   const { open } = useNotification();
+  const { language } = useLanguage();
+  const t = DOCUMENT_EDIT_TRANSLATIONS[language];
 
   const { formProps, saveButtonProps } = useForm({
     resource: 'documents',
@@ -33,8 +81,8 @@ export const DocumentEdit: React.FC = () => {
 
       open?.({
         type: "success",
-        message: "Document updated successfully",
-        description: "Changes have been saved correctly",
+        message: t.updateSuccess,
+        description: t.updateSuccessDesc,
       });
 
       // Navigate back to documents list
@@ -106,25 +154,26 @@ export const DocumentEdit: React.FC = () => {
     } catch (error: any) {
       open?.({
         type: "error",
-        message: "Error updating document",
+        message: t.updateError,
         description: error.response?.data?.message || error.message,
       });
     }
   };
 
   if (documentLoading) {
-    return <div>Loading...</div>;
+    return <div>{t.loading}</div>;
   }
 
   if (!documentData) {
-    return <div>Document not found</div>;
+    return <div>{t.notFound}</div>;
   }
 
   return (
     <Edit
-      title="Edit Document"
+      title={t.title}
       saveButtonProps={{
         ...saveButtonProps,
+        children: t.save,
         onClick: () => formProps.form?.submit(),
       }}
     >
@@ -132,15 +181,15 @@ export const DocumentEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Child"
+              label={t.child}
               name="childId"
-              rules={[{ required: true, message: 'Please select a child' }]}
+              rules={[{ required: true, message: t.selectChildRequired }]}
             >
               <Select
-                placeholder="Select a child"
+                placeholder={t.selectChild}
                 showSearch
                 loading={childrenLoading}
-                notFoundContent={childrenLoading ? "Loading..." : "No children available"}
+                notFoundContent={childrenLoading ? t.loading : t.noChildren}
                 filterOption={(input, option) =>
                   String(option?.children || "").toLowerCase().includes(input.toLowerCase())
                 }
@@ -156,14 +205,14 @@ export const DocumentEdit: React.FC = () => {
 
           <Col span={12}>
             <Form.Item
-              label="Document Type"
+              label={t.documentType}
               name="documentTypeId"
-              rules={[{ required: true, message: 'Please select a document type' }]}
+              rules={[{ required: true, message: t.selectDocTypeRequired }]}
             >
               <Select
-                placeholder="Select a document type"
+                placeholder={t.selectDocType}
                 loading={documentTypesLoading}
-                notFoundContent={documentTypesLoading ? "Loading..." : "No document types available"}
+                notFoundContent={documentTypesLoading ? t.loading : t.noDocTypes}
                 showSearch
                 filterOption={(input, option) =>
                   String(option?.children || "").toLowerCase().includes(input.toLowerCase())
@@ -180,24 +229,24 @@ export const DocumentEdit: React.FC = () => {
         </Row>
 
         <Form.Item
-          label="Expiration Date"
+          label={t.expirationDate}
           name="expiresAt"
         >
           <DatePicker
             style={{ width: '100%' }}
             format="DD/MM/YYYY"
-            placeholder="Select expiration date"
+            placeholder={t.expirationPlaceholder}
           />
         </Form.Item>
 
         <Form.Item
-          label="Current File"
+          label={t.currentFile}
         >
           <div style={{ padding: '8px 12px', background: '#f5f5f5', borderRadius: '6px' }}>
             <strong>{documentData.originalFilename}</strong>
             <br />
             <span style={{ color: '#666', fontSize: '12px' }}>
-              Size: {(documentData.fileSize / 1024 / 1024).toFixed(2)} MB
+              {t.size}: {(documentData.fileSize / 1024 / 1024).toFixed(2)} MB
             </span>
           </div>
         </Form.Item>

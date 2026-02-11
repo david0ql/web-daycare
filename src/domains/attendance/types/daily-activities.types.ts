@@ -59,6 +59,22 @@ export const ACTIVITY_TYPE_LABELS = {
   [ActivityTypeEnum.OTHER]: 'Other',
 } as const;
 
+import type { Language } from "../../../shared/contexts/language.context";
+
+export const ACTIVITY_TYPE_LABELS_BY_LANGUAGE: Record<Language, Record<ActivityTypeEnum, string>> = {
+  english: ACTIVITY_TYPE_LABELS,
+  spanish: {
+    [ActivityTypeEnum.BREAKFAST]: "Desayuno",
+    [ActivityTypeEnum.LUNCH]: "Almuerzo",
+    [ActivityTypeEnum.SNACK]: "Merienda",
+    [ActivityTypeEnum.NAP]: "Siesta",
+    [ActivityTypeEnum.DIAPER_CHANGE]: "Cambio de pañal",
+    [ActivityTypeEnum.CLOTHING_CHANGE]: "Cambio de ropa",
+    [ActivityTypeEnum.HYDRATION]: "Hidratación",
+    [ActivityTypeEnum.OTHER]: "Otro",
+  },
+};
+
 // Activity type icons
 export const ACTIVITY_TYPE_ICONS = {
   [ActivityTypeEnum.BREAKFAST]: '🍳',

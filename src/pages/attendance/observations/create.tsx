@@ -1,18 +1,65 @@
 import React, { useState } from "react";
 import { Create, useForm } from "@refinedev/antd";
-import { Form, Input, Select, Row, Col, Typography } from "antd";
+import { Form, Input, Select, Row, Col } from "antd";
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { MoodEnum, MOOD_LABELS, MOOD_ICONS } from "../../../domains/attendance/types/daily-observations.types";
+import { MoodEnum, MOOD_ICONS, MOOD_LABELS_BY_LANGUAGE } from "../../../domains/attendance/types/daily-observations.types";
 import { axiosInstance } from "../../../shared";
 import dayjs from 'dayjs';
+import { useLanguage } from "../../../shared/contexts/language.context";
 
-const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
+const ATTENDANCE_OBSERVATIONS_CREATE_TRANSLATIONS = {
+  english: {
+    title: "Register Daily Observation",
+    save: "Save",
+    child: "Child",
+    selectChildRequired: "Please select a child",
+    selectChild: "Select a child",
+    loading: "Loading...",
+    noChildren: "No children available",
+    attendanceRecord: "Attendance Record",
+    selectAttendanceRequired: "Please select an attendance record",
+    selectAttendance: "Select an attendance record",
+    firstSelectChild: "First select a child",
+    noAttendanceToday: "No attendance records for today",
+    mood: "Mood",
+    selectMoodRequired: "Please select the mood",
+    selectMood: "Select mood",
+    generalObservations: "General Observations",
+    generalObservationsRequired: "Please enter observations",
+    generalObservationsPlaceholder:
+      "Describe the child's behavior, activities, interactions, and any relevant observations...",
+  },
+  spanish: {
+    title: "Registrar observación diaria",
+    save: "Guardar",
+    child: "Niño",
+    selectChildRequired: "Por favor selecciona un niño",
+    selectChild: "Selecciona un niño",
+    loading: "Cargando...",
+    noChildren: "No hay niños disponibles",
+    attendanceRecord: "Registro de asistencia",
+    selectAttendanceRequired: "Por favor selecciona un registro de asistencia",
+    selectAttendance: "Selecciona un registro de asistencia",
+    firstSelectChild: "Primero selecciona un niño",
+    noAttendanceToday: "No hay registros de asistencia para hoy",
+    mood: "Ánimo",
+    selectMoodRequired: "Por favor selecciona el ánimo",
+    selectMood: "Selecciona ánimo",
+    generalObservations: "Observaciones generales",
+    generalObservationsRequired: "Por favor ingresa las observaciones",
+    generalObservationsPlaceholder:
+      "Describe el comportamiento del niño, actividades, interacciones y cualquier observación relevante...",
+  },
+} as const;
+
 export const AttendanceObservationsCreate: React.FC = () => {
   const { attendanceId } = useParams();
+  const { language } = useLanguage();
+  const t = ATTENDANCE_OBSERVATIONS_CREATE_TRANSLATIONS[language];
   const { formProps, saveButtonProps } = useForm();
   const [selectedChildId, setSelectedChildId] = useState<number | undefined>(undefined);
   
@@ -52,12 +99,6 @@ export const AttendanceObservationsCreate: React.FC = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Debug logs
-  console.log('Children data:', childrenData);
-  console.log('Attendance data:', attendanceData);
-  console.log('Children data.data:', childrenData?.data);
-  console.log('Attendance data.data:', attendanceData?.data);
-
   const handleFinish = (values: any) => {
     const formData = {
       ...values,
@@ -69,26 +110,26 @@ export const AttendanceObservationsCreate: React.FC = () => {
 
   return (
     <Create
-      title="Register Daily Observation"
-      saveButtonProps={saveButtonProps}
+      title={t.title}
+      saveButtonProps={{ ...saveButtonProps, children: t.save }}
     >
       <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Row gutter={16}>
           <Col span={12}>
-                <Form.Item
-                  label="Child"
-                  name="childId"
-                  rules={[{ required: true, message: 'Please select a child' }]}
-                >
-                  <Select 
-                    placeholder="Select a child" 
-                    showSearch
-                    loading={childrenLoading}
-                    notFoundContent={childrenLoading ? "Loading..." : "No children available"}
-                    onChange={(value) => {
-                      setSelectedChildId(value);
-                      // Clear attendance selection when child changes
-                      formProps.form?.setFieldsValue({ attendanceId: undefined });
+	                <Form.Item
+	                  label={t.child}
+	                  name="childId"
+	                  rules={[{ required: true, message: t.selectChildRequired }]}
+	                >
+	                  <Select 
+	                    placeholder={t.selectChild} 
+	                    showSearch
+	                    loading={childrenLoading}
+	                    notFoundContent={childrenLoading ? t.loading : t.noChildren}
+	                    onChange={(value) => {
+	                      setSelectedChildId(value);
+	                      // Clear attendance selection when child changes
+	                      formProps.form?.setFieldsValue({ attendanceId: undefined });
                     }}
                   >
                     {(childrenData?.data || []).map((child: any) => (
@@ -100,28 +141,28 @@ export const AttendanceObservationsCreate: React.FC = () => {
                 </Form.Item>
           </Col>
           
-          <Col span={12}>
-            <Form.Item
-              label="Attendance Record"
-              name="attendanceId"
-              rules={[{ required: true, message: 'Please select an attendance record' }]}
-              initialValue={attendanceId ? parseInt(attendanceId) : undefined}
-            >
-              <Select 
-                placeholder={selectedChildId ? "Select an attendance record" : "First select a child"} 
-                showSearch
-                loading={attendanceLoading}
-                disabled={!selectedChildId}
-                notFoundContent={
-                  attendanceLoading 
-                    ? "Loading..." 
-                    : !selectedChildId 
-                      ? "First select a child" 
-                      : "No attendance records for today"
-                }
-              >
-                {(attendanceData || []).map((attendance: any) => (
-                  <Option key={attendance.id} value={attendance.id}>
+	          <Col span={12}>
+	            <Form.Item
+	              label={t.attendanceRecord}
+	              name="attendanceId"
+	              rules={[{ required: true, message: t.selectAttendanceRequired }]}
+	              initialValue={attendanceId ? parseInt(attendanceId) : undefined}
+	            >
+	              <Select 
+	                placeholder={selectedChildId ? t.selectAttendance : t.firstSelectChild} 
+	                showSearch
+	                loading={attendanceLoading}
+	                disabled={!selectedChildId}
+	                notFoundContent={
+	                  attendanceLoading 
+	                    ? t.loading 
+	                    : !selectedChildId 
+	                      ? t.firstSelectChild 
+	                      : t.noAttendanceToday
+	                }
+	              >
+	                {(attendanceData || []).map((attendance: any) => (
+	                  <Option key={attendance.id} value={attendance.id}>
                     {attendance.child?.firstName} {attendance.child?.lastName} - {dayjs(attendance.attendanceDate).format('DD/MM/YYYY')}
                   </Option>
                 ))}
@@ -130,41 +171,41 @@ export const AttendanceObservationsCreate: React.FC = () => {
           </Col>
         </Row>
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              label="Mood"
-              name="mood"
-              rules={[{ required: true, message: 'Please select the mood' }]}
-            >
-              <Select placeholder="Select mood">
-                {Object.values(MoodEnum).map((mood) => (
-                  <Option key={mood} value={mood}>
-                    <span style={{ marginRight: 8, fontSize: '16px' }}>{MOOD_ICONS[mood]}</span>
-                    {MOOD_LABELS[mood]}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
+	        <Row gutter={16}>
+	          <Col span={12}>
+	            <Form.Item
+	              label={t.mood}
+	              name="mood"
+	              rules={[{ required: true, message: t.selectMoodRequired }]}
+	            >
+	              <Select placeholder={t.selectMood}>
+	                {Object.values(MoodEnum).map((mood) => (
+	                  <Option key={mood} value={mood}>
+	                    <span style={{ marginRight: 8, fontSize: '16px' }}>{MOOD_ICONS[mood]}</span>
+	                    {MOOD_LABELS_BY_LANGUAGE[language][mood]}
+	                  </Option>
+	                ))}
+	              </Select>
+	            </Form.Item>
+	          </Col>
+	        </Row>
 
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="General Observations"
-              name="generalObservations"
-              rules={[{ required: true, message: 'Please enter observations' }]}
-            >
-              <TextArea 
-                rows={4}
-                placeholder="Describe the child's behavior, activities, interactions, and any relevant observations..."
-                maxLength={1000}
-                showCount
-              />
-            </Form.Item>
-          </Col>
-        </Row>
+	        <Row gutter={16}>
+	          <Col span={24}>
+	            <Form.Item
+	              label={t.generalObservations}
+	              name="generalObservations"
+	              rules={[{ required: true, message: t.generalObservationsRequired }]}
+	            >
+	              <TextArea 
+	                rows={4}
+	                placeholder={t.generalObservationsPlaceholder}
+	                maxLength={1000}
+	                showCount
+	              />
+	            </Form.Item>
+	          </Col>
+	        </Row>
       </Form>
     </Create>
   );

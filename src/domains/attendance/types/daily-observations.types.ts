@@ -53,6 +53,21 @@ export const MOOD_LABELS = {
   [MoodEnum.NEUTRAL]: 'Neutral',
 } as const;
 
+import type { Language } from "../../../shared/contexts/language.context";
+
+export const MOOD_LABELS_BY_LANGUAGE: Record<Language, Record<MoodEnum, string>> = {
+  english: MOOD_LABELS,
+  spanish: {
+    [MoodEnum.HAPPY]: "Feliz",
+    [MoodEnum.SAD]: "Triste",
+    [MoodEnum.TIRED]: "Cansado",
+    [MoodEnum.ENERGETIC]: "Energético",
+    [MoodEnum.CALM]: "Tranquilo",
+    [MoodEnum.CRANKY]: "Irritable",
+    [MoodEnum.NEUTRAL]: "Neutral",
+  },
+};
+
 // Mood colors
 export const MOOD_COLORS = {
   [MoodEnum.HAPPY]: '#52c41a',

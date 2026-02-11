@@ -1,9 +1,11 @@
 import React from "react";
 import { usePermissions } from "@refinedev/core";
 import { List, useTable, ShowButton, EditButton, DeleteButton, TagField } from "@refinedev/antd";
-import { Table, Space, Avatar, Typography, Tag } from "antd";
+import { Table, Space, Avatar, Typography } from "antd";
 import { UserOutlined, WarningOutlined } from "@ant-design/icons";
-import moment from "moment";
+import { ChildUtils } from "../../domains/children/utils/child.utils";
+import { useLanguage } from "../../shared/contexts/language.context";
+import { getIntlLocale } from "../../shared/i18n/locale";
 
 const { Text } = Typography;
 
@@ -20,9 +22,35 @@ interface Child {
   createdAt: string;
 }
 
+const CHILDREN_LIST_TRANSLATIONS = {
+  english: {
+    title: "Children List",
+    photo: "Photo",
+    fullName: "Full Name",
+    birthDate: "Birth Date",
+    address: "Address",
+    paymentAlert: "Payment",
+    status: "Status",
+    actions: "Actions",
+  },
+  spanish: {
+    title: "Lista de niños",
+    photo: "Foto",
+    fullName: "Nombre completo",
+    birthDate: "Fecha de nacimiento",
+    address: "Dirección",
+    paymentAlert: "Pago",
+    status: "Estado",
+    actions: "Acciones",
+  },
+} as const;
+
 export const ChildList: React.FC = () => {
   const { data: permissions } = usePermissions({});
   const canEdit = permissions === "administrator" || permissions === "educator";
+  const { language } = useLanguage();
+  const t = CHILDREN_LIST_TRANSLATIONS[language];
+  const intlLocale = getIntlLocale(language);
 
   const { tableProps } = useTable<Child>({
     syncWithLocation: false,
@@ -36,24 +64,12 @@ export const ChildList: React.FC = () => {
     },
   });
 
-  const calculateAge = (birthDate: string) => {
-    const birth = moment(birthDate);
-    const now = moment();
-    const years = now.diff(birth, "years");
-    const months = now.diff(birth, "months") % 12;
-    
-    if (years > 0) {
-      return `${years}a ${months}m`;
-    }
-    return `${months} months`;
-  };
-
   return (
-    <List title="Children List">
+    <List title={t.title}>
       <Table {...tableProps} rowKey="id">
         <Table.Column
           dataIndex="profilePicture"
-          title="Photo"
+          title={t.photo}
           render={(value, record: Child) => (
             <Avatar
               src={value}
@@ -65,35 +81,36 @@ export const ChildList: React.FC = () => {
         />
         <Table.Column
           dataIndex="firstName"
-          title="Full Name"
+          title={t.fullName}
           render={(value, record: Child) => (
             <Space direction="vertical" size={0}>
               <Text strong>{`${record.firstName} ${record.lastName}`}</Text>
               <Text type="secondary">
-                {calculateAge(record.birthDate)} • {record.birthCity || "Not specified"}
+                {ChildUtils.getAgeDisplay(record.birthDate, language)} •{" "}
+                {ChildUtils.formatBirthCity(record.birthCity, language)}
               </Text>
             </Space>
           )}
         />
         <Table.Column
           dataIndex="birthDate"
-          title="Birth Date"
-          render={(value) => moment(value).format("DD/MM/YYYY")}
+          title={t.birthDate}
+          render={(value) => new Date(value).toLocaleDateString(intlLocale)}
         />
         <Table.Column
           dataIndex="address"
-          title="Address"
-          render={(value) => value || "Not specified"}
+          title={t.address}
+          render={(value) => ChildUtils.formatAddress(value, language)}
           ellipsis
         />
         <Table.Column
           dataIndex="hasPaymentAlert"
-          title="Payment Alert"
+          title={t.paymentAlert}
           render={(value) => (
             <Space>
               {value && <WarningOutlined style={{ color: "#ff4d4f" }} />}
               <TagField
-                value={value ? "Pending" : "Up to date"}
+                value={ChildUtils.getPaymentAlertText(value, language)}
                 color={value ? "red" : "green"}
               />
             </Space>
@@ -101,16 +118,16 @@ export const ChildList: React.FC = () => {
         />
         <Table.Column
           dataIndex="isActive"
-          title="Status"
+          title={t.status}
           render={(value) => (
             <TagField
-              value={value ? "Active" : "Inactive"}
+              value={ChildUtils.getActiveStatusText(value, language)}
               color={value ? "green" : "red"}
             />
           )}
         />
         <Table.Column
-          title="Actions"
+          title={t.actions}
           dataIndex="actions"
           render={(_, record: Child) => (
             <Space>

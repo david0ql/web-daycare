@@ -1,6 +1,7 @@
 import React from 'react';
 import { Spin, Card } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { useLanguage } from '../contexts/language.context';
 
 interface LoadingComponentProps {
   size?: 'small' | 'default' | 'large';
@@ -9,12 +10,24 @@ interface LoadingComponentProps {
   height?: string | number;
 }
 
+const LOADING_COMPONENT_TRANSLATIONS = {
+  english: {
+    loading: "Loading...",
+  },
+  spanish: {
+    loading: "Cargando...",
+  },
+} as const;
+
 export const LoadingComponent: React.FC<LoadingComponentProps> = ({
   size = 'default',
-  tip = 'Loading...',
+  tip,
   fullScreen = false,
   height = 200,
 }) => {
+  const { language } = useLanguage();
+  const t = LOADING_COMPONENT_TRANSLATIONS[language];
+  const resolvedTip = tip ?? t.loading;
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
   if (fullScreen) {
@@ -33,7 +46,7 @@ export const LoadingComponent: React.FC<LoadingComponentProps> = ({
           zIndex: 9999,
         }}
       >
-        <Spin size={size} indicator={antIcon} tip={tip} />
+        <Spin size={size} indicator={antIcon} tip={resolvedTip} />
       </div>
     );
   }
@@ -49,7 +62,7 @@ export const LoadingComponent: React.FC<LoadingComponentProps> = ({
         boxShadow: 'none',
       }}
     >
-      <Spin size={size} indicator={antIcon} tip={tip} />
+      <Spin size={size} indicator={antIcon} tip={resolvedTip} />
     </Card>
   );
 };

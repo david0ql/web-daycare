@@ -1,21 +1,57 @@
 import React, { useState, useEffect } from "react";
 import { Edit, useForm } from "@refinedev/antd";
-import { useInvalidate, useGo, useNotification } from "@refinedev/core";
+import { useGo, useNotification } from "@refinedev/core";
 import { useQueryClient } from "@tanstack/react-query";
-import { Form, Input, Row, Col, Typography, Upload, message } from "antd";
+import { Form, Input, Row, Col, Upload, message } from "antd";
 import { useParams } from "react-router";
 import { CameraOutlined } from "@ant-design/icons";
 import { axiosInstance } from "../../../shared";
+import { useLanguage } from "../../../shared/contexts/language.context";
 
-const { Title } = Typography;
 const { TextArea } = Input;
+
+const ATTENDANCE_PHOTOS_EDIT_TRANSLATIONS = {
+  english: {
+    title: "Edit Activity Photo",
+    save: "Save",
+    updatedSuccess: "Photo updated successfully",
+    updatedDescription: "Changes have been saved correctly",
+    updateError: "Error updating photo",
+    updateErrorDescription: "Could not update photo. Please verify the data and try again.",
+    onlyImagesAllowed: "Only image files are allowed",
+    imageTooLarge: "Image must be less than 5MB",
+    mustSelectOrKeep: "You must select a new photo or keep the current one",
+    currentPhoto: "Current Photo",
+    changePhoto: "Change Photo",
+    description: "Description",
+    descriptionPlaceholder: "Photo description (optional)",
+    updateErrorPrefix: "Error updating photo",
+  },
+  spanish: {
+    title: "Editar foto de actividad",
+    save: "Guardar",
+    updatedSuccess: "Foto actualizada correctamente",
+    updatedDescription: "Los cambios se han guardado correctamente",
+    updateError: "Error actualizando la foto",
+    updateErrorDescription: "No se pudo actualizar la foto. Verifica los datos e inténtalo de nuevo.",
+    onlyImagesAllowed: "Solo se permiten archivos de imagen",
+    imageTooLarge: "La imagen debe ser menor a 5MB",
+    mustSelectOrKeep: "Debes seleccionar una nueva foto o mantener la actual",
+    currentPhoto: "Foto actual",
+    changePhoto: "Cambiar foto",
+    description: "Descripción",
+    descriptionPlaceholder: "Descripción de la foto (opcional)",
+    updateErrorPrefix: "Error actualizando la foto",
+  },
+} as const;
 
 export const AttendancePhotosEdit: React.FC = () => {
   const { id } = useParams();
-  const invalidate = useInvalidate();
   const go = useGo();
   const queryClient = useQueryClient();
   const { open } = useNotification();
+  const { language } = useLanguage();
+  const t = ATTENDANCE_PHOTOS_EDIT_TRANSLATIONS[language];
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,8 +78,8 @@ export const AttendancePhotosEdit: React.FC = () => {
       // Show success notification
       open?.({
         type: "success",
-        message: "Photo updated successfully",
-        description: "Changes have been saved correctly",
+        message: t.updatedSuccess,
+        description: t.updatedDescription,
       });
       
       // Navigate back to photos list with a small delay for better UX
@@ -55,19 +91,10 @@ export const AttendancePhotosEdit: React.FC = () => {
       }, 1000);
     },
     onMutationError: (error, variables) => {
-      if (error?.response?.data?.message) {
-        const errorMessages = Array.isArray(error.response.data.message) 
-          ? error.response.data.message 
-          : [error.response.data.message];
-        
-        errorMessages.forEach((msg: any, index: number) => {
-          console.log(`🔍 Error ${index + 1}:`, msg);
-        });
-      }
       open?.({ 
         type: "error", 
-        message: "Error updating photo", 
-        description: "Could not update photo. Please verify the data and try again." 
+        message: t.updateError, 
+        description: t.updateErrorDescription,
       });
     }
   });
@@ -97,13 +124,13 @@ export const AttendancePhotosEdit: React.FC = () => {
   const beforeUpload = (file: File) => {
     const isImage = file.type.startsWith('image/');
     if (!isImage) {
-      message.error('Only image files are allowed');
+      message.error(t.onlyImagesAllowed);
       return false;
     }
 
     const isLt5M = file.size / 1024 / 1024 < 5;
     if (!isLt5M) {
-      message.error('Image must be less than 5MB');
+      message.error(t.imageTooLarge);
       return false;
     }
 
@@ -141,7 +168,7 @@ export const AttendancePhotosEdit: React.FC = () => {
         if (Object.keys(updateData).length > 0) {
           await axiosInstance.patch(`/attendance/activity-photos/${id}`, updateData);
         } else {
-          message.warning('You must select a new photo or keep the current one');
+          message.warning(t.mustSelectOrKeep);
           setIsSubmitting(false);
           return;
         }
@@ -155,9 +182,9 @@ export const AttendancePhotosEdit: React.FC = () => {
         if (Object.keys(updateData).length > 0) {
           await axiosInstance.patch(`/attendance/activity-photos/${id}`, updateData);
         }
-      }
+	      }
 
-      message.success('Photo updated successfully');
+	      message.success(t.updatedSuccess);
       
       // Invalidate cache
       await queryClient.invalidateQueries({
@@ -175,29 +202,30 @@ export const AttendancePhotosEdit: React.FC = () => {
         });
       }, 1000);
       
-    } catch (error: any) {
-      console.error('Error updating photo:', error);
-      message.error('Error updating photo: ' + (error.response?.data?.message || error.message));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+	    } catch (error: any) {
+	      console.error('Error updating photo:', error);
+	      message.error(`${t.updateErrorPrefix}: ${error.response?.data?.message || error.message}`);
+	    } finally {
+	      setIsSubmitting(false);
+	    }
+	  };
 
-  return (
-    <Edit
-      title="Edit Activity Photo"
-      saveButtonProps={{
-        ...saveButtonProps,
-        loading: isSubmitting,
-        onClick: () => form.submit(),
-      }}
-    >
+	  return (
+	    <Edit
+	      title={t.title}
+	      saveButtonProps={{
+	        ...saveButtonProps,
+	        loading: isSubmitting,
+	        children: t.save,
+	        onClick: () => form.submit(),
+	      }}
+	    >
       <Form {...formProps} form={form} layout="vertical" onFinish={handleFinish}>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="Current Photo"
-            >
+	        <Row gutter={16}>
+	          <Col span={24}>
+	            <Form.Item
+	              label={t.currentPhoto}
+	            >
               <Upload
                 listType="picture-card"
                 fileList={fileList}
@@ -209,29 +237,29 @@ export const AttendancePhotosEdit: React.FC = () => {
                   showRemoveIcon: true,
                 }}
               >
-                {fileList.length >= 1 ? null : (
-                  <div>
-                    <CameraOutlined style={{ fontSize: '24px', color: '#999' }} />
-                    <div style={{ marginTop: 8 }}>Change Photo</div>
-                  </div>
-                )}
-              </Upload>
-            </Form.Item>
-          </Col>
-        </Row>
+	                {fileList.length >= 1 ? null : (
+	                  <div>
+	                    <CameraOutlined style={{ fontSize: '24px', color: '#999' }} />
+	                    <div style={{ marginTop: 8 }}>{t.changePhoto}</div>
+	                  </div>
+	                )}
+	              </Upload>
+	            </Form.Item>
+	          </Col>
+	        </Row>
 
         <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="Description"
-              name="caption"
-            >
-              <TextArea 
-                rows={3}
-                placeholder="Photo description (optional)"
-                maxLength={500}
-                showCount
-              />
+	          <Col span={24}>
+	            <Form.Item
+	              label={t.description}
+	              name="caption"
+	            >
+	              <TextArea 
+	                rows={3}
+	                placeholder={t.descriptionPlaceholder}
+	                maxLength={500}
+	                showCount
+	              />
             </Form.Item>
           </Col>
         </Row>

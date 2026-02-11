@@ -2,14 +2,42 @@ import React from "react";
 import { List, useTable, DateField, TextField, EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Table, Avatar, Tooltip, Tag, Space, Button, Card, Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { MOOD_LABELS, MOOD_ICONS, MOOD_COLORS } from "../../domains/attendance/types/daily-observations.types";
+import { MOOD_LABELS_BY_LANGUAGE, MOOD_ICONS, MOOD_COLORS } from "../../domains/attendance/types/daily-observations.types";
 import { useNavigate } from "react-router";
 import dayjs from 'dayjs';
+import { useLanguage } from "../../shared/contexts/language.context";
 
 const { Title, Text } = Typography;
 
+const ATTENDANCE_OBSERVATIONS_TRANSLATIONS = {
+  english: {
+    title: "Daily Observations",
+    registerObservation: "Register Observation",
+    child: "Child",
+    mood: "Mood",
+    observations: "Observations",
+    date: "Date",
+    registeredBy: "Registered by",
+    created: "Created",
+    actions: "Actions",
+  },
+  spanish: {
+    title: "Observaciones diarias",
+    registerObservation: "Registrar observación",
+    child: "Niño",
+    mood: "Estado de ánimo",
+    observations: "Observaciones",
+    date: "Fecha",
+    registeredBy: "Registrado por",
+    created: "Creado",
+    actions: "Acciones",
+  },
+} as const;
+
 export const AttendanceObservations: React.FC = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = ATTENDANCE_OBSERVATIONS_TRANSLATIONS[language];
   const today = dayjs().format('YYYY-MM-DD');
   const { tableProps } = useTable({
     resource: "attendance/daily-observations",
@@ -38,14 +66,14 @@ export const AttendanceObservations: React.FC = () => {
         color={MOOD_COLORS[mood as keyof typeof MOOD_COLORS]}
         icon={<span style={{ fontSize: '14px' }}>{MOOD_ICONS[mood as keyof typeof MOOD_ICONS]}</span>}
       >
-        {MOOD_LABELS[mood as keyof typeof MOOD_LABELS]}
+        {MOOD_LABELS_BY_LANGUAGE[language][mood as keyof typeof MOOD_LABELS_BY_LANGUAGE.english]}
       </Tag>
     );
   };
 
   return (
     <List
-      title="Daily Observations"
+      title={t.title}
       headerButtons={[
         <Button 
           type="primary" 
@@ -53,14 +81,14 @@ export const AttendanceObservations: React.FC = () => {
           icon={<PlusOutlined />}
           onClick={() => navigate('/attendance/observations/create')}
         >
-          Register Observation
+          {t.registerObservation}
         </Button>,
       ]}
     >
       <Table {...tableProps} rowKey="id">
         <Table.Column
           dataIndex="child"
-          title="Child"
+          title={t.child}
           render={(child: any) => (
             <Space>
               <Avatar 
@@ -75,12 +103,12 @@ export const AttendanceObservations: React.FC = () => {
         />
         <Table.Column
           dataIndex="mood"
-          title="Mood"
+          title={t.mood}
           render={(mood: string) => getMoodTag(mood)}
         />
         <Table.Column
           dataIndex="generalObservations"
-          title="Observations"
+          title={t.observations}
           render={(observations: string) => (
             <Tooltip title={observations}>
               <Text ellipsis style={{ maxWidth: 300 }}>
@@ -91,14 +119,14 @@ export const AttendanceObservations: React.FC = () => {
         />
         <Table.Column
           dataIndex="attendance"
-          title="Date"
+          title={t.date}
           render={(attendance: any) => (
             <DateField value={attendance?.attendanceDate} format="DD/MM/YYYY" />
           )}
         />
         <Table.Column
           dataIndex="createdBy2"
-          title="Registered by"
+          title={t.registeredBy}
           render={(user: any) => (
             <Text type="secondary">
               {user?.firstName} {user?.lastName}
@@ -107,13 +135,13 @@ export const AttendanceObservations: React.FC = () => {
         />
         <Table.Column
           dataIndex="createdAt"
-          title="Created"
+          title={t.created}
           render={(value: string) => (
             <DateField value={value} format="DD/MM/YYYY HH:mm" />
           )}
         />
         <Table.Column
-          title="Actions"
+          title={t.actions}
           dataIndex="actions"
           render={(_, record: any) => (
             <Space>

@@ -2,10 +2,18 @@ import React from "react";
 import { useIsFetching, useIsMutating } from "@tanstack/react-query";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
+import { useLanguage } from "../contexts/language.context";
+
+const GLOBAL_LOADING_TRANSLATIONS = {
+  english: { loading: "Loading..." },
+  spanish: { loading: "Cargando..." },
+} as const;
 
 const GlobalLoading: React.FC = () => {
   const isFetching = useIsFetching();
   const isMutating = useIsMutating();
+  const { language } = useLanguage();
+  const t = GLOBAL_LOADING_TRANSLATIONS[language];
   
   const isLoading = isFetching > 0 || isMutating > 0;
 
@@ -42,7 +50,7 @@ const GlobalLoading: React.FC = () => {
           indicator={<LoadingOutlined style={{ fontSize: 32, color: "#1890ff" }} spin />}
         />
         <div style={{ marginTop: "16px", fontSize: "16px", color: "#666" }}>
-          Loading...
+          {t.loading}
         </div>
       </div>
     </div>

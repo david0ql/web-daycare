@@ -6,9 +6,7 @@ import { useCalendarEvents } from '../hooks/use-calendar.hook';
 import { EventTypeEnum } from '../types/calendar.types';
 import { CalendarUtils } from '../utils/calendar.utils';
 import dayjs from 'dayjs';
-import 'dayjs/locale/es';
-
-dayjs.locale('es');
+import { useLanguage } from '../../../shared/contexts/language.context';
 
 const { Title, Text } = Typography;
 
@@ -18,12 +16,32 @@ interface UpcomingEventsWidgetProps {
   showCreateButton?: boolean;
 }
 
+const UPCOMING_EVENTS_TRANSLATIONS = {
+  english: {
+    defaultTitle: "Upcoming Events",
+    create: "Create",
+    noUpcomingEvents: "No upcoming events",
+    allDay: "All Day",
+    viewAll: "View all events",
+  },
+  spanish: {
+    defaultTitle: "Próximos eventos",
+    create: "Crear",
+    noUpcomingEvents: "No hay eventos próximos",
+    allDay: "Todo el día",
+    viewAll: "Ver todos los eventos",
+  },
+} as const;
+
 export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
-  title = "Upcoming Events",
+  title,
   maxItems = 5,
   showCreateButton = true,
 }) => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = UPCOMING_EVENTS_TRANSLATIONS[language];
+  const resolvedTitle = title ?? t.defaultTitle;
   const { getUpcomingEvents, isLoading } = useCalendarEvents();
 
   const upcomingEvents = getUpcomingEvents(30).slice(0, maxItems);
@@ -41,7 +59,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
       title={
         <Space>
           <CalendarOutlined />
-          {title}
+          {resolvedTitle}
         </Space>
       }
       extra={
@@ -52,7 +70,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
             icon={<PlusOutlined />}
             onClick={handleCreateEvent}
           >
-            Create
+            {t.create}
           </Button>
         )
       }
@@ -61,7 +79,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
       {upcomingEvents.length === 0 ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No upcoming events"
+          description={t.noUpcomingEvents}
           style={{ padding: '20px 0' }}
         />
       ) : (
@@ -85,7 +103,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
                     <Tag
                       color={CalendarUtils.getEventTypeColor(event.eventType)}
                     >
-                      {CalendarUtils.getEventTypeLabel(event.eventType)}
+                      {CalendarUtils.getEventTypeLabel(event.eventType, language)}
                     </Tag>
                   </div>
                 }
@@ -93,7 +111,9 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
                   <Space direction="vertical" size="small">
                     <div>
                       <Text type="secondary" style={{ fontSize: '12px' }}>
-                        {dayjs(event.startDate).format('MMMM DD, YYYY')}
+                        {dayjs(event.startDate).format(
+                          language === "spanish" ? "DD [de] MMMM, YYYY" : "MMMM DD, YYYY",
+                        )}
                       </Text>
                       {!event.isAllDay && event.startTime && (
                         <div>
@@ -106,7 +126,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
                       )}
                       {event.isAllDay && (
                         <Tag style={{ fontSize: '10px' }}>
-                          All Day
+                          {t.allDay}
                         </Tag>
                       )}
                     </div>
@@ -133,7 +153,7 @@ export const UpcomingEventsWidget: React.FC<UpcomingEventsWidgetProps> = ({
             size="small"
             onClick={() => navigate('/calendar')}
           >
-            View all events
+            {t.viewAll}
           </Button>
         </div>
       )}

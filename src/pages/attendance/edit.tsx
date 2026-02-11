@@ -1,46 +1,75 @@
 import React from "react";
 import { Edit, useForm, useSelect } from "@refinedev/antd";
 import { Form, Select, Input, DatePicker, TimePicker } from "antd";
-import { useAuthorizedPickupPersons } from "../../domains/children";
-import { axiosInstance } from "../../shared";
 import dayjs from "dayjs";
+import { useAuthorizedPickupPersons } from "../../domains/children";
+import { useLanguage } from "../../shared/contexts/language.context";
 
 const { TextArea } = Input;
 
+const ATTENDANCE_EDIT_TRANSLATIONS = {
+  english: {
+    title: "Edit Attendance",
+    save: "Save",
+    loading: "Loading...",
+    child: "Child",
+    childRequired: "You must select a child",
+    selectChild: "Select a child",
+    attendanceDate: "Attendance Date",
+    attendanceDateRequired: "You must specify the date",
+    selectDate: "Select the date",
+    checkInTime: "Check-in Time",
+    selectCheckInTime: "Select check-in time",
+    checkOutTime: "Check-out Time",
+    selectCheckOutTime: "Select check-out time",
+    deliveredBy: "Delivered by",
+    deliveredByPlaceholder: "Who delivers the child?",
+    pickedUpBy: "Picked up by",
+    pickedUpByPlaceholder: "Who picks up the child?",
+    checkInNotes: "Check-in Notes",
+    checkInNotesPlaceholder: "Notes about the child's check-in",
+    checkOutNotes: "Check-out Notes",
+    checkOutNotesPlaceholder: "Notes about the child's check-out",
+  },
+  spanish: {
+    title: "Editar asistencia",
+    save: "Guardar",
+    loading: "Cargando...",
+    child: "Niño",
+    childRequired: "Debes seleccionar un niño",
+    selectChild: "Selecciona un niño",
+    attendanceDate: "Fecha de asistencia",
+    attendanceDateRequired: "Debes especificar la fecha",
+    selectDate: "Selecciona la fecha",
+    checkInTime: "Hora de entrada",
+    selectCheckInTime: "Selecciona hora de entrada",
+    checkOutTime: "Hora de salida",
+    selectCheckOutTime: "Selecciona hora de salida",
+    deliveredBy: "Entregado por",
+    deliveredByPlaceholder: "¿Quién entrega al niño?",
+    pickedUpBy: "Recogido por",
+    pickedUpByPlaceholder: "¿Quién recoge al niño?",
+    checkInNotes: "Notas de entrada",
+    checkInNotesPlaceholder: "Notas sobre la entrada del niño",
+    checkOutNotes: "Notas de salida",
+    checkOutNotesPlaceholder: "Notas sobre la salida del niño",
+  },
+} as const;
+
+type AttendanceEditTranslations = (typeof ATTENDANCE_EDIT_TRANSLATIONS)[keyof typeof ATTENDANCE_EDIT_TRANSLATIONS];
+
 export const AttendanceEdit: React.FC = () => {
-  console.log("🔍 AttendanceEdit component mounted");
-  
   const [form] = Form.useForm();
+  const { language } = useLanguage();
+  const t = ATTENDANCE_EDIT_TRANSLATIONS[language];
   
   const { formProps, saveButtonProps } = useForm<any>();
 
-  // Debug logs
-  console.log("🔍 Attendance Edit - formProps:", formProps);
-  console.log("🔍 Attendance Edit - saveButtonProps:", saveButtonProps);
-  console.log("🔍 Attendance Edit - formProps.initialValues:", formProps.initialValues);
-
   const record = formProps.initialValues;
-  
-  console.log("🔍 Attendance Edit - record:", record);
-  console.log("🔍 Attendance Edit - record type:", typeof record);
-  console.log("🔍 Attendance Edit - record is null/undefined:", record == null);
 
   // Transform form data for display
   React.useEffect(() => {
     if (record) {
-      console.log("🔍 Attendance Edit - raw record from API:", record);
-      console.log("🔍 Attendance Edit - record.checkInNotes:", record.checkInNotes);
-      console.log("🔍 Attendance Edit - record.checkOutNotes:", record.checkOutNotes);
-      console.log("🔍 Attendance Edit - record.notes:", record.notes);
-      console.log("🔍 Attendance Edit - record.checkInTime:", record.checkInTime, typeof record.checkInTime);
-      console.log("🔍 Attendance Edit - record.checkOutTime:", record.checkOutTime, typeof record.checkOutTime);
-      
-      // Debug all record properties to see what's available
-      console.log("🔍 Attendance Edit - All record keys:", Object.keys(record));
-      console.log("🔍 Attendance Edit - Record values:", Object.entries(record).filter(([key, value]) => 
-        key.toLowerCase().includes('note') || key.toLowerCase().includes('check')
-      ));
-      
       const formData = {
         ...record,
         attendanceDate: record.attendanceDate ? dayjs(record.attendanceDate).isValid() ? dayjs(record.attendanceDate) : null : null,
@@ -51,9 +80,6 @@ export const AttendanceEdit: React.FC = () => {
         checkInNotes: record.checkInNotes,
         notes: record.checkOutNotes || record.notes,
       };
-      console.log("🔍 Attendance Edit - setting form data:", formData);
-      console.log("🔍 Attendance Edit - formData.checkInNotes:", formData.checkInNotes);
-      console.log("🔍 Attendance Edit - formData.notes:", formData.notes);
       
       // Set form values explicitly
       form.setFieldsValue(formData);
@@ -62,53 +88,44 @@ export const AttendanceEdit: React.FC = () => {
       form.setFieldValue('checkInNotes', formData.checkInNotes);
       form.setFieldValue('notes', formData.notes);
     }
-  }, [record, formProps.form]);
+  }, [record, form]);
 
   const handleFinish = (values: any) => {
-    console.log("🔍 Attendance Edit - handleFinish called with values:", values);
-    console.log("🔍 Attendance Edit - attendanceDate type:", typeof values.attendanceDate);
-    console.log("🔍 Attendance Edit - checkInTime type:", typeof values.checkInTime);
-    console.log("🔍 Attendance Edit - checkOutTime type:", typeof values.checkOutTime);
-    
     const transformedValues = {
       ...values,
       attendanceDate: values.attendanceDate && dayjs.isDayjs(values.attendanceDate) ? values.attendanceDate.format('YYYY-MM-DD') : values.attendanceDate,
       checkInTime: values.checkInTime && dayjs.isDayjs(values.checkInTime) ? values.checkInTime.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : values.checkInTime,
       checkOutTime: values.checkOutTime && dayjs.isDayjs(values.checkOutTime) ? values.checkOutTime.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : values.checkOutTime,
     };
-    
-    console.log("🔍 Attendance Edit - transformed values:", transformedValues);
-    
+
     // Call the original formProps.onFinish with transformed values
     if (formProps.onFinish) {
-      console.log("🔍 Calling formProps.onFinish with:", transformedValues);
       formProps.onFinish(transformedValues);
-    } else {
-      console.error("🔍 formProps.onFinish is not available!");
     }
   };
 
   // Override saveButtonProps to use our custom handleFinish
   const customSaveButtonProps = {
     ...saveButtonProps,
+    children: t.save,
     onClick: () => {
-      console.log("🔍 Attendance Edit - Save button clicked - triggering form submit");
       form.submit();
     }
   };
 
   // Show loading state if initialValues is not available yet
   if (!formProps.initialValues) {
-    return <div>Loading...</div>;
+    return <div>{t.loading}</div>;
   }
 
   return (
-    <Edit title="Edit Attendance" saveButtonProps={customSaveButtonProps}>
+    <Edit title={t.title} saveButtonProps={customSaveButtonProps}>
       <AttendanceEditForm 
         formProps={formProps} 
         form={form}
         record={record} 
         onFinish={handleFinish}
+        t={t}
       />
     </Edit>
   );
@@ -120,7 +137,8 @@ const AttendanceEditForm: React.FC<{
   form: any;
   record: any;
   onFinish: (values: any) => any;
-}> = ({ formProps, form, record, onFinish }) => {
+  t: AttendanceEditTranslations;
+}> = ({ formProps, form, record, onFinish, t }) => {
   // Get children for the select
   const { selectProps: childrenSelectProps } = useSelect({
     resource: "children",
@@ -135,27 +153,23 @@ const AttendanceEditForm: React.FC<{
   return (
     <Form {...formProps} form={form} layout="vertical" onFinish={onFinish}>
       <Form.Item
-        label="Child"
+        label={t.child}
         name="childId"
-        rules={[{ required: true, message: "You must select a child" }]}
+        rules={[{ required: true, message: t.childRequired }]}
       >
         <Select
           {...childrenSelectProps}
-          placeholder="Select a child"
+          placeholder={t.selectChild}
           disabled
         />
       </Form.Item>
 
       <Form.Item
-        label="Attendance Date"
+        label={t.attendanceDate}
         name="attendanceDate"
-        rules={[{ required: true, message: "You must specify the date" }]}
-        getValueFromEvent={(date) => {
-          console.log("🔍 DatePicker getValueFromEvent:", date);
-          return date;
-        }}
+        rules={[{ required: true, message: t.attendanceDateRequired }]}
+        getValueFromEvent={(date) => date}
         getValueProps={(value) => {
-          console.log("🔍 DatePicker getValueProps:", value, typeof value);
           if (!value) return { value: null };
           if (dayjs.isDayjs(value)) return { value };
           if (typeof value === 'string') {
@@ -168,19 +182,15 @@ const AttendanceEditForm: React.FC<{
         <DatePicker
           style={{ width: '100%' }}
           format="DD/MM/YYYY"
-          placeholder="Select the date"
+          placeholder={t.selectDate}
         />
       </Form.Item>
 
       <Form.Item
-        label="Check-in Time"
+        label={t.checkInTime}
         name="checkInTime"
-        getValueFromEvent={(time) => {
-          console.log("🔍 TimePicker getValueFromEvent:", time);
-          return time;
-        }}
+        getValueFromEvent={(time) => time}
         getValueProps={(value) => {
-          console.log("🔍 TimePicker getValueProps:", value, typeof value);
           if (!value) return { value: null };
           if (dayjs.isDayjs(value)) return { value };
           if (typeof value === 'string') {
@@ -194,19 +204,15 @@ const AttendanceEditForm: React.FC<{
         <TimePicker
           style={{ width: '100%' }}
           format="HH:mm"
-          placeholder="Select check-in time"
+          placeholder={t.selectCheckInTime}
         />
       </Form.Item>
 
       <Form.Item
-        label="Check-out Time"
+        label={t.checkOutTime}
         name="checkOutTime"
-        getValueFromEvent={(time) => {
-          console.log("🔍 TimePicker getValueFromEvent:", time);
-          return time;
-        }}
+        getValueFromEvent={(time) => time}
         getValueProps={(value) => {
-          console.log("🔍 TimePicker getValueProps:", value, typeof value);
           if (!value) return { value: null };
           if (dayjs.isDayjs(value)) return { value };
           if (typeof value === 'string') {
@@ -220,16 +226,16 @@ const AttendanceEditForm: React.FC<{
         <TimePicker
           style={{ width: '100%' }}
           format="HH:mm"
-          placeholder="Select check-out time"
+          placeholder={t.selectCheckOutTime}
         />
       </Form.Item>
 
       <Form.Item
-        label="Delivered by"
+        label={t.deliveredBy}
         name="deliveredBy"
       >
         <Select
-          placeholder="Who delivers the child?"
+          placeholder={t.deliveredByPlaceholder}
           allowClear
           showSearch
           optionFilterProp="children"
@@ -244,11 +250,11 @@ const AttendanceEditForm: React.FC<{
       </Form.Item>
 
       <Form.Item
-        label="Picked up by"
+        label={t.pickedUpBy}
         name="pickedUpBy"
       >
         <Select
-          placeholder="Who picks up the child?"
+          placeholder={t.pickedUpByPlaceholder}
           allowClear
           showSearch
           optionFilterProp="children"
@@ -263,22 +269,22 @@ const AttendanceEditForm: React.FC<{
       </Form.Item>
 
       <Form.Item
-        label="Check-in Notes"
+        label={t.checkInNotes}
         name="checkInNotes"
       >
         <TextArea
           rows={3}
-          placeholder="Notes about the child's check-in"
+          placeholder={t.checkInNotesPlaceholder}
         />
       </Form.Item>
 
       <Form.Item
-        label="Check-out Notes"
+        label={t.checkOutNotes}
         name="notes"
       >
         <TextArea
           rows={3}
-          placeholder="Notes about the child's check-out"
+          placeholder={t.checkOutNotesPlaceholder}
         />
       </Form.Item>
     </Form>

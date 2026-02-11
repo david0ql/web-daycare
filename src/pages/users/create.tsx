@@ -2,7 +2,75 @@ import React from "react";
 import { useList, useInvalidate, useGo, useNotification } from "@refinedev/core";
 import { Create, useForm } from "@refinedev/antd";
 import { useQueryClient } from "@tanstack/react-query";
-import { Form, Input, Select, Switch, Upload, Button, Avatar } from "antd";
+import { Form, Input, Select, Switch } from "antd";
+import { useLanguage } from "../../shared/contexts/language.context";
+
+const USER_CREATE_TRANSLATIONS = {
+  english: {
+    title: "Create User",
+    email: "Email",
+    emailRequired: "Email is required",
+    emailInvalid: "Please enter a valid email",
+    emailPlaceholder: "usuario@ejemplo.com",
+    password: "Password",
+    passwordRequired: "Password is required",
+    passwordMin: "Password must be at least 6 characters",
+    passwordPlaceholder: "Enter password",
+    firstName: "First Name",
+    firstNameRequired: "First name is required",
+    firstNamePlaceholder: "First name",
+    lastName: "Last Name",
+    lastNameRequired: "Last name is required",
+    lastNamePlaceholder: "Last name",
+    phone: "Phone",
+    phonePlaceholder: "+1234567890",
+    role: "Role",
+    roleRequired: "Role is required",
+    rolePlaceholder: "Select a role",
+    activeStatus: "Active Status",
+    profilePicture: "Profile Picture",
+    profilePicturePlaceholder: "Image URL (optional)",
+    successMessage: "User created successfully",
+    successDescription: "The new user has been registered correctly",
+    save: "Save",
+    roleAdministrator: "Administrator",
+    roleEducator: "Educator",
+    roleParent: "Parent",
+    roleStaff: "Staff",
+  },
+  spanish: {
+    title: "Crear usuario",
+    email: "Correo electrónico",
+    emailRequired: "El correo es requerido",
+    emailInvalid: "Por favor ingresa un correo válido",
+    emailPlaceholder: "usuario@ejemplo.com",
+    password: "Contraseña",
+    passwordRequired: "La contraseña es requerida",
+    passwordMin: "La contraseña debe tener al menos 6 caracteres",
+    passwordPlaceholder: "Ingresa la contraseña",
+    firstName: "Nombre",
+    firstNameRequired: "El nombre es requerido",
+    firstNamePlaceholder: "Nombre",
+    lastName: "Apellido",
+    lastNameRequired: "El apellido es requerido",
+    lastNamePlaceholder: "Apellido",
+    phone: "Teléfono",
+    phonePlaceholder: "+1234567890",
+    role: "Rol",
+    roleRequired: "El rol es requerido",
+    rolePlaceholder: "Seleccionar un rol",
+    activeStatus: "Estado activo",
+    profilePicture: "Foto de perfil",
+    profilePicturePlaceholder: "URL de imagen (opcional)",
+    successMessage: "Usuario creado correctamente",
+    successDescription: "El nuevo usuario ha sido registrado correctamente",
+    save: "Guardar",
+    roleAdministrator: "Administrador",
+    roleEducator: "Educador",
+    roleParent: "Padre/Madre",
+    roleStaff: "Personal",
+  },
+} as const;
 
 // Custom Switch component that always returns boolean
 const BooleanSwitch: React.FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({ value, onChange }) => {
@@ -13,7 +81,6 @@ const BooleanSwitch: React.FC<{ value?: boolean; onChange?: (value: boolean) => 
 
   return <Switch checked={Boolean(value)} onChange={handleChange} />;
 };
-import { UserOutlined, UploadOutlined } from "@ant-design/icons";
 
 interface UserRole {
   id: number;
@@ -27,6 +94,18 @@ export const UserCreate: React.FC = () => {
   const go = useGo();
   const queryClient = useQueryClient();
   const { open } = useNotification();
+  const { language } = useLanguage();
+  const t = USER_CREATE_TRANSLATIONS[language];
+
+  const getRoleDisplayName = (roleName: string) => {
+    const map: Record<string, string> = {
+      administrator: t.roleAdministrator,
+      educator: t.roleEducator,
+      parent: t.roleParent,
+      staff: t.roleStaff,
+    };
+    return map[roleName] || roleName.charAt(0).toUpperCase() + roleName.slice(1);
+  };
   
   const { formProps, saveButtonProps } = useForm({
     onMutationSuccess: async (data, variables) => {
@@ -49,8 +128,8 @@ export const UserCreate: React.FC = () => {
       // Show success notification
       open?.({
         type: "success",
-        message: "User created successfully",
-        description: "The new user has been registered correctly",
+        message: t.successMessage,
+        description: t.successDescription,
       });
       
       // Navigate back to users list with a small delay for better UX
@@ -91,69 +170,69 @@ export const UserCreate: React.FC = () => {
   };
 
   return (
-    <Create title="Create User" saveButtonProps={saveButtonProps}>
+    <Create title={t.title} saveButtonProps={{ ...saveButtonProps, children: t.save }}>
       <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Form.Item
-          label="Email"
+          label={t.email}
           name="email"
           rules={[
-            { required: true, message: "Email is required" },
-            { type: "email", message: "Please enter a valid email" },
+            { required: true, message: t.emailRequired },
+            { type: "email", message: t.emailInvalid },
           ]}
         >
-          <Input placeholder="usuario@ejemplo.com" />
+          <Input placeholder={t.emailPlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label="Password"
+          label={t.password}
           name="password"
           rules={[
-            { required: true, message: "Password is required" },
-            { min: 6, message: "Password must be at least 6 characters" },
+            { required: true, message: t.passwordRequired },
+            { min: 6, message: t.passwordMin },
           ]}
         >
-          <Input.Password placeholder="Enter password" />
+          <Input.Password placeholder={t.passwordPlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label="First Name"
+          label={t.firstName}
           name="firstName"
-          rules={[{ required: true, message: "First name is required" }]}
+          rules={[{ required: true, message: t.firstNameRequired }]}
         >
-          <Input placeholder="First name" />
+          <Input placeholder={t.firstNamePlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label="Last Name"
+          label={t.lastName}
           name="lastName"
-          rules={[{ required: true, message: "Last name is required" }]}
+          rules={[{ required: true, message: t.lastNameRequired }]}
         >
-          <Input placeholder="Last name" />
+          <Input placeholder={t.lastNamePlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label="Phone"
+          label={t.phone}
           name="phone"
         >
-          <Input placeholder="+1234567890" />
+          <Input placeholder={t.phonePlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label="Role"
+          label={t.role}
           name="roleId"
-          rules={[{ required: true, message: "Role is required" }]}
+          rules={[{ required: true, message: t.roleRequired }]}
         >
           <Select
-            placeholder="Select a role"
+            placeholder={t.rolePlaceholder}
             options={roles.map((role: UserRole) => ({
-              label: role.name.charAt(0).toUpperCase() + role.name.slice(1),
+              label: getRoleDisplayName(role.name),
               value: role.id,
             }))}
           />
         </Form.Item>
 
         <Form.Item
-          label="Active Status"
+          label={t.activeStatus}
           name="isActive"
           initialValue={true}
         >
@@ -161,10 +240,10 @@ export const UserCreate: React.FC = () => {
         </Form.Item>
 
         <Form.Item
-          label="Profile Picture"
+          label={t.profilePicture}
           name="profilePicture"
         >
-          <Input placeholder="Image URL (optional)" />
+          <Input placeholder={t.profilePicturePlaceholder} />
         </Form.Item>
       </Form>
     </Create>

@@ -1,28 +1,72 @@
 import React from "react";
-import { Show, DateField, TextField } from "@refinedev/antd";
+import { Show, DateField } from "@refinedev/antd";
 import { useShow } from "@refinedev/core";
 import { Typography, Card, Row, Col, Tag, Space } from "antd";
 import { CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
-import { ACTIVITY_TYPE_LABELS, ACTIVITY_TYPE_ICONS } from "../../../domains/attendance/types/daily-activities.types";
+import { ActivityTypeEnum, ACTIVITY_TYPE_LABELS_BY_LANGUAGE, ACTIVITY_TYPE_ICONS } from "../../../domains/attendance/types/daily-activities.types";
 import dayjs from 'dayjs';
+import { useLanguage } from "../../../shared/contexts/language.context";
 
 const { Title, Text } = Typography;
+
+const ATTENDANCE_ACTIVITIES_SHOW_TRANSLATIONS = {
+  english: {
+    activityInformation: "Activity Information",
+    childInformation: "Child Information",
+    child: "Child",
+    id: "ID",
+    activityStatus: "Activity Status",
+    status: "Status",
+    date: "Date",
+    pending: "Pending",
+    completed: "Completed",
+    activityDetails: "Activity Details",
+    type: "Type",
+    completionTime: "Completion Time",
+    additionalInformation: "Additional Information",
+    notes: "Notes",
+    noNotes: "No notes",
+    registeredBy: "Registered by",
+    created: "Created",
+  },
+  spanish: {
+    activityInformation: "Información de la actividad",
+    childInformation: "Información del niño",
+    child: "Niño",
+    id: "ID",
+    activityStatus: "Estado de la actividad",
+    status: "Estado",
+    date: "Fecha",
+    pending: "Pendiente",
+    completed: "Completado",
+    activityDetails: "Detalles de la actividad",
+    type: "Tipo",
+    completionTime: "Hora de finalización",
+    additionalInformation: "Información adicional",
+    notes: "Notas",
+    noNotes: "Sin notas",
+    registeredBy: "Registrado por",
+    created: "Creado",
+  },
+} as const;
 
 export const AttendanceActivitiesShow: React.FC = () => {
   const { data, isLoading } = useShow() as any;
   const record = data?.data;
+  const { language } = useLanguage();
+  const t = ATTENDANCE_ACTIVITIES_SHOW_TRANSLATIONS[language];
 
   const getActivityStatus = () => {
     if (!record?.completed) {
       return (
         <Tag color="orange" icon={<ClockCircleOutlined />}>
-          Pending
+          {t.pending}
         </Tag>
       );
     }
     return (
       <Tag color="green" icon={<CheckCircleOutlined />}>
-        Completed
+        {t.completed}
       </Tag>
     );
   };
@@ -36,18 +80,18 @@ export const AttendanceActivitiesShow: React.FC = () => {
 
   return (
     <Show isLoading={isLoading}>
-      <Title level={5}>Activity Information</Title>
+      <Title level={5}>{t.activityInformation}</Title>
       
       <Row gutter={16}>
         <Col span={12}>
-          <Card title="Child Information" size="small">
+          <Card title={t.childInformation} size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Child: </Text>
+                <Text strong>{t.child}: </Text>
                 <Text>{record?.child?.firstName} {record?.child?.lastName}</Text>
               </div>
               <div>
-                <Text strong>ID: </Text>
+                <Text strong>{t.id}: </Text>
                 <Text>{record?.childId}</Text>
               </div>
             </Space>
@@ -55,14 +99,14 @@ export const AttendanceActivitiesShow: React.FC = () => {
         </Col>
         
         <Col span={12}>
-          <Card title="Activity Status" size="small">
+          <Card title={t.activityStatus} size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Status: </Text>
+                <Text strong>{t.status}: </Text>
                 {getActivityStatus()}
               </div>
               <div>
-                <Text strong>Date: </Text>
+                <Text strong>{t.date}: </Text>
                 <DateField value={record?.attendance?.attendanceDate} format="DD/MM/YYYY" />
               </div>
             </Space>
@@ -72,20 +116,20 @@ export const AttendanceActivitiesShow: React.FC = () => {
 
       <Row gutter={16} style={{ marginTop: 16 }}>
         <Col span={12}>
-          <Card title="Activity Details" size="small">
+          <Card title={t.activityDetails} size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Type: </Text>
-                <Space>
-                  <span style={{ fontSize: '16px' }}>
-                    {ACTIVITY_TYPE_ICONS[record?.activityType as keyof typeof ACTIVITY_TYPE_ICONS]}
-                  </span>
-                  {ACTIVITY_TYPE_LABELS[record?.activityType as keyof typeof ACTIVITY_TYPE_LABELS]}
-                </Space>
-              </div>
+                <Text strong>{t.type}: </Text>
+	                <Space>
+	                  <span style={{ fontSize: '16px' }}>
+	                    {ACTIVITY_TYPE_ICONS[record?.activityType as keyof typeof ACTIVITY_TYPE_ICONS]}
+	                  </span>
+	                  {record?.activityType ? ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][record.activityType as ActivityTypeEnum] : "-"}
+	                </Space>
+	              </div>
               {record?.completed && record?.timeCompleted && (
                 <div>
-                  <Text strong>Completion Time: </Text>
+                  <Text strong>{t.completionTime}: </Text>
                   <Text>{getTimeCompleted()}</Text>
                 </div>
               )}
@@ -94,18 +138,18 @@ export const AttendanceActivitiesShow: React.FC = () => {
         </Col>
         
         <Col span={12}>
-          <Card title="Additional Information" size="small">
+          <Card title={t.additionalInformation} size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Notes: </Text>
-                <Text>{record?.notes || 'No notes'}</Text>
+                <Text strong>{t.notes}: </Text>
+                <Text>{record?.notes || t.noNotes}</Text>
               </div>
               <div>
-                <Text strong>Registered by: </Text>
+                <Text strong>{t.registeredBy}: </Text>
                 <Text>{record?.createdByUser?.firstName} {record?.createdByUser?.lastName}</Text>
               </div>
               <div>
-                <Text strong>Created: </Text>
+                <Text strong>{t.created}: </Text>
                 <DateField value={record?.createdAt} format="DD/MM/YYYY HH:mm" />
               </div>
             </Space>

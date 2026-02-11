@@ -1,5 +1,35 @@
 import dayjs from 'dayjs';
 import { Document, DocumentType } from '../types/document.types';
+import type { Language } from '../../../shared/contexts/language.context';
+
+const DOCUMENT_UTILS_TRANSLATIONS = {
+  english: {
+    noExpirationDate: "No expiration date",
+    expired: "Expired",
+    expiringSoon: "Expiring soon",
+    expiring: "Expiring",
+    valid: "Valid",
+    expiredDaysAgo: "Expired",
+    daysAgo: "days ago",
+    expiresToday: "Expires today",
+    expiresTomorrow: "Expires tomorrow",
+    expiresIn: "Expires in",
+    days: "days",
+  },
+  spanish: {
+    noExpirationDate: "Sin fecha de expiración",
+    expired: "Expirado",
+    expiringSoon: "Por expirar",
+    expiring: "Próximo a expirar",
+    valid: "Vigente",
+    expiredDaysAgo: "Expiró hace",
+    daysAgo: "días",
+    expiresToday: "Expira hoy",
+    expiresTomorrow: "Expira mañana",
+    expiresIn: "Expira en",
+    days: "días",
+  },
+} as const;
 
 // Formatear fecha de documento
 export const formatDocumentDate = (date: string): string => {
@@ -7,8 +37,9 @@ export const formatDocumentDate = (date: string): string => {
 };
 
 // Formatear fecha de expiración
-export const formatExpirationDate = (date: string | null): string => {
-  if (!date) return 'Sin fecha de expiración';
+export const formatExpirationDate = (date: string | null, language: Language = "english"): string => {
+  const t = DOCUMENT_UTILS_TRANSLATIONS[language];
+  if (!date) return t.noExpirationDate;
   return dayjs(date).format('DD/MM/YYYY');
 };
 
@@ -21,11 +52,12 @@ export const getExpirationColor = (document: Document): string => {
 };
 
 // Obtener etiqueta del estado de expiración
-export const getExpirationLabel = (document: Document): string => {
-  if (document.isExpired) return 'Expirado';
-  if (document.daysUntilExpiration <= 30) return 'Por expirar';
-  if (document.daysUntilExpiration <= 90) return 'Próximo a expirar';
-  return 'Vigente';
+export const getExpirationLabel = (document: Document, language: Language = "english"): string => {
+  const t = DOCUMENT_UTILS_TRANSLATIONS[language];
+  if (document.isExpired) return t.expired;
+  if (document.daysUntilExpiration <= 30) return t.expiringSoon;
+  if (document.daysUntilExpiration <= 90) return t.expiring;
+  return t.valid;
 };
 
 // Formatear tamaño de archivo
@@ -86,18 +118,21 @@ export const isNearExpiration = (document: Document, days: number = 30): boolean
 };
 
 // Obtener días hasta expiración en formato legible
-export const getDaysUntilExpirationText = (document: Document): string => {
+export const getDaysUntilExpirationText = (document: Document, language: Language = "english"): string => {
+  const t = DOCUMENT_UTILS_TRANSLATIONS[language];
   if (document.isExpired) {
-    return `Expirado hace ${Math.abs(document.daysUntilExpiration)} días`;
+    return language === "spanish"
+      ? `${t.expiredDaysAgo} ${Math.abs(document.daysUntilExpiration)} ${t.daysAgo}`
+      : `${t.expired} ${Math.abs(document.daysUntilExpiration)} ${t.daysAgo}`;
   }
   
   if (document.daysUntilExpiration === 0) {
-    return 'Expira hoy';
+    return t.expiresToday;
   }
   
   if (document.daysUntilExpiration === 1) {
-    return 'Expira mañana';
+    return t.expiresTomorrow;
   }
   
-  return `Expira en ${document.daysUntilExpiration} días`;
+  return `${t.expiresIn} ${document.daysUntilExpiration} ${t.days}`;
 };

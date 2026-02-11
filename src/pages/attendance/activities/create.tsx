@@ -1,19 +1,73 @@
 import React, { useState } from "react";
 import { Create, useForm } from "@refinedev/antd";
-import { Form, Input, Select, Switch, TimePicker, Row, Col, Typography } from "antd";
-import { useParams, useNavigate } from "react-router";
+import { Form, Input, Select, Switch, TimePicker, Row, Col } from "antd";
+import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ActivityTypeEnum, ACTIVITY_TYPE_LABELS } from "../../../domains/attendance/types/daily-activities.types";
+import { ActivityTypeEnum, ACTIVITY_TYPE_LABELS_BY_LANGUAGE } from "../../../domains/attendance/types/daily-activities.types";
 import { axiosInstance } from "../../../shared";
 import dayjs from 'dayjs';
+import { useLanguage } from "../../../shared/contexts/language.context";
 
-const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
+const ATTENDANCE_ACTIVITIES_CREATE_TRANSLATIONS = {
+  english: {
+    title: "Register Daily Activity",
+    save: "Save",
+    child: "Child",
+    selectChildRequired: "Please select a child",
+    selectChild: "Select a child",
+    loading: "Loading...",
+    noChildren: "No children available",
+    attendanceRecord: "Attendance Record",
+    selectAttendanceRequired: "Please select an attendance record",
+    selectAttendance: "Select an attendance record",
+    firstSelectChild: "First select a child",
+    noAttendanceToday: "No attendance records for today",
+    activityType: "Activity Type",
+    selectActivityTypeRequired: "Please select activity type",
+    selectActivityType: "Select activity type",
+    firstSelectAttendance: "First select an attendance record",
+    noActivityTypes: "No activity types available",
+    completed: "Completed",
+    completionTime: "Completion Time",
+    selectCompletionTimeRequired: "Please select completion time",
+    selectTime: "Select time",
+    notes: "Notes",
+    notesPlaceholder: "Additional notes about the activity (optional)",
+  },
+  spanish: {
+    title: "Registrar actividad diaria",
+    save: "Guardar",
+    child: "Niño",
+    selectChildRequired: "Por favor selecciona un niño",
+    selectChild: "Selecciona un niño",
+    loading: "Cargando...",
+    noChildren: "No hay niños disponibles",
+    attendanceRecord: "Registro de asistencia",
+    selectAttendanceRequired: "Por favor selecciona un registro de asistencia",
+    selectAttendance: "Selecciona un registro de asistencia",
+    firstSelectChild: "Primero selecciona un niño",
+    noAttendanceToday: "No hay registros de asistencia para hoy",
+    activityType: "Tipo de actividad",
+    selectActivityTypeRequired: "Por favor selecciona el tipo de actividad",
+    selectActivityType: "Selecciona tipo de actividad",
+    firstSelectAttendance: "Primero selecciona un registro de asistencia",
+    noActivityTypes: "No hay tipos de actividad disponibles",
+    completed: "Completado",
+    completionTime: "Hora de finalización",
+    selectCompletionTimeRequired: "Por favor selecciona la hora de finalización",
+    selectTime: "Selecciona hora",
+    notes: "Notas",
+    notesPlaceholder: "Notas adicionales sobre la actividad (opcional)",
+  },
+} as const;
+
 export const AttendanceActivitiesCreate: React.FC = () => {
   const { attendanceId } = useParams();
-  const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = ATTENDANCE_ACTIVITIES_CREATE_TRANSLATIONS[language];
   const { formProps, saveButtonProps } = useForm();
   const [selectedChildId, setSelectedChildId] = useState<number | undefined>(undefined);
   const [selectedAttendanceId, setSelectedAttendanceId] = useState<number | undefined>(undefined);
@@ -69,12 +123,6 @@ export const AttendanceActivitiesCreate: React.FC = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Debug logs
-  console.log('Children data:', childrenData);
-  console.log('Attendance data:', attendanceData);
-  console.log('Children data.data:', childrenData?.data);
-  console.log('Attendance data.data:', attendanceData?.data);
-
   const handleFinish = (values: any) => {
     const formData = {
       ...values,
@@ -87,22 +135,22 @@ export const AttendanceActivitiesCreate: React.FC = () => {
 
   return (
     <Create
-      title="Register Daily Activity"
-      saveButtonProps={saveButtonProps}
+      title={t.title}
+      saveButtonProps={{ ...saveButtonProps, children: t.save }}
     >
       <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Row gutter={16}>
           <Col span={12}>
                 <Form.Item
-                  label="Child"
+                  label={t.child}
                   name="childId"
-                  rules={[{ required: true, message: 'Please select a child' }]}
+                  rules={[{ required: true, message: t.selectChildRequired }]}
                 >
                   <Select 
-                    placeholder="Select a child" 
+                    placeholder={t.selectChild} 
                     showSearch
                     loading={childrenLoading}
-                    notFoundContent={childrenLoading ? "Loading..." : "No children available"}
+                    notFoundContent={childrenLoading ? t.loading : t.noChildren}
                     onChange={(value) => {
                       setSelectedChildId(value);
                       // Clear attendance selection when child changes
@@ -120,13 +168,13 @@ export const AttendanceActivitiesCreate: React.FC = () => {
           
           <Col span={12}>
             <Form.Item
-              label="Attendance Record"
+              label={t.attendanceRecord}
               name="attendanceId"
-              rules={[{ required: true, message: 'Please select an attendance record' }]}
+              rules={[{ required: true, message: t.selectAttendanceRequired }]}
               initialValue={attendanceId ? parseInt(attendanceId) : undefined}
             >
               <Select 
-                placeholder={selectedChildId ? "Select an attendance record" : "First select a child"} 
+                placeholder={selectedChildId ? t.selectAttendance : t.firstSelectChild} 
                 showSearch
                 loading={attendanceLoading}
                 disabled={!selectedChildId}
@@ -137,10 +185,10 @@ export const AttendanceActivitiesCreate: React.FC = () => {
                 }}
                 notFoundContent={
                   attendanceLoading 
-                    ? "Loading..." 
+                    ? t.loading 
                     : !selectedChildId 
-                      ? "First select a child" 
-                      : "No attendance records for today"
+                      ? t.firstSelectChild 
+                      : t.noAttendanceToday
                 }
               >
                 {(attendanceData || []).map((attendance: any) => (
@@ -156,17 +204,17 @@ export const AttendanceActivitiesCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
                 <Form.Item
-                  label="Activity Type"
+                  label={t.activityType}
                   name="activityType"
-                  rules={[{ required: true, message: 'Please select activity type' }]}
+                  rules={[{ required: true, message: t.selectActivityTypeRequired }]}
                 >
                   <Select 
-                    placeholder="Select activity type"
+                    placeholder={t.selectActivityType}
                     disabled={!selectedAttendanceId}
                     notFoundContent={
                       !selectedAttendanceId 
-                        ? "First select an attendance record" 
-                        : "No activity types available"
+                        ? t.firstSelectAttendance 
+                        : t.noActivityTypes
                     }
                   >
                     {Object.values(ActivityTypeEnum)
@@ -177,7 +225,7 @@ export const AttendanceActivitiesCreate: React.FC = () => {
                       })
                       .map((type) => (
                         <Option key={type} value={type}>
-                          {ACTIVITY_TYPE_LABELS[type]}
+                          {ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][type]}
                         </Option>
                       ))}
                   </Select>
@@ -186,7 +234,7 @@ export const AttendanceActivitiesCreate: React.FC = () => {
           
           <Col span={12}>
             <Form.Item
-              label="Completed"
+              label={t.completed}
               name="completed"
               valuePropName="checked"
               getValueFromEvent={(checked) => Boolean(checked)}
@@ -201,43 +249,43 @@ export const AttendanceActivitiesCreate: React.FC = () => {
           noStyle
           shouldUpdate={(prevValues, currentValues) => prevValues.completed !== currentValues.completed}
         >
-          {({ getFieldValue }) => {
-            const completed = getFieldValue('completed');
-            return completed ? (
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Completion Time"
-                    name="timeCompleted"
-                    rules={[{ required: true, message: 'Please select completion time' }]}
-                  >
-                    <TimePicker 
-                      style={{ width: '100%' }}
-                      format="HH:mm"
-                      placeholder="Select time"
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-            ) : null;
-          }}
-        </Form.Item>
+	          {({ getFieldValue }) => {
+	            const completed = getFieldValue('completed');
+	            return completed ? (
+	              <Row gutter={16}>
+	                <Col span={12}>
+	                  <Form.Item
+	                    label={t.completionTime}
+	                    name="timeCompleted"
+	                    rules={[{ required: true, message: t.selectCompletionTimeRequired }]}
+	                  >
+	                    <TimePicker 
+	                      style={{ width: '100%' }}
+	                      format="HH:mm"
+	                      placeholder={t.selectTime}
+	                    />
+	                  </Form.Item>
+	                </Col>
+	              </Row>
+	            ) : null;
+	          }}
+	        </Form.Item>
 
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="Notes"
-              name="notes"
-            >
-              <TextArea 
-                rows={3}
-                placeholder="Additional notes about the activity (optional)"
-                maxLength={500}
-                showCount
-              />
-            </Form.Item>
-          </Col>
-        </Row>
+	        <Row gutter={16}>
+	          <Col span={24}>
+	            <Form.Item
+	              label={t.notes}
+	              name="notes"
+	            >
+	              <TextArea 
+	                rows={3}
+	                placeholder={t.notesPlaceholder}
+	                maxLength={500}
+	                showCount
+	              />
+	            </Form.Item>
+	          </Col>
+	        </Row>
       </Form>
     </Create>
   );

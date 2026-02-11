@@ -95,3 +95,16 @@ export const EVENT_TYPE_LABELS = {
   [EventTypeEnum.EVENT]: 'Event',
   [EventTypeEnum.CLOSURE]: 'Closure',
 } as const;
+
+import type { Language } from "../../../shared/contexts/language.context";
+
+export const EVENT_TYPE_LABELS_BY_LANGUAGE: Record<Language, Record<EventTypeEnum, string>> = {
+  english: EVENT_TYPE_LABELS,
+  spanish: {
+    [EventTypeEnum.HOLIDAY]: "Festivo",
+    [EventTypeEnum.VACATION]: "Vacaciones",
+    [EventTypeEnum.MEETING]: "Reunión",
+    [EventTypeEnum.EVENT]: "Evento",
+    [EventTypeEnum.CLOSURE]: "Cierre",
+  },
+};

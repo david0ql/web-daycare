@@ -3,9 +3,33 @@ import { Result, Button } from "antd";
 import { useNavigate } from "react-router";
 import { HomeOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { colors } from "../styles/colors";
+import { useLanguage } from "../shared/contexts/language.context";
+
+const ERROR_404_TRANSLATIONS = {
+  english: {
+    pageNotFound: "Page Not Found",
+    description1: "Sorry, the page you are looking for does not exist or has been moved.",
+    description2: "Please verify the URL or return to the main page.",
+    goToDashboard: "Go to Dashboard",
+    goBack: "Go Back",
+    needHelp: "Need help?",
+    helpText: "If you believe this is an error, contact the system administrator or verify that the URL is correct.",
+  },
+  spanish: {
+    pageNotFound: "Página no encontrada",
+    description1: "Lo sentimos, la página que buscas no existe o ha sido movida.",
+    description2: "Por favor verifica la URL o regresa a la página principal.",
+    goToDashboard: "Ir al panel",
+    goBack: "Volver",
+    needHelp: "¿Necesitas ayuda?",
+    helpText: "Si crees que esto es un error, contacta al administrador del sistema o verifica que la URL sea correcta.",
+  },
+} as const;
 
 export const Error404: React.FC = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = ERROR_404_TRANSLATIONS[language];
 
   const handleGoHome = () => {
     navigate("/");
@@ -47,12 +71,12 @@ export const Error404: React.FC = () => {
           subTitle={
             <div style={{ color: colors.text.secondary }}>
               <div style={{ fontSize: "24px", marginBottom: "16px" }}>
-                🏫 Page Not Found
+                🏫 {t.pageNotFound}
               </div>
               <div style={{ fontSize: "16px", lineHeight: "1.6" }}>
-                Sorry, the page you are looking for does not exist or has been moved.
+                {t.description1}
                 <br />
-                Please verify the URL or return to the main page.
+                {t.description2}
               </div>
             </div>
           }
@@ -76,7 +100,7 @@ export const Error404: React.FC = () => {
                 boxShadow: colors.shadows.md,
               }}
             >
-              Go to Dashboard
+              {t.goToDashboard}
             </Button>,
             <Button
               key="back"
@@ -94,7 +118,7 @@ export const Error404: React.FC = () => {
                 color: colors.text.primary,
               }}
             >
-              Go Back
+              {t.goBack}
             </Button>,
           ]}
         />
@@ -115,12 +139,9 @@ export const Error404: React.FC = () => {
             fontSize: "14px",
             lineHeight: "1.5"
           }}>
-            <strong style={{ color: colors.text.primary }}>
-              Need help?
-            </strong>
+            <strong style={{ color: colors.text.primary }}>{t.needHelp}</strong>
             <br />
-            If you believe this is an error, contact the system administrator
-            or verify that the URL is correct.
+            {t.helpText}
           </div>
         </div>
       </div>

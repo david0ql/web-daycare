@@ -6,6 +6,7 @@ import { UserOutlined, LoginOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useCheckIn, useCheckOut } from "../../domains/attendance";
 import { useAuthorizedPickupPersons } from "../../domains/children";
 import { axiosInstance } from "../../shared";
+import { useLanguage } from "../../shared/contexts/language.context";
 
 const { Text, Title } = Typography;
 const { TextArea } = Input;
@@ -23,7 +24,72 @@ interface User {
   lastName: string;
 }
 
+const ATTENDANCE_CREATE_TRANSLATIONS = {
+  english: {
+    title: "Attendance Management",
+    checkIn: "Check-in",
+    checkOut: "Check-out",
+    selectChild: "Select Child",
+    selectChildRequired: "You must select a child",
+    searchChild: "Search and select child",
+    selectedForCheckIn: "Selected for check-in",
+    selectedForCheckOut: "Selected for check-out",
+    deliveredByOptional: "Delivered by (Optional)",
+    deliveredByPlaceholder: "Who delivers the child?",
+    firstSelectChild: "First select a child",
+    checkInNotesOptional: "Check-in Notes (Optional)",
+    checkInNotesPlaceholder: "Observations about the child's condition upon arrival...",
+    registerCheckIn: "Register Check-in",
+    checkInSuccess: "Check-in successful. The child has been registered correctly.",
+    checkInErrorPrefix: "Check-in error:",
+    couldNotRegisterCheckIn: "Could not register check-in",
+    pickedUpBy: "Picked up by",
+    pickedUpByRequired: "You must specify who picks up the child",
+    pickedUpByPlaceholder: "Who picks up the child?",
+    checkOutNotesRequiredLabel: "Check-out Notes (Required)",
+    checkOutNotesRequired: "Check-out notes are required",
+    checkOutNotesPlaceholder: "Summary of the child's day, behavior, activities performed, meals, etc...",
+    registerCheckOut: "Register Check-out",
+    checkOutSuccess: "Check-out successful. The child has been registered for departure correctly.",
+    checkOutErrorPrefix: "Check-out error:",
+    couldNotRegisterCheckOut: "Could not register check-out",
+    loadingData: "Loading data...",
+  },
+  spanish: {
+    title: "Gestión de asistencia",
+    checkIn: "Entrada",
+    checkOut: "Salida",
+    selectChild: "Seleccionar niño",
+    selectChildRequired: "Debes seleccionar un niño",
+    searchChild: "Buscar y seleccionar niño",
+    selectedForCheckIn: "Seleccionado para entrada",
+    selectedForCheckOut: "Seleccionado para salida",
+    deliveredByOptional: "Entregado por (Opcional)",
+    deliveredByPlaceholder: "¿Quién entrega al niño?",
+    firstSelectChild: "Primero selecciona un niño",
+    checkInNotesOptional: "Notas de entrada (Opcional)",
+    checkInNotesPlaceholder: "Observaciones sobre el estado del niño al llegar...",
+    registerCheckIn: "Registrar entrada",
+    checkInSuccess: "Entrada exitosa. El niño ha sido registrado correctamente.",
+    checkInErrorPrefix: "Error de entrada:",
+    couldNotRegisterCheckIn: "No se pudo registrar la entrada",
+    pickedUpBy: "Recogido por",
+    pickedUpByRequired: "Debes indicar quién recoge al niño",
+    pickedUpByPlaceholder: "¿Quién recoge al niño?",
+    checkOutNotesRequiredLabel: "Notas de salida (Requerido)",
+    checkOutNotesRequired: "Las notas de salida son requeridas",
+    checkOutNotesPlaceholder: "Resumen del día del niño, comportamiento, actividades realizadas, comidas, etc...",
+    registerCheckOut: "Registrar salida",
+    checkOutSuccess: "Salida exitosa. El niño ha sido registrado correctamente para su salida.",
+    checkOutErrorPrefix: "Error de salida:",
+    couldNotRegisterCheckOut: "No se pudo registrar la salida",
+    loadingData: "Cargando datos...",
+  },
+} as const;
+
 export const AttendanceCreate: React.FC = () => {
+  const { language } = useLanguage();
+  const t = ATTENDANCE_CREATE_TRANSLATIONS[language];
   const [activeTab, setActiveTab] = useState("checkin");
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
 
@@ -101,22 +167,22 @@ export const AttendanceCreate: React.FC = () => {
       notes: values.checkInNotes,
     }, {
       onSuccess: () => {
-        message.success("Check-in successful. The child has been registered correctly.");
+        message.success(t.checkInSuccess);
         setSelectedChild(null);
       },
       onError: (error: any) => {
-        message.error("Check-in error: " + (error?.response?.data?.message || "Could not register check-in"));
+        message.error(`${t.checkInErrorPrefix} ${error?.response?.data?.message || t.couldNotRegisterCheckIn}`);
       }
     });
   };
 
   const handleCheckOut = (values: any) => {
     if (!values.pickedUpBy) {
-      message.error("You must specify who picks up the child");
+      message.error(t.pickedUpByRequired);
       return;
     }
     if (!values.checkOutNotes) {
-      message.error("Check-out notes are required");
+      message.error(t.checkOutNotesRequired);
       return;
     }
     
@@ -126,11 +192,11 @@ export const AttendanceCreate: React.FC = () => {
       notes: values.checkOutNotes,
     }, {
       onSuccess: () => {
-        message.success("Check-out successful. The child has been registered for departure correctly.");
+        message.success(t.checkOutSuccess);
         setSelectedChild(null);
       },
       onError: (error: any) => {
-        message.error("Check-out error: " + (error?.response?.data?.message || "Could not register check-out"));
+        message.error(`${t.checkOutErrorPrefix} ${error?.response?.data?.message || t.couldNotRegisterCheckOut}`);
       }
     });
   };
@@ -146,18 +212,18 @@ export const AttendanceCreate: React.FC = () => {
       label: (
         <Space>
           <LoginOutlined />
-          Check-in
+          {t.checkIn}
         </Space>
       ),
       children: (
         <Form layout="vertical" onFinish={handleCheckIn}>
           <Form.Item
-            label="Select Child"
+            label={t.selectChild}
             name="childId"
-            rules={[{ required: true, message: "You must select a child" }]}
+            rules={[{ required: true, message: t.selectChildRequired }]}
           >
             <Select
-              placeholder="Search and select child"
+              placeholder={t.searchChild}
               showSearch
               optionFilterProp="children"
               onChange={handleChildSelect}
@@ -185,18 +251,18 @@ export const AttendanceCreate: React.FC = () => {
                   <Title level={4} style={{ margin: 0 }}>
                     {`${selectedChild.firstName} ${selectedChild.lastName}`}
                   </Title>
-                  <Text type="secondary">Selected for check-in</Text>
+                  <Text type="secondary">{t.selectedForCheckIn}</Text>
                 </Col>
               </Row>
             </Card>
           )}
 
           <Form.Item
-            label="Delivered by (Optional)"
+            label={t.deliveredByOptional}
             name="deliveredBy"
           >
             <Select
-              placeholder={selectedChild ? "Who delivers the child?" : "First select a child"}
+              placeholder={selectedChild ? t.deliveredByPlaceholder : t.firstSelectChild}
               allowClear
               showSearch
               optionFilterProp="children"
@@ -213,12 +279,12 @@ export const AttendanceCreate: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            label="Check-in Notes (Optional)"
+            label={t.checkInNotesOptional}
             name="checkInNotes"
           >
             <TextArea
               rows={3}
-              placeholder="Observations about the child's condition upon arrival..."
+              placeholder={t.checkInNotesPlaceholder}
             />
           </Form.Item>
 
@@ -231,7 +297,7 @@ export const AttendanceCreate: React.FC = () => {
               icon={<LoginOutlined />}
               block
             >
-              Register Check-in
+              {t.registerCheckIn}
             </Button>
           </Form.Item>
         </Form>
@@ -242,18 +308,18 @@ export const AttendanceCreate: React.FC = () => {
       label: (
         <Space>
           <LogoutOutlined />
-          Check-out
+          {t.checkOut}
         </Space>
       ),
       children: (
         <Form layout="vertical" onFinish={handleCheckOut}>
           <Form.Item
-            label="Select Child"
+            label={t.selectChild}
             name="childId"
-            rules={[{ required: true, message: "You must select a child" }]}
+            rules={[{ required: true, message: t.selectChildRequired }]}
           >
             <Select
-              placeholder="Search and select child"
+              placeholder={t.searchChild}
               showSearch
               optionFilterProp="children"
               onChange={handleChildSelect}
@@ -281,19 +347,19 @@ export const AttendanceCreate: React.FC = () => {
                   <Title level={4} style={{ margin: 0 }}>
                     {`${selectedChild.firstName} ${selectedChild.lastName}`}
                   </Title>
-                  <Text type="secondary">Selected for check-out</Text>
+                  <Text type="secondary">{t.selectedForCheckOut}</Text>
                 </Col>
               </Row>
             </Card>
           )}
 
           <Form.Item
-            label="Picked up by"
+            label={t.pickedUpBy}
             name="pickedUpBy"
-            rules={[{ required: true, message: "You must specify who picks up the child" }]}
+            rules={[{ required: true, message: t.pickedUpByRequired }]}
           >
             <Select
-              placeholder={selectedChild ? "Who picks up the child?" : "First select a child"}
+              placeholder={selectedChild ? t.pickedUpByPlaceholder : t.firstSelectChild}
               showSearch
               optionFilterProp="children"
               disabled={!selectedChild}
@@ -309,13 +375,13 @@ export const AttendanceCreate: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            label="Check-out Notes (Required)"
+            label={t.checkOutNotesRequiredLabel}
             name="checkOutNotes"
-            rules={[{ required: true, message: "Check-out notes are required" }]}
+            rules={[{ required: true, message: t.checkOutNotesRequired }]}
           >
             <TextArea
               rows={4}
-              placeholder="Summary of the child's day, behavior, activities performed, meals, etc..."
+              placeholder={t.checkOutNotesPlaceholder}
             />
           </Form.Item>
 
@@ -329,7 +395,7 @@ export const AttendanceCreate: React.FC = () => {
               block
               danger
             >
-              Register Check-out
+              {t.registerCheckOut}
             </Button>
           </Form.Item>
         </Form>
@@ -340,7 +406,7 @@ export const AttendanceCreate: React.FC = () => {
   if (loadingChildren) {
     return (
       <Create
-        title="Attendance Management"
+        title={t.title}
         breadcrumb={false}
         headerButtons={<></>}
         // saveButtonProps={{ style: { display: 'none' } }} // Comentado: el check-in y check-out tienen sus propios botones
@@ -350,7 +416,7 @@ export const AttendanceCreate: React.FC = () => {
           <div style={{ textAlign: 'center', padding: '50px' }}>
             <Spin size="large" />
             <div style={{ marginTop: 16 }}>
-              <Text>Loading data...</Text>
+              <Text>{t.loadingData}</Text>
             </div>
           </div>
         </Card>
@@ -360,7 +426,7 @@ export const AttendanceCreate: React.FC = () => {
 
   return (
     <Create
-      title="Attendance Management"
+      title={t.title}
       breadcrumb={false}
       headerButtons={<></>}
       // saveButtonProps={{ style: { display: 'none' } }} // Comentado: el check-in y check-out tienen sus propios botones

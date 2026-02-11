@@ -11,12 +11,22 @@ import { colors } from "../styles/colors.styles";
 import { EnhancedSidebar } from "./enhanced-sidebar.component";
 import { useAuth } from "../hooks/use-auth.hook";
 import "../styles/navbar.styles.css";
+import { useLanguage } from "../contexts/language.context";
 
 const { Text } = Typography;
 
 interface CustomLayoutProps {
   children: React.ReactNode;
 }
+
+const CUSTOM_LAYOUT_TRANSLATIONS = {
+  english: {
+    logOut: "Log Out",
+  },
+  spanish: {
+    logOut: "Cerrar sesión",
+  },
+} as const;
 
 export const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const { 
@@ -26,13 +36,15 @@ export const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
     getUserFullName, 
     getUserRoleLabel 
   } = useAuth();
+  const { language } = useLanguage();
+  const t = CUSTOM_LAYOUT_TRANSLATIONS[language];
   const [collapsed, setCollapsed] = useState(false);
 
   const userMenuItems = [
     {
       key: "logout",
       icon: <LogoutOutlined />,
-      label: "Log Out",
+      label: t.logOut,
       onClick: logout,
     },
   ];

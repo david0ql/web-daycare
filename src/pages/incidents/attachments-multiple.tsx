@@ -3,6 +3,8 @@ import { Upload, Button, List, Typography, Space, Tag, Image, Modal, message } f
 import { UploadOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { axiosInstance } from '../../shared';
 import { useNotification } from '@refinedev/core';
+import { useLanguage } from '../../shared/contexts/language.context';
+import { getIntlLocale } from '../../shared/i18n/locale';
 
 const { Text } = Typography;
 const { Dragger } = Upload;
@@ -24,12 +26,57 @@ interface IncidentAttachmentsMultipleProps {
   disabled?: boolean;
 }
 
+const INCIDENT_ATTACHMENTS_MULTIPLE_TRANSLATIONS = {
+  english: {
+    title: "Incident Attachments",
+    uploadError: "Error uploading file",
+    noIncidentSelected: "No incident has been selected",
+    uploadSuccess: "File uploaded successfully",
+    uploadSuccessDescPrefix: "The file",
+    uploadSuccessDescSuffix: "has been uploaded correctly",
+    deleteSuccess: "File deleted successfully",
+    deleteSuccessDesc: "The file has been deleted correctly",
+    deleteError: "Error deleting file",
+    clickOrDrag: "Click or drag files here to upload",
+    hint: "You can upload multiple files (images and documents)",
+    view: "View",
+    delete: "Delete",
+    image: "Image",
+    document: "Document",
+    uploadedOn: "Uploaded on",
+    imagePreview: "Image Preview",
+  },
+  spanish: {
+    title: "Adjuntos del incidente",
+    uploadError: "Error al subir archivo",
+    noIncidentSelected: "No se ha seleccionado un incidente",
+    uploadSuccess: "Archivo subido correctamente",
+    uploadSuccessDescPrefix: "El archivo",
+    uploadSuccessDescSuffix: "ha sido subido correctamente",
+    deleteSuccess: "Archivo eliminado correctamente",
+    deleteSuccessDesc: "El archivo ha sido eliminado correctamente",
+    deleteError: "Error al eliminar archivo",
+    clickOrDrag: "Haz clic o arrastra archivos aquí para subirlos",
+    hint: "Puedes subir múltiples archivos (imágenes y documentos)",
+    view: "Ver",
+    delete: "Eliminar",
+    image: "Imagen",
+    document: "Documento",
+    uploadedOn: "Subido el",
+    imagePreview: "Vista previa de imagen",
+  },
+} as const;
+
 export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultipleProps> = ({
   incidentId,
   initialAttachments = [],
   onAttachmentsChange,
   disabled = false,
 }) => {
+  const { language } = useLanguage();
+  const t = INCIDENT_ATTACHMENTS_MULTIPLE_TRANSLATIONS[language];
+  const intlLocale = getIntlLocale(language);
+
   const [attachments, setAttachments] = useState<Attachment[]>(initialAttachments);
   const [uploading, setUploading] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -40,8 +87,8 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
     if (!incidentId) {
       open?.({
         type: "error",
-        message: "Error uploading file",
-        description: "No incident has been selected",
+        message: t.uploadError,
+        description: t.noIncidentSelected,
       });
       return false;
     }
@@ -75,15 +122,15 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
 
       open?.({
         type: "success",
-        message: "File uploaded successfully",
-        description: `The file ${file.name} has been uploaded correctly`,
+        message: t.uploadSuccess,
+        description: `${t.uploadSuccessDescPrefix} ${file.name} ${t.uploadSuccessDescSuffix}`,
       });
 
       return false; // Prevent default upload behavior
     } catch (error: any) {
       open?.({
         type: "error",
-        message: "Error uploading file",
+        message: t.uploadError,
         description: error.response?.data?.message || error.message,
       });
       return false;
@@ -103,13 +150,13 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
 
       open?.({
         type: "success",
-        message: "File deleted successfully",
-        description: "The file has been deleted correctly",
+        message: t.deleteSuccess,
+        description: t.deleteSuccessDesc,
       });
     } catch (error: any) {
       open?.({
         type: "error",
-        message: "Error deleting file",
+        message: t.deleteError,
         description: error.response?.data?.message || error.message,
       });
     }
@@ -139,7 +186,7 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
 
   return (
     <div>
-      <Typography.Title level={5}>Incident Attachments</Typography.Title>
+      <Typography.Title level={5}>{t.title}</Typography.Title>
       
       {!disabled && (
         <Dragger
@@ -153,10 +200,10 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
             <UploadOutlined />
           </p>
           <p className="ant-upload-text">
-            Click or drag files here to upload
+            {t.clickOrDrag}
           </p>
           <p className="ant-upload-hint">
-            You can upload multiple files (images and documents)
+            {t.hint}
           </p>
         </Dragger>
       )}
@@ -174,7 +221,7 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
                   icon={<EyeOutlined />}
                   onClick={() => handlePreview(attachment)}
                 >
-                  View
+                  {t.view}
                 </Button>,
                 !disabled && (
                   <Button
@@ -184,7 +231,7 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
                     icon={<DeleteOutlined />}
                     onClick={() => attachment.id && handleDelete(attachment.id)}
                   >
-                    Delete
+                    {t.delete}
                   </Button>
                 ),
               ].filter(Boolean)}
@@ -195,13 +242,13 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
                   <Space>
                     <Text strong>{attachment.filename}</Text>
                     <Tag color={getFileTypeColor(attachment.fileType)}>
-                      {attachment.fileType === 'image' ? 'Image' : 'Document'}
+                      {attachment.fileType === 'image' ? t.image : t.document}
                     </Tag>
                   </Space>
                 }
                 description={
                   <Text type="secondary">
-                    Uploaded on {new Date(attachment.createdAt || '').toLocaleDateString()}
+                    {t.uploadedOn} {new Date(attachment.createdAt || '').toLocaleDateString(intlLocale)}
                   </Text>
                 }
               />
@@ -212,7 +259,7 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
 
       <Modal
         open={previewVisible}
-        title="Image Preview"
+        title={t.imagePreview}
         footer={null}
         onCancel={() => setPreviewVisible(false)}
         width={800}

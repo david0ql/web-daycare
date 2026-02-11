@@ -11,12 +11,71 @@ import {
   useUpdatePassword,
   useNotification
 } from "@refinedev/core";
+import { useLanguage } from "../contexts/language.context";
+
+const AUTH_TRANSLATIONS = {
+  english: {
+    user: "User",
+    loginSuccess: "Signed in successfully",
+    welcome: "Welcome,",
+    loginError: "Sign-in error",
+    invalidCredentials: "Invalid credentials",
+    logoutSuccess: "Signed out",
+    logoutSuccessDesc: "You have signed out successfully",
+    logoutError: "Sign-out error",
+    logoutLocalDesc: "You have been signed out locally",
+    registerSuccess: "Registration successful",
+    registerSuccessDesc: "User registered successfully",
+    registerError: "Registration error",
+    registerErrorDesc: "User could not be registered",
+    emailSent: "Email sent",
+    emailSentDesc: "A recovery link has been sent to your email",
+    emailError: "Email error",
+    emailErrorDesc: "Recovery email could not be sent",
+    passwordUpdated: "Password updated",
+    passwordUpdatedDesc: "Your password has been updated successfully",
+    passwordUpdateError: "Password update error",
+    passwordUpdateErrorDesc: "Password could not be updated",
+    roleAdministrator: "Administrator",
+    roleEducator: "Educator",
+    roleParent: "Parent",
+  },
+  spanish: {
+    user: "Usuario",
+    loginSuccess: "Inicio de sesión exitoso",
+    welcome: "Bienvenido,",
+    loginError: "Error al iniciar sesión",
+    invalidCredentials: "Credenciales inválidas",
+    logoutSuccess: "Sesión cerrada",
+    logoutSuccessDesc: "Has cerrado sesión correctamente",
+    logoutError: "Error al cerrar sesión",
+    logoutLocalDesc: "Se ha cerrado la sesión localmente",
+    registerSuccess: "Registro exitoso",
+    registerSuccessDesc: "Usuario registrado correctamente",
+    registerError: "Error en el registro",
+    registerErrorDesc: "No se pudo registrar el usuario",
+    emailSent: "Email enviado",
+    emailSentDesc: "Se ha enviado un enlace de recuperación a tu email",
+    emailError: "Error al enviar email",
+    emailErrorDesc: "No se pudo enviar el email de recuperación",
+    passwordUpdated: "Contraseña actualizada",
+    passwordUpdatedDesc: "Tu contraseña ha sido actualizada correctamente",
+    passwordUpdateError: "Error al actualizar contraseña",
+    passwordUpdateErrorDesc: "No se pudo actualizar la contraseña",
+    roleAdministrator: "Administrador",
+    roleEducator: "Educador",
+    roleParent: "Padre/Madre",
+  },
+} as const;
 
 /**
  * Hook personalizado para operaciones de autenticación
  * Implementa las mejores prácticas de Refine para autenticación
  */
 export const useAuth = () => {
+  const { language } = useLanguage();
+  const t = AUTH_TRANSLATIONS[language];
+
   // ===== HOOKS BÁSICOS =====
   const { data: user, isLoading: userLoading, refetch: refetchUser } = useGetIdentity();
   const { mutate: login } = useLogin();
@@ -48,15 +107,15 @@ export const useAuth = () => {
         await login(credentials);
         openNotification?.({
           type: "success",
-          message: "Inicio de sesión exitoso",
-          description: `Bienvenido, ${user?.firstName || "Usuario"}`,
+          message: t.loginSuccess,
+          description: `${t.welcome} ${user?.firstName || t.user}`,
         });
       }
     } catch (error) {
       openNotification?.({
         type: "error",
-        message: "Error al iniciar sesión",
-        description: "Credenciales inválidas",
+        message: t.loginError,
+        description: t.invalidCredentials,
       });
       throw error;
     }
@@ -73,8 +132,8 @@ export const useAuth = () => {
           onSuccess: () => {
             openNotification?.({
               type: "success",
-              message: "Sesión cerrada",
-              description: "Has cerrado sesión correctamente",
+              message: t.logoutSuccess,
+              description: t.logoutSuccessDesc,
             });
           },
           onError: (error) => {
@@ -87,8 +146,8 @@ export const useAuth = () => {
             
             openNotification?.({
               type: "error",
-              message: "Error al cerrar sesión",
-              description: "Se ha cerrado la sesión localmente",
+              message: t.logoutError,
+              description: t.logoutLocalDesc,
             });
             
             // Redirigir manualmente si es necesario
@@ -106,8 +165,8 @@ export const useAuth = () => {
       
       openNotification?.({
         type: "error",
-        message: "Error al cerrar sesión",
-        description: "Se ha cerrado la sesión localmente",
+        message: t.logoutError,
+        description: t.logoutLocalDesc,
       });
       
       // Redirigir manualmente si es necesario
@@ -124,15 +183,15 @@ export const useAuth = () => {
         await register(userData);
         openNotification?.({
           type: "success",
-          message: "Registro exitoso",
-          description: "Usuario registrado correctamente",
+          message: t.registerSuccess,
+          description: t.registerSuccessDesc,
         });
       }
     } catch (error) {
       openNotification?.({
         type: "error",
-        message: "Error en el registro",
-        description: "No se pudo registrar el usuario",
+        message: t.registerError,
+        description: t.registerErrorDesc,
       });
       throw error;
     }
@@ -147,15 +206,15 @@ export const useAuth = () => {
         await forgotPassword({ email });
         openNotification?.({
           type: "success",
-          message: "Email enviado",
-          description: "Se ha enviado un enlace de recuperación a tu email",
+          message: t.emailSent,
+          description: t.emailSentDesc,
         });
       }
     } catch (error) {
       openNotification?.({
         type: "error",
-        message: "Error al enviar email",
-        description: "No se pudo enviar el email de recuperación",
+        message: t.emailError,
+        description: t.emailErrorDesc,
       });
       throw error;
     }
@@ -170,15 +229,15 @@ export const useAuth = () => {
         await updatePassword(passwordData);
         openNotification?.({
           type: "success",
-          message: "Contraseña actualizada",
-          description: "Tu contraseña ha sido actualizada correctamente",
+          message: t.passwordUpdated,
+          description: t.passwordUpdatedDesc,
         });
       }
     } catch (error) {
       openNotification?.({
         type: "error",
-        message: "Error al actualizar contraseña",
-        description: "No se pudo actualizar la contraseña",
+        message: t.passwordUpdateError,
+        description: t.passwordUpdateErrorDesc,
       });
       throw error;
     }
@@ -288,8 +347,8 @@ export const useAuth = () => {
       }
     }
     
-    if (!currentUser) return "Usuario";
-    const fullName = `${currentUser.firstName || ""} ${currentUser.lastName || ""}`.trim() || "Usuario";
+    if (!currentUser) return t.user;
+    const fullName = `${currentUser.firstName || ""} ${currentUser.lastName || ""}`.trim() || t.user;
     console.log("🔍 getUserFullName - Full name:", fullName);
     return fullName;
   };
@@ -315,21 +374,21 @@ export const useAuth = () => {
       }
     }
     
-    if (!currentPermissions) return "Usuario";
+    if (!currentPermissions) return t.user;
     
-    let roleLabel = "Usuario";
+    let roleLabel: string = t.user;
     switch (currentPermissions) {
       case "administrator":
-        roleLabel = "Administrador";
+        roleLabel = t.roleAdministrator;
         break;
       case "educator":
-        roleLabel = "Educador";
+        roleLabel = t.roleEducator;
         break;
       case "parent":
-        roleLabel = "Padre/Madre";
+        roleLabel = t.roleParent;
         break;
       default:
-        roleLabel = "Usuario";
+        roleLabel = t.user;
     }
     console.log("🔍 getUserRoleLabel - Role label:", roleLabel);
     return roleLabel;

@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, DatePicker, TimePicker, Switch, Card, Row, Col, Typography, Button, message } from 'antd';
 import { useNavigate } from 'react-router';
-import { UpdateCalendarEventData, EventTypeEnum, EVENT_TYPE_LABELS } from '../types/calendar.types';
+import { UpdateCalendarEventData, EventTypeEnum, EVENT_TYPE_LABELS_BY_LANGUAGE } from '../types/calendar.types';
 import { useCalendarEvent } from '../hooks/use-calendar.hook';
 import { axiosInstance } from '../../../shared';
 import dayjs from 'dayjs';
-import 'dayjs/locale/es';
-
-// Set Spanish locale for dayjs
-dayjs.locale('es');
+import { useLanguage } from '../../../shared/contexts/language.context';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -19,8 +16,79 @@ interface CalendarEditFormProps {
   onSuccess?: () => void;
 }
 
+const CALENDAR_EDIT_FORM_TRANSLATIONS = {
+  english: {
+    documentTitle: "Edit Event | The Children's World",
+    header: "Edit Event",
+    updateSuccess: "Event updated successfully",
+    updateError: "Error updating event",
+    notFoundTitle: "Event Not Found",
+    notFoundDesc: "Could not load the event or it does not exist.",
+    eventTitle: "Event Title",
+    eventTitleRequired: "Please enter the event title",
+    titleTooLong: "Title cannot exceed 255 characters",
+    titlePlaceholder: "Enter event title",
+    eventType: "Event Type",
+    eventTypeRequired: "Please select the event type",
+    eventTypePlaceholder: "Select event type",
+    allDay: "All Day",
+    startDate: "Start Date",
+    startDateRequired: "Please select the start date",
+    startDatePlaceholder: "Select start date",
+    endDate: "End Date",
+    endDateRequired: "Please select the end date",
+    endDatePlaceholder: "Select end date",
+    startTime: "Start Time",
+    startTimeRequired: "Please select the start time",
+    startTimePlaceholder: "Select start time",
+    endTime: "End Time",
+    endTimeRequired: "Please select the end time",
+    endTimePlaceholder: "Select end time",
+    description: "Description",
+    descriptionPlaceholder: "Enter event description (optional)",
+    cancel: "Cancel",
+    saving: "Saving...",
+    saveChanges: "Save Changes",
+  },
+  spanish: {
+    documentTitle: "Editar evento | The Children's World",
+    header: "Editar evento",
+    updateSuccess: "Evento actualizado correctamente",
+    updateError: "Error al actualizar evento",
+    notFoundTitle: "Evento no encontrado",
+    notFoundDesc: "No se pudo cargar el evento o no existe.",
+    eventTitle: "Título del evento",
+    eventTitleRequired: "Por favor ingresa el título del evento",
+    titleTooLong: "El título no puede superar 255 caracteres",
+    titlePlaceholder: "Ingresa el título del evento",
+    eventType: "Tipo de evento",
+    eventTypeRequired: "Por favor selecciona el tipo de evento",
+    eventTypePlaceholder: "Selecciona tipo de evento",
+    allDay: "Todo el día",
+    startDate: "Fecha inicio",
+    startDateRequired: "Por favor selecciona la fecha de inicio",
+    startDatePlaceholder: "Selecciona fecha de inicio",
+    endDate: "Fecha fin",
+    endDateRequired: "Por favor selecciona la fecha de fin",
+    endDatePlaceholder: "Selecciona fecha de fin",
+    startTime: "Hora inicio",
+    startTimeRequired: "Por favor selecciona la hora de inicio",
+    startTimePlaceholder: "Selecciona hora de inicio",
+    endTime: "Hora fin",
+    endTimeRequired: "Por favor selecciona la hora de fin",
+    endTimePlaceholder: "Selecciona hora de fin",
+    description: "Descripción",
+    descriptionPlaceholder: "Ingresa la descripción del evento (opcional)",
+    cancel: "Cancelar",
+    saving: "Guardando...",
+    saveChanges: "Guardar cambios",
+  },
+} as const;
+
 export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onSuccess }) => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = CALENDAR_EDIT_FORM_TRANSLATIONS[language];
   const [form] = Form.useForm();
   const [isAllDay, setIsAllDay] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,8 +97,8 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
 
   // Set document title
   useEffect(() => {
-    document.title = "Edit Event | The Children's World";
-  }, []);
+    document.title = t.documentTitle;
+  }, [t.documentTitle]);
 
   // Update form when event data is loaded
   useEffect(() => {
@@ -77,7 +145,7 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
 
       await axiosInstance.patch(`/calendar/events/${eventId}`, eventData);
       
-      message.success('Event updated successfully');
+      message.success(t.updateSuccess);
       
       if (onSuccess) {
         onSuccess();
@@ -86,7 +154,7 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
       }
     } catch (error) {
       console.error('Error updating event:', error);
-      message.error('Error updating event');
+      message.error(t.updateError);
     } finally {
       setIsSubmitting(false);
     }
@@ -99,8 +167,8 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
   if (error || !event) {
     return (
       <Card>
-        <Title level={4}>Event Not Found</Title>
-        <p>Could not load the event or it does not exist.</p>
+        <Title level={4}>{t.notFoundTitle}</Title>
+        <p>{t.notFoundDesc}</p>
       </Card>
     );
   }
@@ -108,7 +176,7 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
   return (
     <Card>
       <Title level={4} style={{ marginBottom: '24px' }}>
-        Edit Event
+        {t.header}
       </Title>
       
       <Form
@@ -119,14 +187,14 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Event Title"
+              label={t.eventTitle}
               name="title"
               rules={[
-                { required: true, message: 'Please enter the event title' },
-                { max: 255, message: 'Title cannot exceed 255 characters' }
+                { required: true, message: t.eventTitleRequired },
+                { max: 255, message: t.titleTooLong }
               ]}
             >
-              <Input placeholder="Enter event title" />
+              <Input placeholder={t.titlePlaceholder} />
             </Form.Item>
           </Col>
         </Row>
@@ -134,14 +202,14 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Event Type"
+              label={t.eventType}
               name="eventType"
-              rules={[{ required: true, message: 'Please select the event type' }]}
+              rules={[{ required: true, message: t.eventTypeRequired }]}
             >
-              <Select placeholder="Select event type">
+              <Select placeholder={t.eventTypePlaceholder}>
                 {Object.values(EventTypeEnum).map((type) => (
                   <Option key={type} value={type}>
-                    {EVENT_TYPE_LABELS[type]}
+                    {EVENT_TYPE_LABELS_BY_LANGUAGE[language][type]}
                   </Option>
                 ))}
               </Select>
@@ -150,7 +218,7 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
           
           <Col span={12}>
             <Form.Item
-              label="All Day"
+              label={t.allDay}
               name="isAllDay"
               valuePropName="checked"
               getValueFromEvent={(checked) => Boolean(checked)}
@@ -167,28 +235,28 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Start Date"
+              label={t.startDate}
               name="startDate"
-              rules={[{ required: true, message: 'Please select the start date' }]}
+              rules={[{ required: true, message: t.startDateRequired }]}
             >
               <DatePicker 
                 style={{ width: '100%' }}
                 format="DD/MM/YYYY"
-                placeholder="Select start date"
+                placeholder={t.startDatePlaceholder}
               />
             </Form.Item>
           </Col>
           
           <Col span={12}>
             <Form.Item
-              label="End Date"
+              label={t.endDate}
               name="endDate"
-              rules={[{ required: true, message: 'Please select the end date' }]}
+              rules={[{ required: true, message: t.endDateRequired }]}
             >
               <DatePicker 
                 style={{ width: '100%' }}
                 format="DD/MM/YYYY"
-                placeholder="Select end date"
+                placeholder={t.endDatePlaceholder}
               />
             </Form.Item>
           </Col>
@@ -198,28 +266,28 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="Start Time"
+                label={t.startTime}
                 name="startTime"
-                rules={[{ required: true, message: 'Please select the start time' }]}
+                rules={[{ required: true, message: t.startTimeRequired }]}
               >
                 <TimePicker 
                   style={{ width: '100%' }}
                   format="HH:mm"
-                  placeholder="Select start time"
+                  placeholder={t.startTimePlaceholder}
                 />
               </Form.Item>
             </Col>
             
             <Col span={12}>
               <Form.Item
-                label="End Time"
+                label={t.endTime}
                 name="endTime"
-                rules={[{ required: true, message: 'Please select the end time' }]}
+                rules={[{ required: true, message: t.endTimeRequired }]}
               >
                 <TimePicker 
                   style={{ width: '100%' }}
                   format="HH:mm"
-                  placeholder="Select end time"
+                  placeholder={t.endTimePlaceholder}
                 />
               </Form.Item>
             </Col>
@@ -229,12 +297,12 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Description"
+              label={t.description}
               name="description"
             >
               <TextArea 
                 rows={4}
-                placeholder="Enter event description (optional)"
+                placeholder={t.descriptionPlaceholder}
                 maxLength={1000}
                 showCount
               />
@@ -248,14 +316,14 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
               type="default"
               onClick={() => navigate('/calendar')}
             >
-              Cancel
+              {t.cancel}
             </Button>
             <Button
               type="primary"
               htmlType="submit"
               loading={isSubmitting}
             >
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
+              {isSubmitting ? t.saving : t.saveChanges}
             </Button>
           </div>
         </Form.Item>

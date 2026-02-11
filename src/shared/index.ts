@@ -2,7 +2,7 @@
 
 // Config
 export { default as axiosInstance } from './config/axios.config';
-export { appResources } from './config/app.config';
+export { getAppResources } from './config/app.config';
 
 // Types
 export type {

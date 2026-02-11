@@ -13,10 +13,55 @@ import {
   getDocumentUrl,
   getDaysUntilExpirationText
 } from '../../domains/documents';
+import { useLanguage } from '../../shared/contexts/language.context';
 
 const { Title, Text } = Typography;
 
+const DOCUMENT_SHOW_TRANSLATIONS = {
+  english: {
+    title: "Document Details",
+    loading: "Loading...",
+    notFound: "Document not found",
+    download: "Download",
+    documentId: "Document ID",
+    fileType: "File Type",
+    child: "Child",
+    documentType: "Document Type",
+    fileSize: "File Size",
+    uploadDate: "Upload Date",
+    expirationDate: "Expiration Date",
+    uploadedBy: "Uploaded by",
+    typeDescription: "Document Type Description",
+    retentionPolicy: "Retention Policy",
+    retentionText: "This document type is retained for",
+    days: "days.",
+    size: "Size",
+  },
+  spanish: {
+    title: "Detalles del documento",
+    loading: "Cargando...",
+    notFound: "Documento no encontrado",
+    download: "Descargar",
+    documentId: "ID del documento",
+    fileType: "Tipo de archivo",
+    child: "Niño",
+    documentType: "Tipo de documento",
+    fileSize: "Tamaño del archivo",
+    uploadDate: "Fecha de subida",
+    expirationDate: "Fecha de vencimiento",
+    uploadedBy: "Subido por",
+    typeDescription: "Descripción del tipo de documento",
+    retentionPolicy: "Política de retención",
+    retentionText: "Este tipo de documento se conserva por",
+    days: "días.",
+    size: "Tamaño",
+  },
+} as const;
+
 export const DocumentShow: React.FC = () => {
+  const { language } = useLanguage();
+  const t = DOCUMENT_SHOW_TRANSLATIONS[language];
+
   const { result: documentData, query: documentQuery } = useOne({
     resource: 'documents',
   }) as any;
@@ -32,18 +77,26 @@ export const DocumentShow: React.FC = () => {
   };
 
   if (isLoading) {
-    return <Show title="Document Details" isLoading={true}><div>Loading...</div></Show>;
+    return (
+      <Show title={t.title} isLoading={true}>
+        <div>{t.loading}</div>
+      </Show>
+    );
   }
 
   if (!document) {
-    return <Show title="Document Details"><div>Document not found</div></Show>;
+    return (
+      <Show title={t.title}>
+        <div>{t.notFound}</div>
+      </Show>
+    );
   }
 
   return (
-    <Show title="Document Details">
+    <Show title={t.title}>
     <div>
       <div style={{ marginBottom: 16 }}>
-        <Title level={2}>Document Details</Title>
+        <Title level={2}>{t.title}</Title>
       </div>
       
       <Row gutter={[16, 16]}>
@@ -59,50 +112,50 @@ export const DocumentShow: React.FC = () => {
                   icon={<DownloadOutlined />}
                   onClick={handleDownload}
                 >
-                  Download
+                  {t.download}
                 </Button>
               </div>
 
               <Descriptions bordered column={2}>
-                <Descriptions.Item label="Document ID">
+                <Descriptions.Item label={t.documentId}>
                   {document.id}
                 </Descriptions.Item>
-                <Descriptions.Item label="File Type">
+                <Descriptions.Item label={t.fileType}>
                   <Tag icon={<FileOutlined />}>
                     {document.mimeType}
                   </Tag>
                 </Descriptions.Item>
                 
-                <Descriptions.Item label="Child">
+                <Descriptions.Item label={t.child}>
                   <Text strong>
                     {document.child.firstName} {document.child.lastName}
                   </Text>
                 </Descriptions.Item>
-                <Descriptions.Item label="Document Type">
+                <Descriptions.Item label={t.documentType}>
                   <Tag color="blue">
                     {document.documentType.name}
                   </Tag>
                 </Descriptions.Item>
                 
-                <Descriptions.Item label="File Size">
+                <Descriptions.Item label={t.fileSize}>
                   {formatFileSize(document.fileSize)}
                 </Descriptions.Item>
-                <Descriptions.Item label="Upload Date">
+                <Descriptions.Item label={t.uploadDate}>
                   {formatDocumentDate(document.createdAt)}
                 </Descriptions.Item>
                 
-                <Descriptions.Item label="Expiration Date">
+                <Descriptions.Item label={t.expirationDate}>
                   <Space direction="vertical" size={0}>
-                    <Text>{formatExpirationDate(document.expiresAt)}</Text>
+                    <Text>{formatExpirationDate(document.expiresAt, language)}</Text>
                     <Tag color={getExpirationColor(document)}>
-                      {getExpirationLabel(document)}
+                      {getExpirationLabel(document, language)}
                     </Tag>
                     <Text type="secondary" style={{ fontSize: '12px' }}>
-                      {getDaysUntilExpirationText(document)}
+                      {getDaysUntilExpirationText(document, language)}
                     </Text>
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="Uploaded by">
+                <Descriptions.Item label={t.uploadedBy}>
                   <Text>
                     {document.uploadedBy2.firstName} {document.uploadedBy2.lastName}
                   </Text>
@@ -111,16 +164,16 @@ export const DocumentShow: React.FC = () => {
 
               {document.documentType.description && (
                 <div>
-                  <Title level={5}>Document Type Description</Title>
+                  <Title level={5}>{t.typeDescription}</Title>
                   <Text>{document.documentType.description}</Text>
                 </div>
               )}
 
               {document.documentType.retentionDays && (
                 <div>
-                  <Title level={5}>Retention Policy</Title>
+                  <Title level={5}>{t.retentionPolicy}</Title>
                   <Text>
-                    This document type is retained for {document.documentType.retentionDays} days.
+                    {t.retentionText} {document.documentType.retentionDays} {t.days}
                   </Text>
                 </div>
               )}

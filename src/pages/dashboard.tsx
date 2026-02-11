@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useCustom, useList } from "@refinedev/core";
+import { useList } from "@refinedev/core";
 import { Card, Row, Col, Typography, Statistic, Space, Avatar, List as AntList } from "antd";
 import { 
   UserOutlined, 
@@ -11,10 +11,91 @@ import {
   CloseCircleOutlined 
 } from "@ant-design/icons";
 import moment from "moment";
-import { axiosInstance } from "../shared";
 import { useAttendanceStats, useTodayAttendance } from "../domains/attendance";
+import { useLanguage } from "../shared/contexts/language.context";
 
 const { Title, Text } = Typography;
+
+const DASHBOARD_TRANSLATIONS = {
+  english: {
+    documentTitle: "Dashboard | The Children's World",
+    title: "Welcome to The Children's World 🏫",
+    systemSummary: "System Summary",
+    totalChildren: "Total Children",
+    active: "active",
+    systemUsers: "System Users",
+    registeredInSystem: "Registered in the system",
+    todaysAttendance: "Today's Attendance",
+    checkIns: "check-ins",
+    checkOuts: "check-outs",
+    paymentAlerts: "Payment Alerts",
+    requiresAttention: "Requires attention",
+    allUpToDate: "All up to date",
+    absentToday: "Absent Today",
+    attendanceRate: "attendance rate",
+    checkIn: "Check-in",
+    checkOut: "Check-out",
+    checkInsLabel: "Check-ins",
+    checkInsRecorded: "Check-ins recorded",
+    checkOutsLabel: "Check-outs",
+    checkOutsRecorded: "Check-outs recorded",
+    attendanceRateLabel: "Attendance Rate",
+    today: "Today",
+    todaysActivity: "Today's Activity",
+    records: "records",
+    noAttendanceRecords: "No attendance records today",
+    andMore: "And",
+    more: "more...",
+    paymentAlertsTitle: "Payment Alerts",
+    alerts: "alerts",
+    pendingPayments: "Pending payments",
+    noPaymentAlerts: "No active payment alerts",
+    quickAccess: "Quick Access",
+    registerAttendance: "Register Attendance",
+    newChild: "New Child",
+    reportIncident: "Report Incident",
+    newUser: "New User",
+  },
+  spanish: {
+    documentTitle: "Panel | The Children's World",
+    title: "Bienvenido a The Children's World 🏫",
+    systemSummary: "Resumen del sistema",
+    totalChildren: "Total de niños",
+    active: "activos",
+    systemUsers: "Usuarios del sistema",
+    registeredInSystem: "Registrados en el sistema",
+    todaysAttendance: "Asistencia de hoy",
+    checkIns: "entradas",
+    checkOuts: "salidas",
+    paymentAlerts: "Alertas de pago",
+    requiresAttention: "Requiere atención",
+    allUpToDate: "Todo al día",
+    absentToday: "Ausentes hoy",
+    attendanceRate: "tasa de asistencia",
+    checkIn: "Entrada",
+    checkOut: "Salida",
+    checkInsLabel: "Entradas",
+    checkInsRecorded: "Entradas registradas",
+    checkOutsLabel: "Salidas",
+    checkOutsRecorded: "Salidas registradas",
+    attendanceRateLabel: "Tasa de asistencia",
+    today: "Hoy",
+    todaysActivity: "Actividad de hoy",
+    records: "registros",
+    noAttendanceRecords: "No hay registros de asistencia hoy",
+    andMore: "Y",
+    more: "más...",
+    paymentAlertsTitle: "Alertas de pago",
+    alerts: "alertas",
+    pendingPayments: "Pagos pendientes",
+    noPaymentAlerts: "No hay alertas de pago activas",
+    quickAccess: "Acceso rápido",
+    registerAttendance: "Registrar asistencia",
+    newChild: "Nuevo niño",
+    reportIncident: "Reportar incidente",
+    newUser: "Nuevo usuario",
+  },
+} as const;
 
 interface DashboardStats {
   totalChildren: number;
@@ -44,9 +125,12 @@ interface AttendanceRecord {
 }
 
 export const Dashboard: React.FC = () => {
+  const { language } = useLanguage();
+  const t = DASHBOARD_TRANSLATIONS[language];
+
   useEffect(() => {
-    document.title = "Dashboard | The Children's World";
-  }, []);
+    document.title = t.documentTitle;
+  }, [t.documentTitle]);
 
   // Get basic stats - using maximum allowed pageSize of 150
   const childrenQuery = useList({
@@ -116,10 +200,10 @@ export const Dashboard: React.FC = () => {
   return (
     <div style={{ padding: "24px" }}>
       <Title level={2}>
-        Welcome to The Children's World 🏫
+        {t.title}
       </Title>
       <Text type="secondary">
-        System Summary - {moment().format("dddd, MMMM DD, YYYY")}
+        {t.systemSummary} - {moment().format("dddd, MMMM DD, YYYY")}
       </Text>
 
       {/* Main Stats */}
@@ -127,52 +211,52 @@ export const Dashboard: React.FC = () => {
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Total Children"
+              title={t.totalChildren}
               value={stats.totalChildren}
               prefix={<TeamOutlined />}
               valueStyle={{ color: "#1890ff" }}
             />
             <Text type="secondary">
-              {stats.activeChildren} active
+              {stats.activeChildren} {t.active}
             </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="System Users"
+              title={t.systemUsers}
               value={stats.totalUsers}
               prefix={<UserOutlined />}
               valueStyle={{ color: "#52c41a" }}
             />
             <Text type="secondary">
-              Registered in the system
+              {t.registeredInSystem}
             </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Today's Attendance"
+              title={t.todaysAttendance}
               value={stats.todayAttendance}
               prefix={<CalendarOutlined />}
               valueStyle={{ color: "#faad14" }}
             />
             <Text type="secondary">
-              {checkedIn} check-ins, {checkedOut} check-outs
+              {checkedIn} {t.checkIns}, {checkedOut} {t.checkOuts}
             </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Payment Alerts"
+              title={t.paymentAlerts}
               value={stats.paymentAlerts}
               prefix={<WarningOutlined />}
               valueStyle={{ color: stats.paymentAlerts > 0 ? "#ff4d4f" : "#52c41a" }}
             />
             <Text type="secondary">
-              {stats.paymentAlerts > 0 ? "Requires attention" : "All up to date"}
+              {stats.paymentAlerts > 0 ? t.requiresAttention : t.allUpToDate}
             </Text>
           </Card>
         </Col>
@@ -183,53 +267,53 @@ export const Dashboard: React.FC = () => {
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Absent Today"
+              title={t.absentToday}
               value={stats.absentToday}
               prefix={<CloseCircleOutlined />}
               valueStyle={{ color: "#ff4d4f" }}
             />
             <Text type="secondary">
-              {stats.attendanceRate}% attendance rate
+              {stats.attendanceRate}% {t.attendanceRate}
             </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Check-ins"
+              title={t.checkInsLabel}
               value={checkedIn}
               prefix={<CheckCircleOutlined />}
               valueStyle={{ color: "#52c41a" }}
             />
             <Text type="secondary">
-              Check-ins recorded
+              {t.checkInsRecorded}
             </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Check-outs"
+              title={t.checkOutsLabel}
               value={checkedOut}
               prefix={<ClockCircleOutlined />}
               valueStyle={{ color: "#1890ff" }}
             />
             <Text type="secondary">
-              Check-outs recorded
+              {t.checkOutsRecorded}
             </Text>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Statistic
-              title="Attendance Rate"
+              title={t.attendanceRateLabel}
               value={stats.attendanceRate}
               suffix="%"
               prefix={<CalendarOutlined />}
               valueStyle={{ color: stats.attendanceRate >= 80 ? "#52c41a" : stats.attendanceRate >= 60 ? "#faad14" : "#ff4d4f" }}
             />
             <Text type="secondary">
-              Hoy
+              {t.today}
             </Text>
           </Card>
         </Col>
@@ -242,10 +326,10 @@ export const Dashboard: React.FC = () => {
             title={
               <Space>
                 <ClockCircleOutlined />
-                Today's Activity
+                {t.todaysActivity}
               </Space>
             }
-            extra={<Text type="secondary">{attendanceRecords.length} records</Text>}
+            extra={<Text type="secondary">{attendanceRecords.length} {t.records}</Text>}
           >
             <AntList
               dataSource={attendanceRecords.slice(0, 5)}
@@ -263,12 +347,12 @@ export const Dashboard: React.FC = () => {
                       <Space>
                         {record.checkInTime && (
                           <Text type="success">
-                            <CheckCircleOutlined /> Check-in: {moment(record.checkInTime, "HH:mm:ss").format("HH:mm")}
+                            <CheckCircleOutlined /> {t.checkIn}: {moment(record.checkInTime, "HH:mm:ss").format("HH:mm")}
                           </Text>
                         )}
                         {record.checkOutTime && (
                           <Text type="warning">
-                            <ClockCircleOutlined /> Check-out: {moment(record.checkOutTime, "HH:mm:ss").format("HH:mm")}
+                            <ClockCircleOutlined /> {t.checkOut}: {moment(record.checkOutTime, "HH:mm:ss").format("HH:mm")}
                           </Text>
                         )}
                       </Space>
@@ -276,12 +360,12 @@ export const Dashboard: React.FC = () => {
                   />
                 </AntList.Item>
               )}
-              locale={{ emptyText: "No attendance records today" }}
+              locale={{ emptyText: t.noAttendanceRecords }}
             />
             {attendanceRecords.length > 5 && (
               <div style={{ textAlign: "center", marginTop: 16 }}>
                 <Text type="secondary">
-                  And {attendanceRecords.length - 5} more...
+                  {t.andMore} {attendanceRecords.length - 5} {t.more}
                 </Text>
               </div>
             )}
@@ -293,10 +377,10 @@ export const Dashboard: React.FC = () => {
             title={
               <Space>
                 <WarningOutlined style={{ color: "#ff4d4f" }} />
-                Payment Alerts
+                {t.paymentAlertsTitle}
               </Space>
             }
-            extra={<Text type="secondary">{paymentAlerts.length} alerts</Text>}
+            extra={<Text type="secondary">{paymentAlerts.length} {t.alerts}</Text>}
           >
             <AntList
               dataSource={paymentAlerts.slice(0, 5)}
@@ -312,18 +396,18 @@ export const Dashboard: React.FC = () => {
                     title={`${child.firstName} ${child.lastName}`}
                     description={
                       <Text type="danger">
-                        <WarningOutlined /> Pending payments
+                        <WarningOutlined /> {t.pendingPayments}
                       </Text>
                     }
                   />
                 </AntList.Item>
               )}
-              locale={{ emptyText: "No active payment alerts" }}
+              locale={{ emptyText: t.noPaymentAlerts }}
             />
             {paymentAlerts.length > 5 && (
               <div style={{ textAlign: "center", marginTop: 16 }}>
                 <Text type="secondary">
-                  And {paymentAlerts.length - 5} more...
+                  {t.andMore} {paymentAlerts.length - 5} {t.more}
                 </Text>
               </div>
             )}
@@ -334,7 +418,7 @@ export const Dashboard: React.FC = () => {
       {/* Quick Actions */}
       <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
         <Col span={24}>
-          <Card title="Quick Access">
+          <Card title={t.quickAccess}>
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={6}>
                 <Card 
@@ -343,7 +427,7 @@ export const Dashboard: React.FC = () => {
                   style={{ textAlign: "center", cursor: "pointer" }}
                 >
                   <CheckCircleOutlined style={{ fontSize: 32, color: "#52c41a", marginBottom: 8 }} />
-                  <div>Register Attendance</div>
+                  <div>{t.registerAttendance}</div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} md={6}>
@@ -353,7 +437,7 @@ export const Dashboard: React.FC = () => {
                   style={{ textAlign: "center", cursor: "pointer" }}
                 >
                   <TeamOutlined style={{ fontSize: 32, color: "#1890ff", marginBottom: 8 }} />
-                  <div>New Child</div>
+                  <div>{t.newChild}</div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} md={6}>
@@ -363,7 +447,7 @@ export const Dashboard: React.FC = () => {
                   style={{ textAlign: "center", cursor: "pointer" }}
                 >
                   <WarningOutlined style={{ fontSize: 32, color: "#faad14", marginBottom: 8 }} />
-                  <div>Report Incident</div>
+                  <div>{t.reportIncident}</div>
                 </Card>
               </Col>
               <Col xs={24} sm={12} md={6}>
@@ -373,7 +457,7 @@ export const Dashboard: React.FC = () => {
                   style={{ textAlign: "center", cursor: "pointer" }}
                 >
                   <UserOutlined style={{ fontSize: 32, color: "#722ed1", marginBottom: 8 }} />
-                  <div>New User</div>
+                  <div>{t.newUser}</div>
                 </Card>
               </Col>
             </Row>

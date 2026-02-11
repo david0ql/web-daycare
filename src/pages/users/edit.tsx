@@ -1,8 +1,78 @@
 import React from "react";
 import { useList, useInvalidate, useGo, useNotification } from "@refinedev/core";
-import { Edit, useForm } from "@refinedev/antd";
+import { Edit, useForm, ListButton, RefreshButton } from "@refinedev/antd";
 import { useQueryClient } from "@tanstack/react-query";
-import { Form, Input, Select, Switch, Button } from "antd";
+import { Form, Input, Select, Switch } from "antd";
+import { useLanguage } from "../../shared/contexts/language.context";
+
+const USER_EDIT_TRANSLATIONS = {
+  english: {
+    title: "Edit User",
+    email: "Email",
+    emailRequired: "Email is required",
+    emailInvalid: "Please enter a valid email",
+    emailPlaceholder: "usuario@ejemplo.com",
+    newPassword: "New Password",
+    passwordMin: "Password must be at least 6 characters",
+    passwordPlaceholder: "Leave empty to keep current password",
+    firstName: "First Name",
+    firstNameRequired: "First name is required",
+    firstNamePlaceholder: "First name",
+    lastName: "Last Name",
+    lastNameRequired: "Last name is required",
+    lastNamePlaceholder: "Last name",
+    phone: "Phone",
+    phonePlaceholder: "+1234567890",
+    role: "Role",
+    roleRequired: "Role is required",
+    rolePlaceholder: "Select a role",
+    activeStatus: "Active Status",
+    profilePicture: "Profile Picture",
+    profilePicturePlaceholder: "Image URL (optional)",
+    successMessage: "User updated successfully",
+    successDescription: "Changes have been saved correctly",
+    save: "Save",
+    users: "Users",
+    refresh: "Refresh",
+    roleAdministrator: "Administrator",
+    roleEducator: "Educator",
+    roleParent: "Parent",
+    roleStaff: "Staff",
+  },
+  spanish: {
+    title: "Editar usuario",
+    email: "Correo electrónico",
+    emailRequired: "El correo es requerido",
+    emailInvalid: "Por favor ingresa un correo válido",
+    emailPlaceholder: "usuario@ejemplo.com",
+    newPassword: "Nueva contraseña",
+    passwordMin: "La contraseña debe tener al menos 6 caracteres",
+    passwordPlaceholder: "Dejar vacío para mantener la contraseña actual",
+    firstName: "Nombre",
+    firstNameRequired: "El nombre es requerido",
+    firstNamePlaceholder: "Nombre",
+    lastName: "Apellido",
+    lastNameRequired: "El apellido es requerido",
+    lastNamePlaceholder: "Apellido",
+    phone: "Teléfono",
+    phonePlaceholder: "+1234567890",
+    role: "Rol",
+    roleRequired: "El rol es requerido",
+    rolePlaceholder: "Seleccionar un rol",
+    activeStatus: "Estado activo",
+    profilePicture: "Foto de perfil",
+    profilePicturePlaceholder: "URL de imagen (opcional)",
+    successMessage: "Usuario actualizado correctamente",
+    successDescription: "Los cambios han sido guardados correctamente",
+    save: "Guardar",
+    users: "Usuarios",
+    refresh: "Actualizar",
+    roleAdministrator: "Administrador",
+    roleEducator: "Educador",
+    roleParent: "Padre/Madre",
+    roleStaff: "Personal",
+  },
+} as const;
 
 // Custom Switch component that always returns boolean
 const BooleanSwitch: React.FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({ value, onChange }) => {
@@ -25,6 +95,18 @@ export const UserEdit: React.FC = () => {
   const go = useGo();
   const queryClient = useQueryClient();
   const { open } = useNotification();
+  const { language } = useLanguage();
+  const t = USER_EDIT_TRANSLATIONS[language];
+
+  const getRoleDisplayName = (roleName: string) => {
+    const map: Record<string, string> = {
+      administrator: t.roleAdministrator,
+      educator: t.roleEducator,
+      parent: t.roleParent,
+      staff: t.roleStaff,
+    };
+    return map[roleName] || roleName.charAt(0).toUpperCase() + roleName.slice(1);
+  };
   
   const { formProps, saveButtonProps } = useForm({
     onMutationSuccess: async (data, variables) => {
@@ -52,8 +134,8 @@ export const UserEdit: React.FC = () => {
       // Show success notification
       open?.({
         type: "success",
-        message: "User updated successfully",
-        description: "Changes have been saved correctly",
+        message: t.successMessage,
+        description: t.successDescription,
       });
       
       // Navigate back to users list with a small delay for better UX
@@ -102,78 +184,87 @@ export const UserEdit: React.FC = () => {
   };
 
   return (
-    <Edit title="Edit User" saveButtonProps={saveButtonProps}>
+    <Edit
+      title={t.title}
+      saveButtonProps={{ ...saveButtonProps, children: t.save }}
+      headerButtons={({ listButtonProps, refreshButtonProps }) => (
+        <>
+          {listButtonProps && <ListButton {...listButtonProps}>{t.users}</ListButton>}
+          <RefreshButton {...refreshButtonProps}>{t.refresh}</RefreshButton>
+        </>
+      )}
+    >
       <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Form.Item
-          label="Email"
+          label={t.email}
           name="email"
           rules={[
-            { required: true, message: "Email is required" },
-            { type: "email", message: "Please enter a valid email" },
+            { required: true, message: t.emailRequired },
+            { type: "email", message: t.emailInvalid },
           ]}
         >
-          <Input placeholder="usuario@ejemplo.com" />
+          <Input placeholder={t.emailPlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label="New Password"
+          label={t.newPassword}
           name="password"
           rules={[
-            { min: 6, message: "Password must be at least 6 characters" },
+            { min: 6, message: t.passwordMin },
           ]}
         >
-          <Input.Password placeholder="Leave empty to keep current password" />
+          <Input.Password placeholder={t.passwordPlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label="First Name"
+          label={t.firstName}
           name="firstName"
-          rules={[{ required: true, message: "First name is required" }]}
+          rules={[{ required: true, message: t.firstNameRequired }]}
         >
-          <Input placeholder="First name" />
+          <Input placeholder={t.firstNamePlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label="Last Name"
+          label={t.lastName}
           name="lastName"
-          rules={[{ required: true, message: "Last name is required" }]}
+          rules={[{ required: true, message: t.lastNameRequired }]}
         >
-          <Input placeholder="Last name" />
+          <Input placeholder={t.lastNamePlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label="Phone"
+          label={t.phone}
           name="phone"
         >
-          <Input placeholder="+1234567890" />
+          <Input placeholder={t.phonePlaceholder} />
         </Form.Item>
 
         <Form.Item
-          label="Role"
+          label={t.role}
           name="roleId"
-          rules={[{ required: true, message: "Role is required" }]}
+          rules={[{ required: true, message: t.roleRequired }]}
         >
           <Select
-            placeholder="Select a role"
+            placeholder={t.rolePlaceholder}
             options={roles.map((role: UserRole) => ({
-              label: role.name.charAt(0).toUpperCase() + role.name.slice(1),
+              label: getRoleDisplayName(role.name),
               value: role.id,
             }))}
           />
         </Form.Item>
 
         <Form.Item
-          label="Active Status"
+          label={t.activeStatus}
           name="isActive"
         >
           <BooleanSwitch />
         </Form.Item>
 
         <Form.Item
-          label="Profile Picture"
+          label={t.profilePicture}
           name="profilePicture"
         >
-          <Input placeholder="Image URL (optional)" />
+          <Input placeholder={t.profilePicturePlaceholder} />
         </Form.Item>
       </Form>
     </Edit>

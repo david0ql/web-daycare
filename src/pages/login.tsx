@@ -4,11 +4,45 @@ import { Form, Input, Button, Card, Typography, Space, Alert, message } from "an
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { colors } from "../styles/colors";
 import { AuthApi } from "../domains/auth";
+import { useLanguage } from "../shared/contexts/language.context";
 
 const { Title, Text } = Typography;
 
+const LOGIN_TRANSLATIONS = {
+  english: {
+    systemName: "Daycare Management System",
+    authError: "Authentication Error",
+    incorrectCredentials: "Incorrect credentials. Please verify your email and password.",
+    email: "Email",
+    emailRequired: "Please enter your email",
+    emailInvalid: "Please enter a valid email",
+    emailPlaceholder: "your@email.com",
+    password: "Password",
+    passwordRequired: "Please enter your password",
+    passwordPlaceholder: "Your password",
+    signIn: "Sign In",
+    genericError: "Error signing in",
+  },
+  spanish: {
+    systemName: "Sistema de gestión de guardería",
+    authError: "Error de autenticación",
+    incorrectCredentials: "Credenciales incorrectas. Por favor verifica tu correo y contraseña.",
+    email: "Correo electrónico",
+    emailRequired: "Por favor ingresa tu correo",
+    emailInvalid: "Por favor ingresa un correo válido",
+    emailPlaceholder: "tu@email.com",
+    password: "Contraseña",
+    passwordRequired: "Por favor ingresa tu contraseña",
+    passwordPlaceholder: "Tu contraseña",
+    signIn: "Iniciar sesión",
+    genericError: "Error al iniciar sesión",
+  },
+} as const;
+
 export const Login: React.FC = () => {
   const { mutate: login, isPending, error } = useLogin();
+  const { language } = useLanguage();
+  const t = LOGIN_TRANSLATIONS[language];
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -34,7 +68,7 @@ export const Login: React.FC = () => {
       
     } catch (error: any) {
       console.error("❌ Login error:", error);
-      setLoginError(error.response?.data?.message || error.message || "Error signing in");
+      setLoginError(error.response?.data?.message || error.message || t.genericError);
     } finally {
       setIsLoading(false);
     }
@@ -64,13 +98,13 @@ export const Login: React.FC = () => {
           <Title level={2} style={{ color: colors.text.primary, marginBottom: "8px" }}>
             🏫 The Children's World
           </Title>
-          <Text type="secondary" style={{ color: colors.text.secondary }}>Daycare Management System</Text>
+          <Text type="secondary" style={{ color: colors.text.secondary }}>{t.systemName}</Text>
         </div>
 
         {(error || loginError) && (
           <Alert
-            message="Authentication Error"
-            description={loginError || "Incorrect credentials. Please verify your email and password."}
+            message={t.authError}
+            description={loginError || t.incorrectCredentials}
             type="error"
             style={{ marginBottom: "16px" }}
           />
@@ -84,29 +118,29 @@ export const Login: React.FC = () => {
         >
           <Form.Item
             name="email"
-            label="Email"
+            label={t.email}
             rules={[
-              { required: true, message: "Please enter your email" },
-              { type: "email", message: "Please enter a valid email" },
+              { required: true, message: t.emailRequired },
+              { type: "email", message: t.emailInvalid },
             ]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="tu@email.com"
+              placeholder={t.emailPlaceholder}
               size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="password"
-            label="Password"
+            label={t.password}
             rules={[
-              { required: true, message: "Please enter your password" },
+              { required: true, message: t.passwordRequired },
             ]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Your password"
+              placeholder={t.passwordPlaceholder}
               size="large"
             />
           </Form.Item>
@@ -125,7 +159,7 @@ export const Login: React.FC = () => {
                 fontWeight: 500,
               }}
             >
-              Sign In
+              {t.signIn}
             </Button>
           </Form.Item>
         </Form>

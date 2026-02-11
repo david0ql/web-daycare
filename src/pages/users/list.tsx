@@ -1,10 +1,11 @@
 import React from "react";
-import { useList, usePermissions } from "@refinedev/core";
-import { List, useTable, EditButton, DeleteButton, TagField, CreateButton } from "@refinedev/antd";
+import { List, useTable, EditButton, DeleteButton, TagField } from "@refinedev/antd";
 import { Table, Space, Tag, Avatar, Typography, Button } from "antd";
 import { UserOutlined, UserAddOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import { useAuth } from "../../shared/hooks/use-auth.hook";
+import { useLanguage } from "../../shared/contexts/language.context";
+import { getIntlLocale } from "../../shared/i18n/locale";
 
 const { Text } = Typography;
 
@@ -25,13 +26,45 @@ interface User {
   createdAt: string;
 }
 
+const USERS_LIST_TRANSLATIONS = {
+  english: {
+    title: "User List",
+    registerUser: "Register User",
+    avatar: "Avatar",
+    fullName: "Full Name",
+    phone: "Phone",
+    role: "Role",
+    status: "Status",
+    lastAccess: "Last Access",
+    actions: "Actions",
+    notSpecified: "Not specified",
+    active: "Active",
+    inactive: "Inactive",
+    never: "Never",
+  },
+  spanish: {
+    title: "Lista de usuarios",
+    registerUser: "Registrar usuario",
+    avatar: "Avatar",
+    fullName: "Nombre completo",
+    phone: "Teléfono",
+    role: "Rol",
+    status: "Estado",
+    lastAccess: "Último acceso",
+    actions: "Acciones",
+    notSpecified: "No especificado",
+    active: "Activo",
+    inactive: "Inactivo",
+    never: "Nunca",
+  },
+} as const;
+
 export const UserList: React.FC = () => {
   const navigate = useNavigate();
-  const { data: permissions } = usePermissions({});
   const { isAdmin } = useAuth();
-  
-  console.log("🔍 UserList - permissions:", permissions);
-  console.log("🔍 UserList - isAdmin():", isAdmin());
+  const { language } = useLanguage();
+  const t = USERS_LIST_TRANSLATIONS[language];
+  const intlLocale = getIntlLocale(language);
 
   const { tableProps } = useTable<User>({
     syncWithLocation: false,
@@ -60,7 +93,7 @@ export const UserList: React.FC = () => {
 
   return (
     <List
-      title="User List"
+      title={t.title}
       headerButtons={
         isAdmin() ? (
           <Button
@@ -68,7 +101,7 @@ export const UserList: React.FC = () => {
             icon={<UserAddOutlined />}
             onClick={() => navigate("/users/register")}
           >
-            Register User
+            {t.registerUser}
           </Button>
         ) : undefined
       }
@@ -76,7 +109,7 @@ export const UserList: React.FC = () => {
       <Table {...tableProps} rowKey="id">
         <Table.Column
           dataIndex="profilePicture"
-          title="Avatar"
+          title={t.avatar}
           render={(value, record: User) => (
             <Avatar
               src={value}
@@ -88,7 +121,7 @@ export const UserList: React.FC = () => {
         />
         <Table.Column
           dataIndex="firstName"
-          title="Full Name"
+          title={t.fullName}
           render={(value, record: User) => (
             <Space direction="vertical" size={0}>
               <Text strong>{`${record.firstName} ${record.lastName}`}</Text>
@@ -98,12 +131,12 @@ export const UserList: React.FC = () => {
         />
         <Table.Column
           dataIndex="phone"
-          title="Phone"
-          render={(value) => value || "Not specified"}
+          title={t.phone}
+          render={(value) => value || t.notSpecified}
         />
         <Table.Column
           dataIndex={["role", "description"]}
-          title="Role"
+          title={t.role}
           render={(value, record: User) => (
             <Tag color={getRoleColor(record.role.name)}>
               {record.role.description || record.role.name}
@@ -112,20 +145,20 @@ export const UserList: React.FC = () => {
         />
         <Table.Column
           dataIndex="isActive"
-          title="Status"
+          title={t.status}
           render={(value) => (
             <TagField
-              value={value ? "Active" : "Inactive"}
+              value={value ? t.active : t.inactive}
               color={value ? "green" : "red"}
             />
           )}
         />
         <Table.Column
           dataIndex="lastLogin"
-          title="Last Access"
+          title={t.lastAccess}
           render={(value) => {
-            if (!value) return "Never";
-            return new Date(value).toLocaleDateString("es-ES", {
+            if (!value) return t.never;
+            return new Date(value).toLocaleString(intlLocale, {
               year: "numeric",
               month: "short",
               day: "numeric",
@@ -135,7 +168,7 @@ export const UserList: React.FC = () => {
           }}
         />
         <Table.Column
-          title="Actions"
+          title={t.actions}
           dataIndex="actions"
           render={(_, record: User) => (
             <Space>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Layout, Menu, Avatar, Typography, Space, Button } from "antd";
+import { Layout, Menu, Avatar, Typography, Space, Button, Modal, Switch } from "antd";
 import { 
   UserOutlined, 
   TeamOutlined, 
@@ -14,15 +14,86 @@ import {
   SafetyOutlined,
   CheckCircleOutlined,
   EyeOutlined,
-  CameraOutlined
+  CameraOutlined,
+  GlobalOutlined
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router";
 import { colors } from "../styles/colors.styles";
 import { useAuth } from "../hooks/use-auth.hook";
 import { useAppNavigation } from "../hooks/use-navigation.hook";
+import { useLanguage } from "../contexts/language.context";
 
 const { Sider } = Layout;
 const { Text } = Typography;
+
+const SIDEBAR_TRANSLATIONS = {
+  english: {
+    appName: "The Children's World",
+    logoAlt: "The Children's World Learning Center",
+    managementSystem: "Management System",
+    version: "The Children's World v1.0",
+    dashboard: "Dashboard",
+    users: "Users",
+    userList: "User List",
+    createUser: "Create User",
+    children: "Children",
+    childrenList: "Children List",
+    registerChild: "Register Child",
+    attendance: "Attendance",
+    attendanceRecord: "Attendance Record",
+    markAttendance: "Mark Attendance",
+    dailyActivities: "Daily Activities",
+    observations: "Observations",
+    activityPhotos: "Activity Photos",
+    incidents: "Incidents",
+    incidentsList: "Incidents List",
+    reportIncident: "Report Incident",
+    calendar: "Calendar",
+    calendarView: "Calendar View",
+    createEvent: "Create Event",
+    documents: "Documents",
+    documentsList: "Documents List",
+    uploadDocument: "Upload Document",
+    language: "Language",
+    reports: "Reports",
+    reportsView: "Reports View",
+    selectLanguage: "Select language",
+    logOut: "Log Out",
+  },
+  spanish: {
+    appName: "The Children's World",
+    logoAlt: "The Children's World - Centro educativo",
+    managementSystem: "Sistema de gestión",
+    version: "The Children's World v1.0",
+    dashboard: "Panel",
+    users: "Usuarios",
+    userList: "Lista de usuarios",
+    createUser: "Crear usuario",
+    children: "Niños",
+    childrenList: "Lista de niños",
+    registerChild: "Registrar niño",
+    attendance: "Asistencia",
+    attendanceRecord: "Registro de asistencia",
+    markAttendance: "Marcar asistencia",
+    dailyActivities: "Actividades diarias",
+    observations: "Observaciones",
+    activityPhotos: "Fotos de actividades",
+    incidents: "Incidentes",
+    incidentsList: "Lista de incidentes",
+    reportIncident: "Reportar incidente",
+    calendar: "Calendario",
+    calendarView: "Vista de calendario",
+    createEvent: "Crear evento",
+    documents: "Documentos",
+    documentsList: "Lista de documentos",
+    uploadDocument: "Subir documento",
+    language: "Idioma",
+    reports: "Reportes",
+    reportsView: "Vista de reportes",
+    selectLanguage: "Seleccionar idioma",
+    logOut: "Cerrar sesión",
+  },
+} as const;
 
 interface EnhancedSidebarProps {
   collapsed: boolean;
@@ -47,31 +118,33 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   const { navigateTo } = useAppNavigation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { language, setLanguage } = useLanguage();
+  const t = SIDEBAR_TRANSLATIONS[language];
 
-
+  const [languageModalOpen, setLanguageModalOpen] = useState(false);
 
   const menuItems = [
     {
       key: "/",
       icon: <DashboardOutlined />,
-      label: "Dashboard",
+      label: t.dashboard,
       path: "/",
     },
     {
       key: "users",
       icon: <TeamOutlined />,
-      label: "Users",
+      label: t.users,
       children: [
         {
           key: "/users",
           icon: <UserOutlined />,
-          label: "User List",
+          label: t.userList,
           path: "/users",
         },
         ...(isAdmin() ? [{
           key: "/users/create",
           icon: <UserAddOutlined />,
-          label: "Create User",
+          label: t.createUser,
           path: "/users/create",
         }] : []),
       ],
@@ -79,18 +152,18 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     {
       key: "children",
       icon: <UserOutlined />,
-      label: "Children",
+      label: t.children,
       children: [
         {
           key: "/children",
           icon: <UserOutlined />,
-          label: "Children List",
+          label: t.childrenList,
           path: "/children",
         },
         ...((isAdmin() || isEducator()) ? [{
           key: "/children/create",
           icon: <UserAddOutlined />,
-          label: "Register Child",
+          label: t.registerChild,
           path: "/children/create",
         }] : []),
       ],
@@ -98,36 +171,36 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     {
       key: "attendance",
       icon: <FileTextOutlined />,
-      label: "Attendance",
+      label: t.attendance,
       children: [
         {
           key: "/attendance",
           icon: <FileTextOutlined />,
-          label: "Attendance Record",
+          label: t.attendanceRecord,
           path: "/attendance",
         },
         ...((isAdmin() || isEducator()) ? [{
           key: "/attendance/create",
           icon: <UserAddOutlined />,
-          label: "Mark Attendance",
+          label: t.markAttendance,
           path: "/attendance/create",
         }] : []),
         {
           key: "/attendance/activities",
           icon: <CheckCircleOutlined />,
-          label: "Daily Activities",
+          label: t.dailyActivities,
           path: "/attendance/activities",
         },
         {
           key: "/attendance/observations",
           icon: <EyeOutlined />,
-          label: "Observations",
+          label: t.observations,
           path: "/attendance/observations",
         },
         {
           key: "/attendance/photos",
           icon: <CameraOutlined />,
-          label: "Activity Photos",
+          label: t.activityPhotos,
           path: "/attendance/photos",
         },
       ],
@@ -135,18 +208,18 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     {
       key: "incidents",
       icon: <WarningOutlined />,
-      label: "Incidents",
+      label: t.incidents,
       children: [
         {
           key: "/incidents",
           icon: <WarningOutlined />,
-          label: "Incidents List",
+          label: t.incidentsList,
           path: "/incidents",
         },
         ...((isAdmin() || isEducator()) ? [{
           key: "/incidents/create",
           icon: <UserAddOutlined />,
-          label: "Report Incident",
+          label: t.reportIncident,
           path: "/incidents/create",
         }] : []),
       ],
@@ -154,18 +227,18 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     {
       key: "calendar",
       icon: <CalendarOutlined />,
-      label: "Calendar",
+      label: t.calendar,
       children: [
         {
           key: "/calendar",
           icon: <CalendarOutlined />,
-          label: "Calendar View",
+          label: t.calendarView,
           path: "/calendar",
         },
         ...((isAdmin() || isEducator()) ? [{
           key: "/calendar/create",
           icon: <UserAddOutlined />,
-          label: "Create Event",
+          label: t.createEvent,
           path: "/calendar/create",
         }] : []),
       ],
@@ -173,18 +246,18 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     {
       key: "documents",
       icon: <BookOutlined />,
-      label: "Documents",
+      label: t.documents,
       children: [
         {
           key: "/documents",
           icon: <BookOutlined />,
-          label: "Documents List",
+          label: t.documentsList,
           path: "/documents",
         },
         ...((isAdmin() || isEducator()) ? [{
           key: "/documents/create",
           icon: <UserAddOutlined />,
-          label: "Upload Document",
+          label: t.uploadDocument,
           path: "/documents/create",
         }] : []),
       ],
@@ -192,19 +265,29 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     ...(isAdmin() ? [{
       key: "reports",
       icon: <BarChartOutlined />,
-      label: "Reports",
+      label: t.reports,
       children: [
         {
           key: "/reports",
           icon: <BarChartOutlined />,
-          label: "Reports View",
+          label: t.reportsView,
           path: "/reports",
         },
       ],
     }] : []),
+    {
+      key: "language",
+      icon: <GlobalOutlined />,
+      label: t.language,
+    },
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
+    if (key === "language") {
+      setLanguageModalOpen(true);
+      return;
+    }
+
     const findPath = (items: any[], targetKey: string): string | null => {
       for (const item of items) {
         if (item.key === targetKey) {
@@ -222,6 +305,10 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
     if (path) {
       navigateTo(path);
     }
+  };
+
+  const handleLanguageToggle = (checked: boolean) => {
+    setLanguage(checked ? "spanish" : "english");
   };
 
   const getSelectedKeys = () => {
@@ -252,6 +339,7 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
   };
 
   return (
+    <>
     <Sider
       trigger={null}
       collapsible
@@ -284,7 +372,7 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         }}>
           <img 
             src="/logo.png" 
-            alt="The Children's World Learning Center"
+            alt={t.logoAlt}
             style={{ 
               width: collapsed ? "40px" : "150px",
               height: "auto",
@@ -297,10 +385,10 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           {!collapsed && (
             <>
               <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "4px" }}>
-                The Children's World
+                {t.appName}
               </div>
               <div style={{ fontSize: "12px", opacity: 0.9 }}>
-                Management System
+                {t.managementSystem}
               </div>
             </>
           )}
@@ -380,7 +468,7 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
               marginBottom: "12px"
             }}>
               <Text type="secondary" style={{ fontSize: "11px" }}>
-                The Children's World v1.0
+                {t.version}
               </Text>
             </div>
           )}
@@ -405,10 +493,31 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
               e.currentTarget.style.color = colors.text.secondary;
             }}
           >
-            {!collapsed && "Log Out"}
+            {!collapsed && t.logOut}
           </Button>
         </div>
       </div>
     </Sider>
+
+    <Modal
+      title={t.selectLanguage}
+      open={languageModalOpen}
+      onCancel={() => setLanguageModalOpen(false)}
+      footer={null}
+	    >
+	      <Space direction="vertical" style={{ width: "100%" }} size="middle">
+	        <Space style={{ width: "100%", justifyContent: "space-between" }}>
+	          <Text>English</Text>
+	          <Switch
+	            checked={language === "spanish"}
+	            checkedChildren="ES"
+	            unCheckedChildren="EN"
+	            onChange={handleLanguageToggle}
+	          />
+	          <Text>Español</Text>
+	        </Space>
+	      </Space>
+	    </Modal>
+    </>
   );
 };

@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { 
-  useList, 
-  useOne, 
-  useMany, 
+	  useList, 
+	  useOne, 
+	  useMany, 
   useCreate, 
   useCreateMany, 
   useUpdate, 
@@ -10,10 +10,98 @@ import {
   useDelete, 
   useDeleteMany, 
   useCustom, 
-  useCustomMutation,
-  useInvalidate,
-  useNotification
-} from "@refinedev/core";
+	  useCustomMutation,
+	  useInvalidate,
+	  useNotification
+	} from "@refinedev/core";
+import { useLanguage } from "../contexts/language.context";
+
+const DATA_TRANSLATIONS = {
+  english: {
+    loadDataError: "Error loading data",
+    loadDataErrorDescription: (resource: string) => `Could not load data from ${resource}`,
+    loadItemError: "Error loading item",
+    loadItemErrorDescription: (resource: string) => `Could not load the item from ${resource}`,
+    loadItemsError: "Error loading items",
+    loadItemsErrorDescription: (resource: string) => `Could not load items from ${resource}`,
+    itemCreated: "Item created",
+    itemCreatedDescription: (resource: string) => `The item was created in ${resource} successfully`,
+    createItemError: "Error creating item",
+    createItemErrorDescription: (resource: string) => `Could not create the item in ${resource}`,
+    itemsCreated: "Items created",
+    itemsCreatedDescription: (count: number, resource: string) =>
+      `${count} item(s) were created in ${resource} successfully`,
+    createItemsError: "Error creating items",
+    createItemsErrorDescription: (resource: string) => `Could not create items in ${resource}`,
+    itemUpdated: "Item updated",
+    itemUpdatedDescription: (resource: string) => `The item was updated in ${resource} successfully`,
+    updateItemError: "Error updating item",
+    updateItemErrorDescription: (resource: string) => `Could not update the item in ${resource}`,
+    itemsUpdated: "Items updated",
+    itemsUpdatedDescription: (resource: string) => `Items were updated in ${resource} successfully`,
+    updateItemsError: "Error updating items",
+    updateItemsErrorDescription: (resource: string) => `Could not update items in ${resource}`,
+    itemDeleted: "Item deleted",
+    itemDeletedDescription: (resource: string) => `The item was deleted from ${resource} successfully`,
+    deleteItemError: "Error deleting item",
+    deleteItemErrorDescription: (resource: string) => `Could not delete the item from ${resource}`,
+    itemsDeleted: "Items deleted",
+    itemsDeletedDescription: (count: number, resource: string) =>
+      `${count} item(s) were deleted from ${resource} successfully`,
+    deleteItemsError: "Error deleting items",
+    deleteItemsErrorDescription: (resource: string) => `Could not delete items from ${resource}`,
+    customOperationError: "Error in custom operation",
+    customOperationErrorDescription: (url: string) => `Could not perform GET operation on ${url}`,
+    operationSuccess: "Operation successful",
+    operationSuccessDescription: (method: string, url: string) =>
+      `The ${method.toUpperCase()} operation on ${url} completed successfully`,
+    operationError: "Error in operation",
+    operationErrorDescription: (method: string, url: string) =>
+      `Could not perform the ${method.toUpperCase()} operation on ${url}`,
+  },
+  spanish: {
+    loadDataError: "Error al cargar datos",
+    loadDataErrorDescription: (resource: string) => `No se pudieron cargar los datos de ${resource}`,
+    loadItemError: "Error al cargar elemento",
+    loadItemErrorDescription: (resource: string) => `No se pudo cargar el elemento de ${resource}`,
+    loadItemsError: "Error al cargar elementos",
+    loadItemsErrorDescription: (resource: string) => `No se pudieron cargar los elementos de ${resource}`,
+    itemCreated: "Elemento creado",
+    itemCreatedDescription: (resource: string) => `Se ha creado el elemento en ${resource} correctamente`,
+    createItemError: "Error al crear elemento",
+    createItemErrorDescription: (resource: string) => `No se pudo crear el elemento en ${resource}`,
+    itemsCreated: "Elementos creados",
+    itemsCreatedDescription: (count: number, resource: string) =>
+      `Se han creado ${count} elementos en ${resource} correctamente`,
+    createItemsError: "Error al crear elementos",
+    createItemsErrorDescription: (resource: string) => `No se pudieron crear los elementos en ${resource}`,
+    itemUpdated: "Elemento actualizado",
+    itemUpdatedDescription: (resource: string) => `Se ha actualizado el elemento en ${resource} correctamente`,
+    updateItemError: "Error al actualizar elemento",
+    updateItemErrorDescription: (resource: string) => `No se pudo actualizar el elemento en ${resource}`,
+    itemsUpdated: "Elementos actualizados",
+    itemsUpdatedDescription: (resource: string) => `Se han actualizado los elementos en ${resource} correctamente`,
+    updateItemsError: "Error al actualizar elementos",
+    updateItemsErrorDescription: (resource: string) => `No se pudieron actualizar los elementos en ${resource}`,
+    itemDeleted: "Elemento eliminado",
+    itemDeletedDescription: (resource: string) => `Se ha eliminado el elemento de ${resource} correctamente`,
+    deleteItemError: "Error al eliminar elemento",
+    deleteItemErrorDescription: (resource: string) => `No se pudo eliminar el elemento de ${resource}`,
+    itemsDeleted: "Elementos eliminados",
+    itemsDeletedDescription: (count: number, resource: string) =>
+      `Se han eliminado ${count} elementos de ${resource} correctamente`,
+    deleteItemsError: "Error al eliminar elementos",
+    deleteItemsErrorDescription: (resource: string) => `No se pudieron eliminar los elementos de ${resource}`,
+    customOperationError: "Error en operación personalizada",
+    customOperationErrorDescription: (url: string) => `No se pudo realizar la operación GET en ${url}`,
+    operationSuccess: "Operación exitosa",
+    operationSuccessDescription: (method: string, url: string) =>
+      `La operación ${method.toUpperCase()} en ${url} se completó correctamente`,
+    operationError: "Error en operación",
+    operationErrorDescription: (method: string, url: string) =>
+      `No se pudo realizar la operación ${method.toUpperCase()} en ${url}`,
+  },
+} as const;
 
 /**
  * Hook personalizado para operaciones de datos
@@ -22,6 +110,8 @@ import {
 export const useData = () => {
   const { open: openNotification } = useNotification();
   const invalidate = useInvalidate();
+  const { language } = useLanguage();
+  const t = DATA_TRANSLATIONS[language];
 
   // ===== FUNCIONES DE NOTIFICACIÓN =====
   
@@ -55,8 +145,8 @@ export const useData = () => {
     // Manejo de errores
     if (result.query.isError) {
       showErrorNotification(
-        "Error al cargar datos",
-        `No se pudieron cargar los datos de ${resource}`
+        t.loadDataError,
+        t.loadDataErrorDescription(resource),
       );
     }
 
@@ -75,8 +165,8 @@ export const useData = () => {
 
     if (result.query.isError) {
       showErrorNotification(
-        "Error al cargar elemento",
-        `No se pudo cargar el elemento de ${resource}`
+        t.loadItemError,
+        t.loadItemErrorDescription(resource),
       );
     }
 
@@ -95,8 +185,8 @@ export const useData = () => {
 
     if (result.query.isError) {
       showErrorNotification(
-        "Error al cargar elementos",
-        `No se pudieron cargar los elementos de ${resource}`
+        t.loadItemsError,
+        t.loadItemsErrorDescription(resource),
       );
     }
 
@@ -118,8 +208,8 @@ export const useData = () => {
       try {
         const response = await result.mutateAsync(values);
         showSuccessNotification(
-          "Elemento creado",
-          `Se ha creado el elemento en ${resource} correctamente`
+          t.itemCreated,
+          t.itemCreatedDescription(resource),
         );
         
         // Invalidar listas relacionadas
@@ -131,8 +221,8 @@ export const useData = () => {
         return response;
       } catch (error) {
         showErrorNotification(
-          "Error al crear elemento",
-          `No se pudo crear el elemento en ${resource}`
+          t.createItemError,
+          t.createItemErrorDescription(resource),
         );
         throw error;
       }
@@ -157,8 +247,8 @@ export const useData = () => {
       try {
         const response = await result.mutateAsync({ values });
         showSuccessNotification(
-          "Elementos creados",
-          `Se han creado ${values.length} elementos en ${resource} correctamente`
+          t.itemsCreated,
+          t.itemsCreatedDescription(values.length, resource),
         );
         
         invalidate({
@@ -169,8 +259,8 @@ export const useData = () => {
         return response;
       } catch (error) {
         showErrorNotification(
-          "Error al crear elementos",
-          `No se pudieron crear los elementos en ${resource}`
+          t.createItemsError,
+          t.createItemsErrorDescription(resource),
         );
         throw error;
       }
@@ -197,8 +287,8 @@ export const useData = () => {
       try {
         const response = await result.mutateAsync(values);
         showSuccessNotification(
-          "Elemento actualizado",
-          `Se ha actualizado el elemento en ${resource} correctamente`
+          t.itemUpdated,
+          t.itemUpdatedDescription(resource),
         );
         
         invalidate({
@@ -209,8 +299,8 @@ export const useData = () => {
         return response;
       } catch (error) {
         showErrorNotification(
-          "Error al actualizar elemento",
-          `No se pudo actualizar el elemento en ${resource}`
+          t.updateItemError,
+          t.updateItemErrorDescription(resource),
         );
         throw error;
       }
@@ -235,8 +325,8 @@ export const useData = () => {
       try {
         const response = await result.mutateAsync(values);
         showSuccessNotification(
-          "Elementos actualizados",
-          `Se han actualizado los elementos en ${resource} correctamente`
+          t.itemsUpdated,
+          t.itemsUpdatedDescription(resource),
         );
         
         invalidate({
@@ -247,8 +337,8 @@ export const useData = () => {
         return response;
       } catch (error) {
         showErrorNotification(
-          "Error al actualizar elementos",
-          `No se pudieron actualizar los elementos en ${resource}`
+          t.updateItemsError,
+          t.updateItemsErrorDescription(resource),
         );
         throw error;
       }
@@ -275,8 +365,8 @@ export const useData = () => {
       try {
         const response = await result.mutateAsync({ id, resource });
         showSuccessNotification(
-          "Elemento eliminado",
-          `Se ha eliminado el elemento de ${resource} correctamente`
+          t.itemDeleted,
+          t.itemDeletedDescription(resource),
         );
         
         invalidate({
@@ -287,8 +377,8 @@ export const useData = () => {
         return response;
       } catch (error) {
         showErrorNotification(
-          "Error al eliminar elemento",
-          `No se pudo eliminar el elemento de ${resource}`
+          t.deleteItemError,
+          t.deleteItemErrorDescription(resource),
         );
         throw error;
       }
@@ -313,8 +403,8 @@ export const useData = () => {
       try {
         const response = await result.mutateAsync({ ids, resource });
         showSuccessNotification(
-          "Elementos eliminados",
-          `Se han eliminado ${ids.length} elementos de ${resource} correctamente`
+          t.itemsDeleted,
+          t.itemsDeletedDescription(ids.length, resource),
         );
         
         invalidate({
@@ -325,8 +415,8 @@ export const useData = () => {
         return response;
       } catch (error) {
         showErrorNotification(
-          "Error al eliminar elementos",
-          `No se pudieron eliminar los elementos de ${resource}`
+          t.deleteItemsError,
+          t.deleteItemsErrorDescription(resource),
         );
         throw error;
       }
@@ -352,8 +442,8 @@ export const useData = () => {
 
     if (result.query.isError) {
       showErrorNotification(
-        "Error en operación personalizada",
-        `No se pudo realizar la operación GET en ${url}`
+        t.customOperationError,
+        t.customOperationErrorDescription(url),
       );
     }
 
@@ -374,14 +464,14 @@ export const useData = () => {
       try {
         const response = await result.mutateAsync(values);
         showSuccessNotification(
-          "Operación exitosa",
-          `La operación ${method.toUpperCase()} en ${url} se completó correctamente`
+          t.operationSuccess,
+          t.operationSuccessDescription(method, url),
         );
         return response;
       } catch (error) {
         showErrorNotification(
-          "Error en operación",
-          `No se pudo realizar la operación ${method.toUpperCase()} en ${url}`
+          t.operationError,
+          t.operationErrorDescription(method, url),
         );
         throw error;
       }

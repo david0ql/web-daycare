@@ -7,13 +7,10 @@ import { CalendarUtils } from '../utils/calendar.utils';
 import { useCalendarRange } from '../hooks/use-calendar-range.hook';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
-import 'dayjs/locale/es';
+import { useLanguage } from '../../../shared/contexts/language.context';
 
 // Extend dayjs with plugins
 dayjs.extend(isBetween);
-
-// Set Spanish locale for dayjs
-dayjs.locale('es');
 
 const { Title, Text } = Typography;
 
@@ -21,8 +18,35 @@ interface CalendarListProps {
   onCreateEvent?: () => void;
 }
 
+const CALENDAR_LIST_TRANSLATIONS = {
+  english: {
+    documentTitle: "Event Calendar | The Children's World",
+    pageTitle: "Event Calendar",
+    createEvent: "Create Event",
+    eventsFor: "Events for",
+    noEventsForDate: "No events for this date",
+    more: "more",
+    allDay: "All Day",
+    createdBy: "Created by",
+    eventTypeLegend: "Event Type Legend",
+  },
+  spanish: {
+    documentTitle: "Calendario de eventos | The Children's World",
+    pageTitle: "Calendario de eventos",
+    createEvent: "Crear evento",
+    eventsFor: "Eventos para",
+    noEventsForDate: "No hay eventos para esta fecha",
+    more: "más",
+    allDay: "Todo el día",
+    createdBy: "Creado por",
+    eventTypeLegend: "Leyenda de tipos de evento",
+  },
+} as const;
+
 export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = CALENDAR_LIST_TRANSLATIONS[language];
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs>(dayjs());
   
   // Get events for the current month
@@ -36,7 +60,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
 
   // Transform events for calendar display
   const calendarEvents = useMemo(() => {
-    return CalendarUtils.transformEventsForCalendar(events);
+    return CalendarUtils.transformEventsForCalendar(events, language);
   }, [events]);
 
   // Get events for a specific date
@@ -64,7 +88,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
                 {event.description && <div>{event.description}</div>}
                 <div>
                   <Tag color={CalendarUtils.getEventTypeColor(event.eventType)}>
-                    {CalendarUtils.getEventTypeLabel(event.eventType)}
+                    {CalendarUtils.getEventTypeLabel(event.eventType, language)}
                   </Tag>
                 </div>
                 {!event.isAllDay && event.startTime && (
@@ -100,7 +124,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
         ))}
         {dateEvents.length > 2 && (
           <div style={{ fontSize: '10px', color: '#666', textAlign: 'center' }}>
-            +{dateEvents.length - 2} more
+            +{dateEvents.length - 2} {t.more}
           </div>
         )}
       </div>
@@ -140,14 +164,14 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
   const selectedDateEvents = getEventsForDate(selectedDate);
 
   useEffect(() => {
-    document.title = "Event Calendar | The Children's World";
-  }, []);
+    document.title = t.documentTitle;
+  }, [t.documentTitle]);
 
   return (
     <div style={{ padding: '24px' }}>
       <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Title level={2} style={{ margin: 0 }}>
-          <CalendarOutlined /> Event Calendar
+          <CalendarOutlined /> {t.pageTitle}
         </Title>
         <Button
           type="primary"
@@ -155,7 +179,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
           onClick={() => navigate('/calendar/create')}
           size="large"
         >
-          Create Event
+          {t.createEvent}
         </Button>
       </div>
 
@@ -173,11 +197,15 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
         </Card>
 
         {/* Selected Date Events */}
-        <Card title={`Events for ${selectedDate.format('MMMM DD, YYYY')}`}>
+        <Card
+          title={`${t.eventsFor} ${
+            selectedDate.format(language === "spanish" ? "DD [de] MMMM, YYYY" : "MMMM DD, YYYY")
+          }`}
+        >
           {selectedDateEvents.length === 0 ? (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No events for this date"
+              description={t.noEventsForDate}
             />
           ) : (
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
@@ -213,14 +241,14 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
                     )}
                     
                     {event.isAllDay && (
-                      <Tag>All Day</Tag>
+                      <Tag>{t.allDay}</Tag>
                     )}
                   </Space>
                   
                   {event.createdByUser && (
                     <div style={{ marginTop: '8px' }}>
                       <Text type="secondary" style={{ fontSize: '11px' }}>
-                        Created by: {event.createdByUser.firstName} {event.createdByUser.lastName}
+                        {t.createdBy}: {event.createdByUser.firstName} {event.createdByUser.lastName}
                       </Text>
                     </div>
                   )}
@@ -232,7 +260,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
       </div>
 
       {/* Event Type Legend */}
-      <Card title="Event Type Legend" style={{ marginTop: '24px' }}>
+      <Card title={t.eventTypeLegend} style={{ marginTop: '24px' }}>
         <Space wrap>
           {Object.values(EventTypeEnum).map((eventType) => (
             <Tag
@@ -240,7 +268,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
               color={CalendarUtils.getEventTypeColor(eventType)}
               style={{ marginBottom: '8px' }}
             >
-              {CalendarUtils.getEventTypeLabel(eventType)}
+              {CalendarUtils.getEventTypeLabel(eventType, language)}
             </Tag>
           ))}
         </Space>

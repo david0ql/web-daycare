@@ -1,29 +1,62 @@
 import React from "react";
 import { Edit, useForm } from "@refinedev/antd";
-import { useInvalidate, useGo, useNotification } from "@refinedev/core";
+import { useGo, useNotification } from "@refinedev/core";
 import { useQueryClient } from "@tanstack/react-query";
-import { Form, Input, Select, Switch, TimePicker, Row, Col, Typography } from "antd";
-import { useParams } from "react-router";
-import { ActivityTypeEnum, ACTIVITY_TYPE_LABELS } from "../../../domains/attendance/types/daily-activities.types";
+import { Form, Input, Select, Switch, TimePicker, Row, Col } from "antd";
+import { ActivityTypeEnum, ACTIVITY_TYPE_LABELS_BY_LANGUAGE } from "../../../domains/attendance/types/daily-activities.types";
 import dayjs from 'dayjs';
+import { useLanguage } from "../../../shared/contexts/language.context";
 
-const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
+const ATTENDANCE_ACTIVITIES_EDIT_TRANSLATIONS = {
+  english: {
+    title: "Edit Daily Activity",
+    save: "Save",
+    activityType: "Activity Type",
+    selectActivityTypeRequired: "Please select activity type",
+    selectActivityType: "Select activity type",
+    completed: "Completed",
+    completionTime: "Completion Time",
+    selectCompletionTimeRequired: "Please select completion time",
+    selectTime: "Select time",
+    notes: "Notes",
+    notesPlaceholder: "Additional notes about the activity (optional)",
+    updatedSuccess: "Activity updated successfully",
+    updatedDescription: "Changes have been saved correctly",
+    updateError: "Error updating activity",
+    updateErrorDescription: "Could not update activity. Please check the data and try again.",
+  },
+  spanish: {
+    title: "Editar actividad diaria",
+    save: "Guardar",
+    activityType: "Tipo de actividad",
+    selectActivityTypeRequired: "Por favor selecciona el tipo de actividad",
+    selectActivityType: "Selecciona tipo de actividad",
+    completed: "Completado",
+    completionTime: "Hora de finalización",
+    selectCompletionTimeRequired: "Por favor selecciona la hora de finalización",
+    selectTime: "Selecciona hora",
+    notes: "Notas",
+    notesPlaceholder: "Notas adicionales sobre la actividad (opcional)",
+    updatedSuccess: "Actividad actualizada correctamente",
+    updatedDescription: "Los cambios se han guardado correctamente",
+    updateError: "Error actualizando la actividad",
+    updateErrorDescription: "No se pudo actualizar la actividad. Verifica los datos e inténtalo de nuevo.",
+  },
+} as const;
+
 export const AttendanceActivitiesEdit: React.FC = () => {
-  const { id } = useParams();
-  const invalidate = useInvalidate();
   const go = useGo();
   const queryClient = useQueryClient();
   const { open } = useNotification();
+  const { language } = useLanguage();
+  const t = ATTENDANCE_ACTIVITIES_EDIT_TRANSLATIONS[language];
   
   const { formProps, saveButtonProps } = useForm({
     resource: "attendance/daily-activities",
     onMutationSuccess: async (data, variables) => {
-      console.log("🔍 EDIT Activity Mutation success - data:", data);
-      console.log("🔍 EDIT Activity Mutation success - variables:", variables);
-      
       // Force invalidate and refetch all daily-activities-related queries
       await queryClient.invalidateQueries({
         predicate: (query) => {
@@ -43,8 +76,8 @@ export const AttendanceActivitiesEdit: React.FC = () => {
       // Show success notification
       open?.({
         type: "success",
-        message: "Activity updated successfully",
-        description: "Changes have been saved correctly",
+        message: t.updatedSuccess,
+        description: t.updatedDescription,
       });
       
       // Navigate back to activities list with a small delay for better UX
@@ -56,19 +89,10 @@ export const AttendanceActivitiesEdit: React.FC = () => {
       }, 1000);
     },
     onMutationError: (error, variables) => {
-      if (error?.response?.data?.message) {
-        const errorMessages = Array.isArray(error.response.data.message) 
-          ? error.response.data.message 
-          : [error.response.data.message];
-        
-        errorMessages.forEach((msg: any, index: number) => {
-          console.log(`🔍 Error ${index + 1}:`, msg);
-        });
-      }
       open?.({ 
         type: "error", 
-        message: "Error updating activity", 
-        description: "Could not update activity. Please check the data and try again." 
+        message: t.updateError, 
+        description: t.updateErrorDescription,
       });
     }
   });
@@ -101,22 +125,22 @@ export const AttendanceActivitiesEdit: React.FC = () => {
   };
 
   return (
-      <Edit
-      title="Edit Daily Activity"
-      saveButtonProps={saveButtonProps}
+    <Edit
+      title={t.title}
+      saveButtonProps={{ ...saveButtonProps, children: t.save }}
     >
       <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Activity Type"
+              label={t.activityType}
               name="activityType"
-              rules={[{ required: true, message: 'Please select activity type' }]}
+              rules={[{ required: true, message: t.selectActivityTypeRequired }]}
             >
-              <Select placeholder="Select activity type">
+              <Select placeholder={t.selectActivityType}>
                 {Object.values(ActivityTypeEnum).map((type) => (
                   <Option key={type} value={type}>
-                    {ACTIVITY_TYPE_LABELS[type]}
+                    {ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][type]}
                   </Option>
                 ))}
               </Select>
@@ -125,7 +149,7 @@ export const AttendanceActivitiesEdit: React.FC = () => {
           
           <Col span={12}>
             <Form.Item
-              label="Completed"
+              label={t.completed}
               name="completed"
               valuePropName="checked"
               getValueFromEvent={(checked) => Boolean(checked)}
@@ -141,44 +165,44 @@ export const AttendanceActivitiesEdit: React.FC = () => {
           shouldUpdate={(prevValues, currentValues) => prevValues.completed !== currentValues.completed}
         >
           {({ getFieldValue }) => {
-            const completed = getFieldValue('completed');
-            return completed ? (
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Completion Time"
-                    name="timeCompleted"
-                    rules={[{ required: true, message: 'Please select completion time' }]}
-                    getValueFromEvent={(time) => time ? dayjs(time) : undefined}
-                    getValueProps={(value) => ({ value: value ? dayjs(value) : undefined })}
-                  >
-                    <TimePicker 
-                      style={{ width: '100%' }}
-                      format="HH:mm"
-                      placeholder="Select time"
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-            ) : null;
-          }}
-        </Form.Item>
+	            const completed = getFieldValue('completed');
+	            return completed ? (
+	              <Row gutter={16}>
+	                <Col span={12}>
+	                  <Form.Item
+	                    label={t.completionTime}
+	                    name="timeCompleted"
+	                    rules={[{ required: true, message: t.selectCompletionTimeRequired }]}
+	                    getValueFromEvent={(time) => time ? dayjs(time) : undefined}
+	                    getValueProps={(value) => ({ value: value ? dayjs(value) : undefined })}
+	                  >
+	                    <TimePicker 
+	                      style={{ width: '100%' }}
+	                      format="HH:mm"
+	                      placeholder={t.selectTime}
+	                    />
+	                  </Form.Item>
+	                </Col>
+	              </Row>
+	            ) : null;
+	          }}
+	        </Form.Item>
 
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="Notes"
-              name="notes"
-            >
-              <TextArea 
-                rows={3}
-                placeholder="Additional notes about the activity (optional)"
-                maxLength={500}
-                showCount
-              />
-            </Form.Item>
-          </Col>
-        </Row>
+	        <Row gutter={16}>
+	          <Col span={24}>
+	            <Form.Item
+	              label={t.notes}
+	              name="notes"
+	            >
+	              <TextArea 
+	                rows={3}
+	                placeholder={t.notesPlaceholder}
+	                maxLength={500}
+	                showCount
+	              />
+	            </Form.Item>
+	          </Col>
+	        </Row>
       </Form>
     </Edit>
   );

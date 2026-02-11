@@ -7,17 +7,88 @@ import { axiosInstance } from '../../shared';
 import { useUpdateIncident } from '../../domains/incidents';
 import { IncidentAttachmentsMultiple } from './attachments-multiple';
 import dayjs from 'dayjs';
-import 'dayjs/locale/es';
+import { useLanguage } from '../../shared/contexts/language.context';
 
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
+
+const INCIDENTS_EDIT_TRANSLATIONS = {
+  english: {
+    title: "Edit Incident",
+    save: "Save",
+    updateSuccess: "Incident updated successfully",
+    updateSuccessDesc: "Changes have been saved correctly",
+    updateError: "Error updating incident",
+    unexpectedError: "An unexpected error occurred",
+    dateRequired: "Incident date is required",
+    dateInvalid: "Incident date is not valid",
+    loading: "Loading...",
+    notFound: "Incident not found",
+    child: "Child",
+    selectChild: "Select a child",
+    selectChildRequired: "Please select a child",
+    incidentType: "Incident Type",
+    selectIncidentType: "Select an incident type",
+    selectIncidentTypeRequired: "Please select an incident type",
+    noTypesAvailable: "No types available",
+    incidentTitle: "Incident Title",
+    incidentTitleRequired: "Please enter the incident title",
+    incidentTitlePlaceholder: "Incident title",
+    incidentDescription: "Incident Description",
+    incidentDescriptionRequired: "Please enter the incident description",
+    incidentDescriptionPlaceholder: "Detailed incident description",
+    incidentDateTime: "Incident Date and Time",
+    incidentDateTimeRequired: "Please select the incident date and time",
+    selectDateTime: "Select date and time",
+    location: "Location",
+    locationPlaceholder: "Location where the incident occurred",
+    actionTaken: "Action Taken",
+    actionTakenPlaceholder: "Action taken in response to the incident (optional)",
+    noChildrenAvailable: "No children available",
+  },
+  spanish: {
+    title: "Editar incidente",
+    save: "Guardar",
+    updateSuccess: "Incidente actualizado correctamente",
+    updateSuccessDesc: "Los cambios han sido guardados correctamente",
+    updateError: "Error al actualizar incidente",
+    unexpectedError: "Ocurrió un error inesperado",
+    dateRequired: "La fecha del incidente es requerida",
+    dateInvalid: "La fecha del incidente no es válida",
+    loading: "Cargando...",
+    notFound: "Incidente no encontrado",
+    child: "Niño",
+    selectChild: "Selecciona un niño",
+    selectChildRequired: "Por favor selecciona un niño",
+    incidentType: "Tipo de incidente",
+    selectIncidentType: "Selecciona un tipo de incidente",
+    selectIncidentTypeRequired: "Por favor selecciona un tipo de incidente",
+    noTypesAvailable: "No hay tipos disponibles",
+    incidentTitle: "Título del incidente",
+    incidentTitleRequired: "Por favor ingresa el título del incidente",
+    incidentTitlePlaceholder: "Título del incidente",
+    incidentDescription: "Descripción del incidente",
+    incidentDescriptionRequired: "Por favor ingresa la descripción del incidente",
+    incidentDescriptionPlaceholder: "Descripción detallada del incidente",
+    incidentDateTime: "Fecha y hora del incidente",
+    incidentDateTimeRequired: "Por favor selecciona la fecha y hora del incidente",
+    selectDateTime: "Selecciona fecha y hora",
+    location: "Ubicación",
+    locationPlaceholder: "Ubicación donde ocurrió el incidente",
+    actionTaken: "Acción tomada",
+    actionTakenPlaceholder: "Acción tomada en respuesta al incidente (opcional)",
+    noChildrenAvailable: "No hay niños disponibles",
+  },
+} as const;
 
 export const IncidentsEdit: React.FC = () => {
   const queryClient = useQueryClient();
   const go = useGo();
   const invalidate = useInvalidate();
   const { open } = useNotification();
+  const { language } = useLanguage();
+  const t = INCIDENTS_EDIT_TRANSLATIONS[language];
   
   const { formProps, saveButtonProps } = useForm({
     resource: 'incidents',
@@ -40,8 +111,8 @@ export const IncidentsEdit: React.FC = () => {
       // Show success notification
       open?.({
         type: "success",
-        message: "Incident updated successfully",
-        description: "Changes have been saved correctly",
+        message: t.updateSuccess,
+        description: t.updateSuccessDesc,
       });
 
       // Navigate back to incidents list
@@ -56,8 +127,8 @@ export const IncidentsEdit: React.FC = () => {
       console.log('🔍 onMutationError - error:', error);
       open?.({
         type: "error",
-        message: "Error updating incident",
-        description: error.message || "An unexpected error occurred",
+        message: t.updateError,
+        description: error.message || t.unexpectedError,
       });
     },
   });
@@ -65,9 +136,6 @@ export const IncidentsEdit: React.FC = () => {
   const updateIncidentMutation = useUpdateIncident();
   const incidentData = formProps.initialValues;
   const [attachments, setAttachments] = useState<any[]>([]);
-  
-  // Set dayjs locale
-  dayjs.locale('es');
   
   // Debug logging
   console.log('🔍 Edit component - formProps:', formProps);
@@ -138,8 +206,8 @@ export const IncidentsEdit: React.FC = () => {
       console.log('🔍 handleFinish - no incidentDate provided');
       open?.({
         type: "error",
-        message: "Error updating incident",
-        description: "Incident date is required",
+        message: t.updateError,
+        description: t.dateRequired,
       });
       return;
     }
@@ -150,8 +218,8 @@ export const IncidentsEdit: React.FC = () => {
       console.log('🔍 handleFinish - invalid date format:', values.incidentDate);
       open?.({
         type: "error",
-        message: "Error updating incident",
-        description: "Incident date is not valid",
+        message: t.updateError,
+        description: t.dateInvalid,
       });
       return;
     }
@@ -169,17 +237,17 @@ export const IncidentsEdit: React.FC = () => {
   };
 
   if (saveButtonProps.disabled) {
-    return <div>Loading...</div>;
+    return <div>{t.loading}</div>;
   }
 
   if (!incidentData) {
-    return <div>Incident not found</div>;
+    return <div>{t.notFound}</div>;
   }
 
   return (
     <Edit
-      title="Edit Incident"
-      saveButtonProps={saveButtonProps}
+      title={t.title}
+      saveButtonProps={{ ...saveButtonProps, children: t.save }}
     >
       <Form
         {...formProps}
@@ -189,15 +257,15 @@ export const IncidentsEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Child"
+              label={t.child}
               name="childId"
-              rules={[{ required: true, message: 'Please select a child' }]}
+              rules={[{ required: true, message: t.selectChildRequired }]}
             >
               <Select
-                placeholder="Select a child"
+                placeholder={t.selectChild}
                 showSearch
                 loading={childrenLoading}
-                notFoundContent={childrenLoading ? "Loading..." : "No children available"}
+                notFoundContent={childrenLoading ? t.loading : t.noChildrenAvailable}
                 filterOption={(input, option) =>
                   String(option?.children || "").toLowerCase().includes(input.toLowerCase())
                 }
@@ -213,14 +281,14 @@ export const IncidentsEdit: React.FC = () => {
 
           <Col span={12}>
             <Form.Item
-              label="Incident Type"
+              label={t.incidentType}
               name="incidentTypeId"
-              rules={[{ required: true, message: 'Please select an incident type' }]}
+              rules={[{ required: true, message: t.selectIncidentTypeRequired }]}
             >
               <Select
-                placeholder="Select an incident type"
+                placeholder={t.selectIncidentType}
                 loading={incidentTypesLoading}
-                notFoundContent={incidentTypesLoading ? "Loading..." : "No types available"}
+                notFoundContent={incidentTypesLoading ? t.loading : t.noTypesAvailable}
               >
                 {(incidentTypesData || []).map((type: any) => (
                   <Option key={type.id} value={type.id}>
@@ -240,11 +308,11 @@ export const IncidentsEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Incident Title"
+              label={t.incidentTitle}
               name="title"
-              rules={[{ required: true, message: 'Please enter the incident title' }]}
+              rules={[{ required: true, message: t.incidentTitleRequired }]}
             >
-              <Input placeholder="Incident title" maxLength={255} />
+              <Input placeholder={t.incidentTitlePlaceholder} maxLength={255} />
             </Form.Item>
           </Col>
         </Row>
@@ -252,13 +320,13 @@ export const IncidentsEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Incident Description"
+              label={t.incidentDescription}
               name="description"
-              rules={[{ required: true, message: 'Please enter the incident description' }]}
+              rules={[{ required: true, message: t.incidentDescriptionRequired }]}
             >
               <TextArea
                 rows={4}
-                placeholder="Detailed incident description"
+                placeholder={t.incidentDescriptionPlaceholder}
                 maxLength={1000}
                 showCount
               />
@@ -269,9 +337,9 @@ export const IncidentsEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Incident Date and Time"
+              label={t.incidentDateTime}
               name="incidentDate"
-              rules={[{ required: true, message: 'Please select the incident date and time' }]}
+              rules={[{ required: true, message: t.incidentDateTimeRequired }]}
               getValueFromEvent={(date) => {
                 console.log("🔍 DatePicker getValueFromEvent:", date);
                 return date;
@@ -290,7 +358,7 @@ export const IncidentsEdit: React.FC = () => {
               <DatePicker
                 showTime
                 format="DD/MM/YYYY HH:mm"
-                placeholder="Select date and time"
+                placeholder={t.selectDateTime}
                 style={{ width: '100%' }}
               />
             </Form.Item>
@@ -298,10 +366,10 @@ export const IncidentsEdit: React.FC = () => {
 
           <Col span={12}>
             <Form.Item
-              label="Location"
+              label={t.location}
               name="location"
             >
-              <Input placeholder="Location where the incident occurred" maxLength={255} />
+              <Input placeholder={t.locationPlaceholder} maxLength={255} />
             </Form.Item>
           </Col>
         </Row>
@@ -309,12 +377,12 @@ export const IncidentsEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="Action Taken"
+              label={t.actionTaken}
               name="actionTaken"
             >
               <TextArea
                 rows={3}
-                placeholder="Action taken in response to the incident (optional)"
+                placeholder={t.actionTakenPlaceholder}
                 maxLength={500}
                 showCount
               />

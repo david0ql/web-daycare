@@ -1,7 +1,7 @@
 import React from 'react';
 import { List, DeleteButton, CreateButton, useTable } from '@refinedev/antd';
 import { Table, Space, Tag, Button, Tooltip, Typography } from 'antd';
-import { DeleteOutlined, PlusOutlined, DownloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useDeleteDocument } from '../../domains/documents';
 import { 
   formatDocumentDate, 
@@ -15,10 +15,54 @@ import {
 import { useInvalidate, useNotification } from '@refinedev/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { clearDataProviderCache } from '../../dataProvider-stable-fixed';
+import { useLanguage } from '../../shared/contexts/language.context';
 
 const { Text } = Typography;
 
+const DOCUMENT_LIST_TRANSLATIONS = {
+  english: {
+    title: "Documents",
+    uploadDocument: "Upload Document",
+    id: "ID",
+    child: "Child",
+    documentType: "Document Type",
+    file: "File",
+    uploadDate: "Upload Date",
+    expirationDate: "Expiration Date",
+    uploadedBy: "Uploaded by",
+    actions: "Actions",
+    download: "Download document",
+    deleteConfirm: "Are you sure you want to delete this document?",
+    deleteOk: "Yes, delete",
+    cancel: "Cancel",
+    deleteSuccess: "Document deleted successfully",
+    deleteDesc: "The document has been deleted correctly",
+    deleteError: "Error deleting document",
+  },
+  spanish: {
+    title: "Documentos",
+    uploadDocument: "Subir documento",
+    id: "ID",
+    child: "Niño",
+    documentType: "Tipo de documento",
+    file: "Archivo",
+    uploadDate: "Fecha de subida",
+    expirationDate: "Fecha de vencimiento",
+    uploadedBy: "Subido por",
+    actions: "Acciones",
+    download: "Descargar documento",
+    deleteConfirm: "¿Está seguro de eliminar este documento?",
+    deleteOk: "Sí, eliminar",
+    cancel: "Cancelar",
+    deleteSuccess: "Documento eliminado correctamente",
+    deleteDesc: "El documento ha sido eliminado correctamente",
+    deleteError: "Error al eliminar el documento",
+  },
+} as const;
+
 export const DocumentList: React.FC = () => {
+  const { language } = useLanguage();
+  const t = DOCUMENT_LIST_TRANSLATIONS[language];
   const { tableProps } = useTable({
     resource: "documents",
     syncWithLocation: false,
@@ -65,15 +109,15 @@ export const DocumentList: React.FC = () => {
       
       open?.({
         type: "success",
-        message: "Document deleted successfully",
-        description: "The document has been deleted correctly",
+        message: t.deleteSuccess,
+        description: t.deleteDesc,
       });
     } catch (error) {
       console.log('🔍 Delete document - error:', error);
       open?.({
         type: "error",
-        message: "Error deleting document",
-        description: "Could not delete document. Please try again.",
+        message: t.deleteError,
+        description: t.deleteError,
       });
     }
   };
@@ -85,23 +129,23 @@ export const DocumentList: React.FC = () => {
 
   const columns = [
     {
-      title: 'ID',
+      title: t.id,
       dataIndex: 'id',
       sorter: (a: any, b: any) => a.id - b.id,
     },
     {
-      title: 'Child',
+      title: t.child,
       dataIndex: ['child', 'firstName'],
       render: (value: any, record: any) => `${record.child.firstName} ${record.child.lastName}`,
       sorter: (a: any, b: any) => a.child.firstName.localeCompare(b.child.firstName),
     },
     {
-      title: 'Document Type',
+      title: t.documentType,
       dataIndex: ['documentType', 'name'],
       sorter: (a: any, b: any) => a.documentType.name.localeCompare(b.documentType.name),
     },
     {
-      title: 'File',
+      title: t.file,
       dataIndex: 'originalFilename',
       render: (value: string, record: any) => (
         <Space>
@@ -113,19 +157,19 @@ export const DocumentList: React.FC = () => {
       sorter: (a: any, b: any) => a.originalFilename.localeCompare(b.originalFilename),
     },
     {
-      title: 'Upload Date',
+      title: t.uploadDate,
       dataIndex: 'createdAt',
       render: (value: string) => formatDocumentDate(value),
       sorter: (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     },
     {
-      title: 'Expiration Date',
+      title: t.expirationDate,
       dataIndex: 'expiresAt',
       render: (value: string | null, record: any) => (
         <Space direction="vertical" size={0}>
-          <Text>{formatExpirationDate(value)}</Text>
+          <Text>{formatExpirationDate(value, language)}</Text>
           <Tag color={getExpirationColor(record)}>
-            {getExpirationLabel(record)}
+            {getExpirationLabel(record, language)}
           </Tag>
         </Space>
       ),
@@ -137,17 +181,17 @@ export const DocumentList: React.FC = () => {
       },
     },
     {
-      title: 'Uploaded by',
+      title: t.uploadedBy,
       dataIndex: ['uploadedBy2', 'firstName'],
       render: (value: any, record: any) => `${record.uploadedBy2.firstName} ${record.uploadedBy2.lastName}`,
       sorter: (a: any, b: any) => a.uploadedBy2.firstName.localeCompare(b.uploadedBy2.firstName),
     },
     {
-      title: 'Actions',
+      title: t.actions,
       key: 'actions',
       render: (record: any) => (
         <Space>
-          <Tooltip title="Download document">
+          <Tooltip title={t.download}>
             <Button
               type="link"
               size="small"
@@ -159,9 +203,9 @@ export const DocumentList: React.FC = () => {
             hideText
             size="small"
             recordItemId={record.id}
-            confirmTitle="Are you sure you want to delete this document?"
-            confirmOkText="Yes, delete"
-            confirmCancelText="Cancel"
+            confirmTitle={t.deleteConfirm}
+            confirmOkText={t.deleteOk}
+            confirmCancelText={t.cancel}
           />
         </Space>
       ),
@@ -170,10 +214,10 @@ export const DocumentList: React.FC = () => {
 
   return (
     <List
-      title="Documents"
+      title={t.title}
       headerButtons={[
         <CreateButton key="create" icon={<PlusOutlined />}>
-          Upload Document
+          {t.uploadDocument}
         </CreateButton>,
       ]}
     >

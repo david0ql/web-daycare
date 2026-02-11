@@ -2,6 +2,24 @@ import { AuthProvider } from "@refinedev/core";
 import { AuthApi } from './auth.api';
 import { AuthUtils } from '../utils/auth.utils';
 import { LoginCredentials, AuthResult, AuthCheckResult } from '../types/auth.types';
+import type { Language } from "../../../shared/contexts/language.context";
+
+const AUTH_PROVIDER_TRANSLATIONS = {
+  english: {
+    invalidResponse: "Invalid response from server",
+    invalidCredentials: "Invalid credentials",
+  },
+  spanish: {
+    invalidResponse: "Respuesta inválida del servidor",
+    invalidCredentials: "Credenciales inválidas",
+  },
+} as const;
+
+const getStoredLanguage = (): Language => {
+  if (typeof window === "undefined") return "english";
+  const stored = window.localStorage.getItem("app-language");
+  return stored === "english" || stored === "spanish" ? stored : "english";
+};
 
 export class AuthProviderService implements AuthProvider {
   async login({ email, password }: LoginCredentials): Promise<AuthResult> {
@@ -11,16 +29,17 @@ export class AuthProviderService implements AuthProvider {
       const data = await AuthApi.login({ email, password });
       console.log("✅ AuthApi.login() returned:", data);
       
-      if (!data || !data.accessToken || !data.user) {
-        console.error("❌ Invalid response from AuthApi.login():", data);
-        return {
-          success: false,
-          error: {
-            name: "LoginError",
-            message: "Invalid response from server",
-          },
-        };
-      }
+	      if (!data || !data.accessToken || !data.user) {
+	        console.error("❌ Invalid response from AuthApi.login():", data);
+	        const t = AUTH_PROVIDER_TRANSLATIONS[getStoredLanguage()];
+	        return {
+	          success: false,
+	          error: {
+	            name: "LoginError",
+	            message: t.invalidResponse,
+	          },
+	        };
+	      }
       
       console.log("💾 Setting token and user...");
       AuthUtils.setToken(data.accessToken);
@@ -33,21 +52,22 @@ export class AuthProviderService implements AuthProvider {
       };
       console.log("🎉 AuthProvider.login() returning success:", result);
       return result;
-    } catch (error: any) {
-      console.error("❌ AuthProvider.login() error:", error);
-      console.error("❌ Error details:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-      });
-      
-      const result = {
-        success: false,
-        error: {
-          name: "LoginError",
-          message: error.response?.data?.message || error.message || "Invalid credentials",
-        },
-      };
+	    } catch (error: any) {
+	      console.error("❌ AuthProvider.login() error:", error);
+	      console.error("❌ Error details:", {
+	        message: error.message,
+	        response: error.response?.data,
+	        status: error.response?.status,
+	      });
+	      const t = AUTH_PROVIDER_TRANSLATIONS[getStoredLanguage()];
+	      
+	      const result = {
+	        success: false,
+	        error: {
+	          name: "LoginError",
+	          message: error.response?.data?.message || t.invalidCredentials,
+	        },
+	      };
       console.log("🚫 AuthProvider.login() returning error:", result);
       return result;
     }

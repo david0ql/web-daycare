@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import { CalendarEvent, EventTypeEnum, EVENT_TYPE_COLORS, EVENT_TYPE_LABELS } from '../types/calendar.types';
+import { CalendarEvent, EventTypeEnum, EVENT_TYPE_COLORS, EVENT_TYPE_LABELS_BY_LANGUAGE } from '../types/calendar.types';
+import type { Language } from '../../../shared/contexts/language.context';
 
 // Extend dayjs with plugins
 dayjs.extend(isBetween);
@@ -30,10 +31,10 @@ export class CalendarUtils {
   }
 
   /**
-   * Get event type label in Spanish
+   * Get event type label by language
    */
-  static getEventTypeLabel(eventType: EventTypeEnum): string {
-    return EVENT_TYPE_LABELS[eventType] || eventType;
+  static getEventTypeLabel(eventType: EventTypeEnum, language: Language = "english"): string {
+    return EVENT_TYPE_LABELS_BY_LANGUAGE[language]?.[eventType] || eventType;
   }
 
   /**
@@ -83,7 +84,7 @@ export class CalendarUtils {
   /**
    * Transform calendar events for calendar display
    */
-  static transformEventsForCalendar(events: CalendarEvent[]) {
+  static transformEventsForCalendar(events: CalendarEvent[], language: Language = "english") {
     return events.map(event => ({
       id: event.id,
       title: event.title,
@@ -98,7 +99,7 @@ export class CalendarUtils {
         id: event.createdBy,
         name: event.createdByUser 
           ? `${event.createdByUser.firstName} ${event.createdByUser.lastName}`
-          : 'Usuario'
+          : (language === "spanish" ? "Usuario" : "User")
       }
     }));
   }
@@ -172,16 +173,30 @@ export class CalendarUtils {
   /**
    * Format event duration
    */
-  static getEventDuration(event: CalendarEvent): string {
+  static getEventDuration(event: CalendarEvent, language: Language = "english"): string {
+    const t = language === "spanish"
+      ? {
+          allDay: "Todo el día",
+          day: "día",
+          days: "días",
+          durationNotSpecified: "Duración no especificada",
+        }
+      : {
+          allDay: "All day",
+          day: "day",
+          days: "days",
+          durationNotSpecified: "Duration not specified",
+        };
+
     if (event.isAllDay) {
       const start = dayjs(event.startDate);
       const end = dayjs(event.endDate);
       
       if (start.isSame(end, 'day')) {
-        return 'Todo el día';
+        return t.allDay;
       } else {
         const days = end.diff(start, 'days') + 1;
-        return `${days} día${days > 1 ? 's' : ''}`;
+        return `${days} ${days > 1 ? t.days : t.day}`;
       }
     } else if (event.startTime && event.endTime) {
       const start = dayjs(`${event.startDate} ${event.startTime}`);
@@ -200,6 +215,6 @@ export class CalendarUtils {
       }
     }
     
-    return 'Duración no especificada';
+    return t.durationNotSpecified;
   }
 }

@@ -1,20 +1,75 @@
 import React, { useState } from "react";
 import { Create } from "@refinedev/antd";
-import { Form, Input, Upload, Button, message, Row, Col, Typography, Select } from "antd";
-import { UploadOutlined, CameraOutlined } from "@ant-design/icons";
+import { Form, Input, Upload, message, Row, Col, Select } from "antd";
+import { CameraOutlined } from "@ant-design/icons";
 import { useParams, useNavigate } from "react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../../../shared";
 import dayjs from 'dayjs';
+import { useLanguage } from "../../../shared/contexts/language.context";
 
-const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
+
+const ATTENDANCE_PHOTOS_CREATE_TRANSLATIONS = {
+  english: {
+    title: "Upload Activity Photo",
+    upload: "Upload",
+    child: "Child",
+    selectChildRequired: "Please select a child",
+    selectChild: "Select a child",
+    loading: "Loading...",
+    noChildren: "No children available",
+    attendanceRecord: "Attendance Record",
+    selectAttendanceRequired: "Please select an attendance record",
+    selectAttendance: "Select an attendance record",
+    firstSelectChild: "First select a child",
+    noAttendanceToday: "No attendance records for today",
+    selectPhoto: "Select Photo",
+    uploadPhoto: "Upload Photo",
+    photoRequired: "Please select a photo",
+    invalidFile: "Error: invalid file",
+    uploadSuccess: "Photo uploaded successfully",
+    uploadErrorPrefix: "Error uploading photo",
+    onlyImagesAllowed: "Only image files are allowed",
+    imageTooLarge: "Image must be less than 5MB",
+    photoDescription: "Photo Description",
+    photoDescriptionPlaceholder:
+      "Describe what is seen in the photo or what activity is being performed...",
+  },
+  spanish: {
+    title: "Subir foto de actividad",
+    upload: "Subir",
+    child: "Niño",
+    selectChildRequired: "Por favor selecciona un niño",
+    selectChild: "Selecciona un niño",
+    loading: "Cargando...",
+    noChildren: "No hay niños disponibles",
+    attendanceRecord: "Registro de asistencia",
+    selectAttendanceRequired: "Por favor selecciona un registro de asistencia",
+    selectAttendance: "Selecciona un registro de asistencia",
+    firstSelectChild: "Primero selecciona un niño",
+    noAttendanceToday: "No hay registros de asistencia para hoy",
+    selectPhoto: "Selecciona foto",
+    uploadPhoto: "Subir foto",
+    photoRequired: "Por favor selecciona una foto",
+    invalidFile: "Error: archivo inválido",
+    uploadSuccess: "Foto subida correctamente",
+    uploadErrorPrefix: "Error subiendo la foto",
+    onlyImagesAllowed: "Solo se permiten archivos de imagen",
+    imageTooLarge: "La imagen debe ser menor a 5MB",
+    photoDescription: "Descripción de la foto",
+    photoDescriptionPlaceholder:
+      "Describe lo que se ve en la foto o qué actividad se está realizando...",
+  },
+} as const;
 
 export const AttendancePhotosCreate: React.FC = () => {
   const { attendanceId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { language } = useLanguage();
+  const t = ATTENDANCE_PHOTOS_CREATE_TRANSLATIONS[language];
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<any[]>([]);
   const [selectedChildId, setSelectedChildId] = useState<number | undefined>(undefined);
@@ -56,27 +111,17 @@ export const AttendancePhotosCreate: React.FC = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Debug logs
-  console.log('Children data:', childrenData);
-  console.log('Attendance data:', attendanceData);
-  console.log('Children data.data:', childrenData?.data);
-  console.log('Attendance data.data:', attendanceData?.data);
-
   const handleFinish = async (values: any) => {
     if (fileList.length === 0) {
-      message.error('Please select a photo');
+      message.error(t.photoRequired);
       return;
     }
 
     const file = fileList[0].originFileObj;
     if (!file) {
-      message.error('Error: invalid file');
+      message.error(t.invalidFile);
       return;
     }
-
-    console.log('File to upload:', file);
-    console.log('File type:', file.type);
-    console.log('File size:', file.size);
 
     setIsSubmitting(true);
     
@@ -95,7 +140,7 @@ export const AttendancePhotosCreate: React.FC = () => {
         },
       });
 
-      message.success('Photo uploaded successfully');
+      message.success(t.uploadSuccess);
       
       // Invalidate cache
       await queryClient.invalidateQueries({
@@ -110,7 +155,7 @@ export const AttendancePhotosCreate: React.FC = () => {
       
     } catch (error: any) {
       console.error('Error uploading photo:', error);
-      message.error('Error uploading photo: ' + (error.response?.data?.message || error.message));
+      message.error(`${t.uploadErrorPrefix}: ${error.response?.data?.message || error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -123,13 +168,13 @@ export const AttendancePhotosCreate: React.FC = () => {
   const beforeUpload = (file: File) => {
     const isImage = file.type.startsWith('image/');
     if (!isImage) {
-      message.error('Only image files are allowed');
+      message.error(t.onlyImagesAllowed);
       return false;
     }
 
     const isLt5M = file.size / 1024 / 1024 < 5;
     if (!isLt5M) {
-      message.error('Image must be less than 5MB');
+      message.error(t.imageTooLarge);
       return false;
     }
 
@@ -138,29 +183,30 @@ export const AttendancePhotosCreate: React.FC = () => {
 
   return (
     <Create
-      title="Upload Activity Photo"
+      title={t.title}
       saveButtonProps={{
         loading: isSubmitting,
+        children: t.upload,
         onClick: () => form.submit(),
       }}
     >
       <Form form={form} layout="vertical" onFinish={handleFinish}>
         <Row gutter={16}>
           <Col span={12}>
-                <Form.Item
-                  label="Child"
-                  name="childId"
-                  rules={[{ required: true, message: 'Please select a child' }]}
-                >
-                  <Select 
-                    placeholder="Select a child" 
-                    showSearch
-                    loading={childrenLoading}
-                    notFoundContent={childrenLoading ? "Loading..." : "No children available"}
-                    onChange={(value) => {
-                      setSelectedChildId(value);
-                      // Clear attendance selection when child changes
-                      form.setFieldsValue({ attendanceId: undefined });
+	                <Form.Item
+	                  label={t.child}
+	                  name="childId"
+	                  rules={[{ required: true, message: t.selectChildRequired }]}
+	                >
+	                  <Select 
+	                    placeholder={t.selectChild} 
+	                    showSearch
+	                    loading={childrenLoading}
+	                    notFoundContent={childrenLoading ? t.loading : t.noChildren}
+	                    onChange={(value) => {
+	                      setSelectedChildId(value);
+	                      // Clear attendance selection when child changes
+	                      form.setFieldsValue({ attendanceId: undefined });
                     }}
                   >
                     {(childrenData?.data || []).map((child: any) => (
@@ -172,27 +218,27 @@ export const AttendancePhotosCreate: React.FC = () => {
                 </Form.Item>
           </Col>
           
-          <Col span={12}>
-            <Form.Item
-              label="Attendance Record"
-              name="attendanceId"
-              rules={[{ required: true, message: 'Please select an attendance record' }]}
-              initialValue={attendanceId ? parseInt(attendanceId) : undefined}
-            >
-              <Select 
-                placeholder={selectedChildId ? "Select an attendance record" : "First select a child"} 
-                showSearch
-                loading={attendanceLoading}
-                disabled={!selectedChildId}
-                notFoundContent={
-                  attendanceLoading 
-                    ? "Loading..." 
-                    : !selectedChildId 
-                      ? "First select a child" 
-                      : "No attendance records for today"
-                }
-              >
-                {(attendanceData || []).map((attendance: any) => (
+	          <Col span={12}>
+	            <Form.Item
+	              label={t.attendanceRecord}
+	              name="attendanceId"
+	              rules={[{ required: true, message: t.selectAttendanceRequired }]}
+	              initialValue={attendanceId ? parseInt(attendanceId) : undefined}
+	            >
+	              <Select 
+	                placeholder={selectedChildId ? t.selectAttendance : t.firstSelectChild} 
+	                showSearch
+	                loading={attendanceLoading}
+	                disabled={!selectedChildId}
+	                notFoundContent={
+	                  attendanceLoading 
+	                    ? t.loading 
+	                    : !selectedChildId 
+	                      ? t.firstSelectChild 
+	                      : t.noAttendanceToday
+	                }
+	              >
+	                {(attendanceData || []).map((attendance: any) => (
                   <Option key={attendance.id} value={attendance.id}>
                     {attendance.child?.firstName} {attendance.child?.lastName} - {dayjs(attendance.attendanceDate).format('DD/MM/YYYY')}
                   </Option>
@@ -202,12 +248,12 @@ export const AttendancePhotosCreate: React.FC = () => {
           </Col>
         </Row>
 
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="Select Photo"
-              required
-            >
+	        <Row gutter={16}>
+	          <Col span={24}>
+	            <Form.Item
+	              label={t.selectPhoto}
+	              required
+	            >
               <Upload
                 listType="picture-card"
                 fileList={fileList}
@@ -219,29 +265,29 @@ export const AttendancePhotosCreate: React.FC = () => {
                   showRemoveIcon: true,
                 }}
               >
-                {fileList.length >= 1 ? null : (
-                  <div>
-                    <CameraOutlined style={{ fontSize: '24px', color: '#999' }} />
-                    <div style={{ marginTop: 8 }}>Upload Photo</div>
-                  </div>
-                )}
-              </Upload>
-            </Form.Item>
-          </Col>
-        </Row>
+	                {fileList.length >= 1 ? null : (
+	                  <div>
+	                    <CameraOutlined style={{ fontSize: '24px', color: '#999' }} />
+	                    <div style={{ marginTop: 8 }}>{t.uploadPhoto}</div>
+	                  </div>
+	                )}
+	              </Upload>
+	            </Form.Item>
+	          </Col>
+	        </Row>
 
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="Photo Description"
-              name="caption"
-            >
-              <TextArea 
-                rows={3}
-                placeholder="Describe what is seen in the photo or what activity is being performed..."
-                maxLength={300}
-                showCount
-              />
+	        <Row gutter={16}>
+	          <Col span={24}>
+	            <Form.Item
+	              label={t.photoDescription}
+	              name="caption"
+	            >
+	              <TextArea 
+	                rows={3}
+	                placeholder={t.photoDescriptionPlaceholder}
+	                maxLength={300}
+	                showCount
+	              />
             </Form.Item>
           </Col>
         </Row>

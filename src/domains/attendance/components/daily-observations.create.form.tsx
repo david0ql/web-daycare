@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Input, Select, Button, Card, Row, Col, Typography, message, Space } from 'antd';
 import { useDailyObservations } from '../hooks/use-daily-observations.hook';
-import { CreateDailyObservationData, MoodEnum, MOOD_LABELS, MOOD_ICONS } from '../types/daily-observations.types';
+import { CreateDailyObservationData, MoodEnum, MOOD_LABELS_BY_LANGUAGE, MOOD_ICONS } from '../types/daily-observations.types';
+import { useLanguage } from '../../../shared/contexts/language.context';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -13,11 +14,42 @@ interface DailyObservationsCreateFormProps {
   onSuccess?: () => void;
 }
 
+const DAILY_OBSERVATIONS_CREATE_TRANSLATIONS = {
+  english: {
+    title: "Register Daily Observation",
+    mood: "Mood",
+    moodRequired: "Please select the mood",
+    moodPlaceholder: "Select mood",
+    generalObservations: "General Observations",
+    observationsRequired: "Please enter the observations",
+    observationsPlaceholder: "Describe the child's behavior, activities, interactions, and any relevant observations...",
+    registering: "Registering...",
+    registerObservation: "Register Observation",
+    success: "Observation registered successfully",
+    error: "Error registering observation",
+  },
+  spanish: {
+    title: "Registrar observación diaria",
+    mood: "Estado de ánimo",
+    moodRequired: "Por favor selecciona el estado de ánimo",
+    moodPlaceholder: "Selecciona estado de ánimo",
+    generalObservations: "Observaciones generales",
+    observationsRequired: "Por favor ingresa las observaciones",
+    observationsPlaceholder: "Describe el comportamiento del niño, actividades, interacciones y cualquier observación relevante...",
+    registering: "Registrando...",
+    registerObservation: "Registrar observación",
+    success: "Observación registrada correctamente",
+    error: "Error al registrar observación",
+  },
+} as const;
+
 export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormProps> = ({
   childId,
   attendanceId,
   onSuccess,
 }) => {
+  const { language } = useLanguage();
+  const t = DAILY_OBSERVATIONS_CREATE_TRANSLATIONS[language];
   const [form] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -36,7 +68,7 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
 
       await createObservation(observationData);
       
-      message.success('Observation registered successfully');
+      message.success(t.success);
       form.resetFields();
       
       if (onSuccess) {
@@ -44,7 +76,7 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
       }
     } catch (error) {
       console.error('Error creating observation:', error);
-      message.error('Error registering observation');
+      message.error(t.error);
     } finally {
       setIsSubmitting(false);
     }
@@ -53,7 +85,7 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
   return (
     <Card>
       <Title level={5} style={{ marginBottom: '16px' }}>
-        Register Daily Observation
+        {t.title}
       </Title>
       
       <Form
@@ -64,16 +96,16 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Mood"
+              label={t.mood}
               name="mood"
-              rules={[{ required: true, message: 'Please select the mood' }]}
+              rules={[{ required: true, message: t.moodRequired }]}
             >
-              <Select placeholder="Select mood">
+              <Select placeholder={t.moodPlaceholder}>
                 {Object.values(MoodEnum).map((mood) => (
                   <Option key={mood} value={mood}>
                     <Space>
                       <span style={{ fontSize: '16px' }}>{MOOD_ICONS[mood]}</span>
-                      {MOOD_LABELS[mood]}
+                      {MOOD_LABELS_BY_LANGUAGE[language][mood]}
                     </Space>
                   </Option>
                 ))}
@@ -85,13 +117,13 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label="General Observations"
+              label={t.generalObservations}
               name="generalObservations"
-              rules={[{ required: true, message: 'Please enter the observations' }]}
+              rules={[{ required: true, message: t.observationsRequired }]}
             >
               <TextArea 
                 rows={4}
-                placeholder="Describe the child's behavior, activities, interactions, and any relevant observations..."
+                placeholder={t.observationsPlaceholder}
                 maxLength={1000}
                 showCount
               />
@@ -106,7 +138,7 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
             loading={isSubmitting}
             block
           >
-            {isSubmitting ? 'Registering...' : 'Register Observation'}
+            {isSubmitting ? t.registering : t.registerObservation}
           </Button>
         </Form.Item>
       </Form>

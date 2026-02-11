@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Card, Typography, Space, Alert, Select, message } from "antd";
-import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Card, Typography, Alert, Select, message } from "antd";
+import { UserOutlined, LockOutlined, MailOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import { usePermissions } from "@refinedev/core";
 import PhoneInput from 'react-phone-number-input';
@@ -8,8 +8,78 @@ import 'react-phone-number-input/style.css';
 import '../../styles/phone-input.css';
 import { colors } from "../../styles/colors";
 import { axiosInstance } from "../../shared";
+import { useLanguage } from "../../shared/contexts/language.context";
 
 const { Title, Text } = Typography;
+
+const REGISTER_TRANSLATIONS = {
+  english: {
+    createUser: "Create New User",
+    registerDesc: "Register a new account in the system",
+    back: "Back",
+    backToUsers: "Back to Users",
+    accessDenied: "Access Denied",
+    accessDeniedDesc: "Only administrators can create new user accounts.",
+    regError: "Registration Error",
+    regErrorDesc: "Could not create account. Please check the entered data.",
+    successMessage: "Account created successfully. You can now log in.",
+    connectionError: "Connection error. Please verify that the API is running.",
+    createAccount: "Create Account",
+    credentialsNote: "The user will receive credentials by email",
+    email: "Email",
+    emailRequired: "Please enter your email",
+    emailInvalid: "Enter a valid email",
+    emailPlaceholder: "your@email.com",
+    password: "Password",
+    passwordRequired: "Please enter your password",
+    passwordMin: "Password must be at least 6 characters long",
+    passwordPlaceholder: "Your password",
+    firstName: "First Name",
+    firstNameRequired: "Please enter your first name",
+    firstNamePlaceholder: "Your first name",
+    lastName: "Last Name",
+    lastNameRequired: "Please enter your last name",
+    lastNamePlaceholder: "Your last name",
+    phoneOptional: "Phone (Optional)",
+    phonePlaceholder: "Enter your phone number",
+    userType: "User Type",
+    userTypeRequired: "Please select user type",
+    userTypePlaceholder: "Select user role",
+  },
+  spanish: {
+    createUser: "Crear nuevo usuario",
+    registerDesc: "Registrar una nueva cuenta en el sistema",
+    back: "Volver",
+    backToUsers: "Volver a usuarios",
+    accessDenied: "Acceso denegado",
+    accessDeniedDesc: "Solo los administradores pueden crear nuevas cuentas de usuario.",
+    regError: "Error de registro",
+    regErrorDesc: "No se pudo crear la cuenta. Por favor verifique los datos.",
+    successMessage: "Cuenta creada correctamente. Ya puede iniciar sesión.",
+    connectionError: "Error de conexión. Por favor verifica que la API esté en ejecución.",
+    createAccount: "Crear cuenta",
+    credentialsNote: "El usuario recibirá las credenciales por correo electrónico",
+    email: "Correo electrónico",
+    emailRequired: "Por favor ingresa tu correo",
+    emailInvalid: "Ingresa un correo válido",
+    emailPlaceholder: "tu@email.com",
+    password: "Contraseña",
+    passwordRequired: "Por favor ingresa tu contraseña",
+    passwordMin: "La contraseña debe tener al menos 6 caracteres",
+    passwordPlaceholder: "Tu contraseña",
+    firstName: "Nombre",
+    firstNameRequired: "Por favor ingresa el nombre",
+    firstNamePlaceholder: "Nombre",
+    lastName: "Apellido",
+    lastNameRequired: "Por favor ingresa el apellido",
+    lastNamePlaceholder: "Apellido",
+    phoneOptional: "Teléfono (Opcional)",
+    phonePlaceholder: "Ingresa el número de teléfono",
+    userType: "Tipo de usuario",
+    userTypeRequired: "Por favor selecciona el tipo de usuario",
+    userTypePlaceholder: "Selecciona el rol del usuario",
+  },
+} as const;
 
 interface Role {
   id: number;
@@ -20,6 +90,8 @@ interface Role {
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = REGISTER_TRANSLATIONS[language];
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [phoneValue, setPhoneValue] = useState<string | undefined>();
@@ -61,28 +133,27 @@ export const Register: React.FC = () => {
     
     try {
       const response = await axiosInstance.post("/auth/register", formData);
-      message.success("Account created successfully. You can now log in.");
+      message.success(t.successMessage);
       navigate("/login");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Connection error. Please verify that the API is running.");
+      setError(err.response?.data?.message || t.connectionError);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Si no es administrador, mostrar mensaje de acceso denegado
   if (!isAdmin) {
     return (
       <div style={{ padding: "24px", textAlign: "center" }}>
         <Alert
-          message="Access Denied"
-          description="Only administrators can create new user accounts."
+          message={t.accessDenied}
+          description={t.accessDeniedDesc}
           type="warning"
           showIcon
           style={{ marginBottom: "16px" }}
         />
         <Button onClick={() => navigate("/users")} icon={<ArrowLeftOutlined />}>
-          Back to Users
+          {t.backToUsers}
         </Button>
       </div>
     );
@@ -105,14 +176,14 @@ export const Register: React.FC = () => {
             onClick={() => navigate("/users")}
             style={{ marginRight: '16px' }}
           >
-            Back
+            {t.back}
           </Button>
           <div>
             <Title level={3} style={{ margin: 0, color: colors.text.primary }}>
-              Create New User
+              {t.createUser}
             </Title>
             <Text type="secondary" style={{ color: colors.text.secondary }}>
-              Register a new account in the system
+              {t.registerDesc}
             </Text>
           </div>
         </div>
@@ -132,8 +203,8 @@ export const Register: React.FC = () => {
 
         {error && (
           <Alert
-            message="Registration Error"
-            description="Could not create account. Please check the entered data."
+            message={t.regError}
+            description={t.regErrorDesc}
             type="error"
             style={{ marginBottom: "16px" }}
           />
@@ -147,71 +218,71 @@ export const Register: React.FC = () => {
         >
           <Form.Item
             name="email"
-            label="Email"
+            label={t.email}
             rules={[
-              { required: true, message: "Please enter your email" },
-              { type: "email", message: "Enter a valid email" },
+              { required: true, message: t.emailRequired },
+              { type: "email", message: t.emailInvalid },
             ]}
           >
             <Input
               prefix={<MailOutlined />}
-              placeholder="your@email.com"
+              placeholder={t.emailPlaceholder}
               size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="password"
-            label="Password"
+            label={t.password}
             rules={[
-              { required: true, message: "Please enter your password" },
-              { min: 6, message: "Password must be at least 6 characters long" },
+              { required: true, message: t.passwordRequired },
+              { min: 6, message: t.passwordMin },
             ]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Your password"
+              placeholder={t.passwordPlaceholder}
               size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="firstName"
-            label="First Name"
+            label={t.firstName}
             rules={[
-              { required: true, message: "Please enter your first name" },
+              { required: true, message: t.firstNameRequired },
             ]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="Your first name"
+              placeholder={t.firstNamePlaceholder}
               size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="lastName"
-            label="Last Name"
+            label={t.lastName}
             rules={[
-              { required: true, message: "Please enter your last name" },
+              { required: true, message: t.lastNameRequired },
             ]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="Your last name"
+              placeholder={t.lastNamePlaceholder}
               size="large"
             />
           </Form.Item>
 
           <Form.Item
-            label="Phone (Optional)"
+            label={t.phoneOptional}
             style={{ marginBottom: 0 }}
           >
             <div style={{ position: 'relative' }}>
               <PhoneInput
                 value={phoneValue}
                 onChange={setPhoneValue}
-                placeholder="Enter your phone number"
+                placeholder={t.phonePlaceholder}
                 defaultCountry="US"
                 className="custom-phone-input"
                 international
@@ -223,13 +294,13 @@ export const Register: React.FC = () => {
 
           <Form.Item
             name="roleId"
-            label="User Type"
+            label={t.userType}
             rules={[
-              { required: true, message: "Please select user type" },
+              { required: true, message: t.userTypeRequired },
             ]}
           >
             <Select
-              placeholder="Select user role"
+              placeholder={t.userTypePlaceholder}
               size="large"
               loading={loadingRoles}
               options={roles.map(role => ({
@@ -253,14 +324,14 @@ export const Register: React.FC = () => {
                 fontWeight: 500,
               }}
             >
-              Create Account
+              {t.createAccount}
             </Button>
           </Form.Item>
         </Form>
 
         <div style={{ textAlign: "center", marginTop: "16px" }}>
           <Text type="secondary" style={{ color: colors.text.secondary }}>
-            The user will receive credentials by email
+            {t.credentialsNote}
           </Text>
         </div>
       </Card>

@@ -4,14 +4,86 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-de
 import { useAuth } from "../hooks/use-auth.hook";
 import { useData } from "../hooks/use-data.hook";
 import { useAppNavigation } from "../hooks/use-navigation.hook";
+import { useLanguage } from "../contexts/language.context";
 
 const { Title, Text } = Typography;
+
+const EXAMPLE_USAGE_TRANSLATIONS = {
+  english: {
+    pageTitle: "Refine Hooks Usage Example",
+    authInfo: "Authentication Information",
+    navigationInfo: "Navigation Information",
+    navigation: "Navigation",
+    crudOperations: "CRUD Operations",
+    usersList: "Users List",
+    childrenList: "Children List",
+    user: "User",
+    role: "Role",
+    permissions: "Permissions",
+    isAdmin: "Is Administrator",
+    isEducator: "Is Educator",
+    isParent: "Is Parent",
+    yes: "Yes",
+    no: "No",
+    currentPath: "Current Path",
+    currentResource: "Current Resource",
+    none: "None",
+    inResourceList: "In Resource List",
+    inResourceCreate: "In Resource Create",
+    createUser: "Create User",
+    userList: "Users List",
+    childList: "Children List",
+    viewUser: "View User",
+    updateUser: "Update User",
+    deleteUser: "Delete User",
+    view: "View",
+    edit: "Edit",
+    delete: "Delete",
+    age: "Age",
+    years: "years",
+  },
+  spanish: {
+    pageTitle: "Ejemplo de Uso de Hooks de Refine",
+    authInfo: "Información de Autenticación",
+    navigationInfo: "Información de Navegación",
+    navigation: "Navegación",
+    crudOperations: "Operaciones CRUD",
+    usersList: "Lista de Usuarios",
+    childrenList: "Lista de Niños",
+    user: "Usuario",
+    role: "Rol",
+    permissions: "Permisos",
+    isAdmin: "Es Administrador",
+    isEducator: "Es Educador",
+    isParent: "Es Padre/Madre",
+    yes: "Sí",
+    no: "No",
+    currentPath: "Ruta Actual",
+    currentResource: "Recurso Actual",
+    none: "Ninguno",
+    inResourceList: "En Lista de Recurso",
+    inResourceCreate: "En Creación de Recurso",
+    createUser: "Crear Usuario",
+    userList: "Lista de Usuarios",
+    childList: "Lista de Niños",
+    viewUser: "Ver Usuario",
+    updateUser: "Actualizar Usuario",
+    deleteUser: "Eliminar Usuario",
+    view: "Ver",
+    edit: "Editar",
+    delete: "Eliminar",
+    age: "Edad",
+    years: "años",
+  },
+} as const;
 
 /**
  * Componente de ejemplo que demuestra el uso de todos los hooks de Refine
  * implementados con las mejores prácticas
  */
 export const ExampleUsage: React.FC = () => {
+  const { language } = useLanguage();
+  const t = EXAMPLE_USAGE_TRANSLATIONS[language];
   // ===== HOOKS DE AUTENTICACIÓN =====
   const { 
     user, 
@@ -102,100 +174,100 @@ export const ExampleUsage: React.FC = () => {
   
   return (
     <div style={{ padding: "24px" }}>
-      <Title level={2}>Ejemplo de Uso de Hooks de Refine</Title>
+      <Title level={2}>{t.pageTitle}</Title>
       
       {/* Información del Usuario */}
-      <Card title="Información de Autenticación" style={{ marginBottom: "24px" }}>
+      <Card title={t.authInfo} style={{ marginBottom: "24px" }}>
         <Space direction="vertical" size="middle">
           <div>
-            <Text strong>Usuario: </Text>
+            <Text strong>{t.user}: </Text>
             <Text>{getUserFullName()}</Text>
           </div>
           <div>
-            <Text strong>Rol: </Text>
+            <Text strong>{t.role}: </Text>
             <Tag color={getUserRoleColor()}>{getUserRoleLabel()}</Tag>
           </div>
           <div>
-            <Text strong>Permisos: </Text>
+            <Text strong>{t.permissions}: </Text>
             <Text code>{JSON.stringify(permissions)}</Text>
           </div>
           <div>
-            <Text strong>Es Administrador: </Text>
+            <Text strong>{t.isAdmin}: </Text>
             <Tag color={isAdmin() ? "green" : "red"}>
-              {isAdmin() ? "Sí" : "No"}
+              {isAdmin() ? t.yes : t.no}
             </Tag>
           </div>
           <div>
-            <Text strong>Es Educador: </Text>
+            <Text strong>{t.isEducator}: </Text>
             <Tag color={isEducator() ? "green" : "red"}>
-              {isEducator() ? "Sí" : "No"}
+              {isEducator() ? t.yes : t.no}
             </Tag>
           </div>
           <div>
-            <Text strong>Es Padre/Madre: </Text>
+            <Text strong>{t.isParent}: </Text>
             <Tag color={isParent() ? "green" : "red"}>
-              {isParent() ? "Sí" : "No"}
+              {isParent() ? t.yes : t.no}
             </Tag>
           </div>
         </Space>
       </Card>
 
       {/* Información de Navegación */}
-      <Card title="Información de Navegación" style={{ marginBottom: "24px" }}>
+      <Card title={t.navigationInfo} style={{ marginBottom: "24px" }}>
         <Space direction="vertical" size="middle">
           <div>
-            <Text strong>Ruta Actual: </Text>
+            <Text strong>{t.currentPath}: </Text>
             <Text code>{currentPath}</Text>
           </div>
           <div>
-            <Text strong>Recurso Actual: </Text>
-            <Text code>{currentResource || "Ninguno"}</Text>
+            <Text strong>{t.currentResource}: </Text>
+            <Text code>{currentResource || t.none}</Text>
           </div>
           <div>
-            <Text strong>En Lista de Recurso: </Text>
+            <Text strong>{t.inResourceList}: </Text>
             <Tag color={isInResourceList("users") ? "green" : "red"}>
-              {isInResourceList("users") ? "Sí" : "No"}
+              {isInResourceList("users") ? t.yes : t.no}
             </Tag>
           </div>
           <div>
-            <Text strong>En Creación de Recurso: </Text>
+            <Text strong>{t.inResourceCreate}: </Text>
             <Tag color={isInResourceCreate("users") ? "green" : "red"}>
-              {isInResourceCreate("users") ? "Sí" : "No"}
+              {isInResourceCreate("users") ? t.yes : t.no}
             </Tag>
           </div>
         </Space>
       </Card>
 
       {/* Botones de Navegación */}
-      <Card title="Navegación" style={{ marginBottom: "24px" }}>
+      <Card title={t.navigation} style={{ marginBottom: "24px" }}>
         <Space wrap>
           <Button 
             type="primary" 
             icon={<PlusOutlined />}
             onClick={() => navigateToCreate("users")}
           >
-            Crear Usuario
+            {t.createUser}
           </Button>
           <Button 
             onClick={() => navigateToList("users")}
           >
-            Lista de Usuarios
+            {t.userList}
           </Button>
           <Button 
             onClick={() => navigateToList("children")}
           >
-            Lista de Niños
+            {t.childList}
           </Button>
           <Button 
             onClick={() => navigateToShow("users", 1)}
           >
-            Ver Usuario
+            {t.viewUser}
           </Button>
         </Space>
       </Card>
 
       {/* Operaciones CRUD */}
-      <Card title="Operaciones CRUD" style={{ marginBottom: "24px" }}>
+      <Card title={t.crudOperations} style={{ marginBottom: "24px" }}>
         <Space wrap>
           <Button 
             type="primary" 
@@ -203,14 +275,14 @@ export const ExampleUsage: React.FC = () => {
             loading={createUserLoading}
             onClick={handleCreateUser}
           >
-            Crear Usuario
+            {t.createUser}
           </Button>
           <Button 
             icon={<EditOutlined />}
             loading={updateUserLoading}
             onClick={() => handleUpdateUser(1)}
           >
-            Actualizar Usuario
+            {t.updateUser}
           </Button>
           <Button 
             danger
@@ -218,13 +290,13 @@ export const ExampleUsage: React.FC = () => {
             loading={deleteUserLoading}
             onClick={() => handleDeleteUser(1)}
           >
-            Eliminar Usuario
+            {t.deleteUser}
           </Button>
         </Space>
       </Card>
 
       {/* Lista de Usuarios */}
-      <Card title="Lista de Usuarios" loading={usersLoading}>
+      <Card title={t.usersList} loading={usersLoading}>
         <List
           dataSource={users || []}
           renderItem={(user: any) => (
@@ -235,14 +307,14 @@ export const ExampleUsage: React.FC = () => {
                   icon={<EyeOutlined />}
                   onClick={() => navigateToShow("users", user.id)}
                 >
-                  Ver
+                  {t.view}
                 </Button>,
                 <Button 
                   type="link" 
                   icon={<EditOutlined />}
                   onClick={() => navigateToEdit("users", user.id)}
                 >
-                  Editar
+                  {t.edit}
                 </Button>,
                 <Button 
                   type="link" 
@@ -250,7 +322,7 @@ export const ExampleUsage: React.FC = () => {
                   icon={<DeleteOutlined />}
                   onClick={() => handleDeleteUser(user.id)}
                 >
-                  Eliminar
+                  {t.delete}
                 </Button>,
               ]}
             >
@@ -264,7 +336,7 @@ export const ExampleUsage: React.FC = () => {
       </Card>
 
       {/* Lista de Niños */}
-      <Card title="Lista de Niños" loading={childrenLoading}>
+      <Card title={t.childrenList} loading={childrenLoading}>
         <List
           dataSource={children || []}
           renderItem={(child: any) => (
@@ -275,20 +347,20 @@ export const ExampleUsage: React.FC = () => {
                   icon={<EyeOutlined />}
                   onClick={() => navigateToShow("children", child.id)}
                 >
-                  Ver
+                  {t.view}
                 </Button>,
                 <Button 
                   type="link" 
                   icon={<EditOutlined />}
                   onClick={() => navigateToEdit("children", child.id)}
                 >
-                  Editar
+                  {t.edit}
                 </Button>,
               ]}
             >
               <List.Item.Meta
                 title={`${child.firstName} ${child.lastName}`}
-                description={`Edad: ${child.age} años`}
+                description={`${t.age}: ${child.age} ${t.years}`}
               />
             </List.Item>
           )}

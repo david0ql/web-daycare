@@ -1,14 +1,70 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { List, EditButton, DeleteButton, ShowButton, CreateButton, useTable } from '@refinedev/antd';
 import { Table, Space, Tag, Button, Tooltip, Image, Typography } from 'antd';
-import { EyeOutlined, EditOutlined, DeleteOutlined, PlusOutlined, BellOutlined } from '@ant-design/icons';
-import { useIncidents, useDeleteIncident } from '../../domains/incidents';
-import { getSeverityColor, getSeverityLabel, formatIncidentDate, getIncidentStatus, getAttachmentUrl } from '../../domains/incidents';
+import { PlusOutlined, BellOutlined } from '@ant-design/icons';
+import { useDeleteIncident } from '../../domains/incidents';
+import { getSeverityColor, getSeverityLabelByLanguage, formatIncidentDate, getIncidentStatusByLanguage, getAttachmentUrl } from '../../domains/incidents';
 import { useInvalidate, useCustomMutation, useNotification } from '@refinedev/core';
+import { useLanguage } from '../../shared/contexts/language.context';
 
 const { Text } = Typography;
 
+const INCIDENTS_LIST_TRANSLATIONS = {
+  english: {
+    title: "Incidents List",
+    createIncident: "Create Incident",
+    id: "ID",
+    titleCol: "Title",
+    child: "Child",
+    type: "Type",
+    incidentDate: "Incident Date",
+    location: "Location",
+    status: "Status",
+    attachments: "Attachments",
+    noAttachments: "No attachments",
+    reportedBy: "Reported by",
+    actions: "Actions",
+    markNotified: "Mark as notified to parents",
+    deleteConfirm: "Are you sure you want to delete this incident?",
+    deleteOk: "Yes, delete",
+    cancel: "Cancel",
+    notifiedSuccess: "Incident marked as notified to parents",
+    notifiedDesc: "The parent has been notified correctly",
+    notifiedError: "Error marking as notified",
+    deleteSuccess: "Incident deleted successfully",
+    deleteDesc: "The incident has been deleted correctly",
+    deleteError: "Error deleting incident",
+  },
+  spanish: {
+    title: "Lista de incidentes",
+    createIncident: "Crear incidente",
+    id: "ID",
+    titleCol: "Título",
+    child: "Niño",
+    type: "Tipo",
+    incidentDate: "Fecha del incidente",
+    location: "Ubicación",
+    status: "Estado",
+    attachments: "Adjuntos",
+    noAttachments: "Sin adjuntos",
+    reportedBy: "Reportado por",
+    actions: "Acciones",
+    markNotified: "Marcar como notificado a padres",
+    deleteConfirm: "¿Está seguro de eliminar este incidente?",
+    deleteOk: "Sí, eliminar",
+    cancel: "Cancelar",
+    notifiedSuccess: "Incidente marcado como notificado a padres",
+    notifiedDesc: "El padre ha sido notificado correctamente",
+    notifiedError: "Error al marcar como notificado",
+    deleteSuccess: "Incidente eliminado correctamente",
+    deleteDesc: "El incidente ha sido eliminado correctamente",
+    deleteError: "Error al eliminar el incidente",
+  },
+} as const;
+
 export const IncidentsList: React.FC = () => {
+  const { language } = useLanguage();
+  const t = INCIDENTS_LIST_TRANSLATIONS[language];
   const { tableProps } = useTable({
     syncWithLocation: false,
     sorters: {
@@ -47,15 +103,15 @@ export const IncidentsList: React.FC = () => {
       
       open?.({
         type: "success",
-        message: "Incident marked as notified to parents",
-        description: "The parent has been notified correctly",
+        message: t.notifiedSuccess,
+        description: t.notifiedDesc,
       });
     } catch (error) {
       console.log('🔍 Mark parent notified - error:', error);
       open?.({
         type: "error",
-        message: "Error marking as notified",
-        description: "Could not notify the parent. Please try again.",
+        message: t.notifiedError,
+        description: t.notifiedError,
       });
     }
   };
@@ -76,34 +132,34 @@ export const IncidentsList: React.FC = () => {
       
       open?.({
         type: "success",
-        message: "Incident deleted successfully",
-        description: "The incident has been deleted correctly",
+        message: t.deleteSuccess,
+        description: t.deleteDesc,
       });
     } catch (error) {
       console.log('🔍 Delete incident - error:', error);
       open?.({
         type: "error",
-        message: "Error deleting incident",
-        description: "Could not delete the incident. Please try again.",
+        message: t.deleteError,
+        description: t.deleteError,
       });
     }
   };
 
   const columns = [
     {
-      title: 'ID',
+      title: t.id,
       dataIndex: 'id',
       key: 'id',
       width: 60,
     },
     {
-      title: 'Title',
+      title: t.titleCol,
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
     },
     {
-      title: 'Child',
+      title: t.child,
       key: 'child',
       render: (record: any) => (
         <Text>
@@ -112,36 +168,36 @@ export const IncidentsList: React.FC = () => {
       ),
     },
     {
-      title: 'Type',
+      title: t.type,
       key: 'incidentType',
       render: (record: any) => (
         <div>
           <Text strong>{record.incidentType?.name}</Text>
           <br />
           <Tag color={getSeverityColor(record.incidentType?.severityLevel)}>
-            {getSeverityLabel(record.incidentType?.severityLevel)}
+            {getSeverityLabelByLanguage(record.incidentType?.severityLevel, language)}
           </Tag>
         </div>
       ),
     },
     {
-      title: 'Incident Date',
+      title: t.incidentDate,
       dataIndex: 'incidentDate',
       key: 'incidentDate',
       render: (date: string) => formatIncidentDate(date),
       sorter: true,
     },
     {
-      title: 'Location',
+      title: t.location,
       dataIndex: 'location',
       key: 'location',
       ellipsis: true,
     },
     {
-      title: 'Status',
+      title: t.status,
       key: 'parentNotified',
       render: (record: any) => {
-        const status = getIncidentStatus(record.parentNotified);
+        const status = getIncidentStatusByLanguage(record.parentNotified, language);
         return (
           <Tag color={status.status}>
             {status.text}
@@ -150,12 +206,12 @@ export const IncidentsList: React.FC = () => {
       },
     },
     {
-      title: 'Attachments',
+      title: t.attachments,
       key: 'attachments',
       render: (record: any) => {
         const attachments = record.incidentAttachments || [];
         if (attachments.length === 0) {
-          return <Text type="secondary">No attachments</Text>;
+          return <Text type="secondary">{t.noAttachments}</Text>;
         }
         
         return (
@@ -183,7 +239,7 @@ export const IncidentsList: React.FC = () => {
       },
     },
     {
-      title: 'Reported by',
+      title: t.reportedBy,
       key: 'reportedBy2',
       render: (record: any) => (
         <Text>
@@ -192,14 +248,14 @@ export const IncidentsList: React.FC = () => {
       ),
     },
     {
-      title: 'Actions',
+      title: t.actions,
       key: 'actions',
       render: (record: any) => (
         <Space>
           <ShowButton hideText size="small" recordItemId={record.id} />
           <EditButton hideText size="small" recordItemId={record.id} />
           {!record.parentNotified && (
-            <Tooltip title="Mark as notified to parents">
+            <Tooltip title={t.markNotified}>
               <Button
                 type="link"
                 size="small"
@@ -212,9 +268,9 @@ export const IncidentsList: React.FC = () => {
             hideText
             size="small"
             recordItemId={record.id}
-            confirmTitle="Are you sure you want to delete this incident?"
-            confirmOkText="Yes, delete"
-            confirmCancelText="Cancel"
+            confirmTitle={t.deleteConfirm}
+            confirmOkText={t.deleteOk}
+            confirmCancelText={t.cancel}
           />
         </Space>
       ),
@@ -223,10 +279,10 @@ export const IncidentsList: React.FC = () => {
 
   return (
     <List
-      title="Incident List"
+      title={t.title}
       headerButtons={[
         <CreateButton key="create" icon={<PlusOutlined />}>
-          Create Incident
+          {t.createIncident}
         </CreateButton>,
       ]}
     >

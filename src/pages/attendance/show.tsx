@@ -4,10 +4,68 @@ import { useShow } from "@refinedev/core";
 import { Typography, Card, Row, Col, Tag, Avatar, Space, Divider } from "antd";
 import { UserOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { AttendanceDetailsTabs } from "../../domains/attendance";
+import { useLanguage } from "../../shared/contexts/language.context";
+import { getIntlLocale } from "../../shared/i18n/locale";
 
 const { Title, Text } = Typography;
 
+const ATTENDANCE_SHOW_TRANSLATIONS = {
+  english: {
+    title: "Attendance Details",
+    infoTitle: "Attendance Information",
+    childInfo: "Child Information",
+    attendanceStatus: "Attendance Status",
+    status: "Status",
+    date: "Date",
+    schedule: "Schedule",
+    checkInTime: "Check-in Time",
+    checkOutTime: "Check-out Time",
+    notRecorded: "Not recorded",
+    responsiblePersons: "Responsible Persons",
+    deliveredBy: "Delivered by",
+    pickedUpBy: "Picked up by",
+    notSpecified: "Not specified",
+    notes: "Notes",
+    checkInNotes: "Check-in Notes",
+    checkOutNotes: "Check-out Notes",
+    noNotes: "No notes",
+    id: "ID",
+    absent: "Absent",
+    checkedOut: "Checked Out",
+    present: "Present",
+    presentNoCheckIn: "Present (No check-in)",
+  },
+  spanish: {
+    title: "Detalles de asistencia",
+    infoTitle: "Información de asistencia",
+    childInfo: "Información del niño",
+    attendanceStatus: "Estado de asistencia",
+    status: "Estado",
+    date: "Fecha",
+    schedule: "Horario",
+    checkInTime: "Hora de entrada",
+    checkOutTime: "Hora de salida",
+    notRecorded: "No registrada",
+    responsiblePersons: "Personas responsables",
+    deliveredBy: "Entregado por",
+    pickedUpBy: "Recogido por",
+    notSpecified: "No especificado",
+    notes: "Notas",
+    checkInNotes: "Notas de entrada",
+    checkOutNotes: "Notas de salida",
+    noNotes: "Sin notas",
+    id: "ID",
+    absent: "Ausente",
+    checkedOut: "Retirado",
+    present: "Presente",
+    presentNoCheckIn: "Presente (sin entrada)",
+  },
+} as const;
+
 export const AttendanceShow: React.FC = () => {
+  const { language } = useLanguage();
+  const t = ATTENDANCE_SHOW_TRANSLATIONS[language];
+  const intlLocale = getIntlLocale(language);
   const { data, isLoading } = useShow() as any;
   const record = data?.data;
 
@@ -15,7 +73,7 @@ export const AttendanceShow: React.FC = () => {
     if (!record?.isPresent) {
       return (
         <Tag color="red" icon={<CloseCircleOutlined />}>
-          Absent
+          {t.absent}
         </Tag>
       );
     }
@@ -23,7 +81,7 @@ export const AttendanceShow: React.FC = () => {
     if (record?.checkOutTime) {
       return (
         <Tag color="green" icon={<CheckCircleOutlined />}>
-          Checked Out
+          {t.checkedOut}
         </Tag>
       );
     }
@@ -31,25 +89,25 @@ export const AttendanceShow: React.FC = () => {
     if (record?.checkInTime) {
       return (
         <Tag color="blue" icon={<ClockCircleOutlined />}>
-          Present
+          {t.present}
         </Tag>
       );
     }
 
     return (
       <Tag color="orange">
-        Present (No check-in)
+        {t.presentNoCheckIn}
       </Tag>
     );
   };
 
   return (
-    <Show title="Attendance Details" isLoading={isLoading}>
-      <Title level={5}>Attendance Information</Title>
+    <Show title={t.title} isLoading={isLoading}>
+      <Title level={5}>{t.infoTitle}</Title>
       
       <Row gutter={16}>
         <Col span={12}>
-          <Card title="Child Information" size="small">
+          <Card title={t.childInfo} size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
                 <Avatar 
@@ -60,7 +118,7 @@ export const AttendanceShow: React.FC = () => {
                 <div style={{ marginTop: 8 }}>
                   <Text strong>{record?.child?.firstName} {record?.child?.lastName}</Text>
                   <br />
-                  <Text type="secondary">ID: {record?.childId}</Text>
+                  <Text type="secondary">{t.id}: {record?.childId}</Text>
                 </div>
               </div>
             </Space>
@@ -68,14 +126,14 @@ export const AttendanceShow: React.FC = () => {
         </Col>
         
         <Col span={12}>
-          <Card title="Attendance Status" size="small">
+          <Card title={t.attendanceStatus} size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Status: </Text>
+                <Text strong>{t.status}: </Text>
                 {getStatusTag()}
               </div>
               <div>
-                <Text strong>Date: </Text>
+                <Text strong>{t.date}: </Text>
                 <DateField value={record?.attendanceDate} format="DD/MM/YYYY" />
               </div>
             </Space>
@@ -87,28 +145,28 @@ export const AttendanceShow: React.FC = () => {
 
       <Row gutter={16}>
         <Col span={12}>
-          <Card title="Schedule" size="small">
+          <Card title={t.schedule} size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Check-in Time: </Text>
+                <Text strong>{t.checkInTime}: </Text>
                 {record?.checkInTime ? (
-                  <Text>{new Date(record.checkInTime).toLocaleTimeString('es-CO', { 
+                  <Text>{new Date(record.checkInTime).toLocaleTimeString(intlLocale, { 
                     hour: '2-digit', 
                     minute: '2-digit' 
                   })}</Text>
                 ) : (
-                  <Text type="secondary">No registrada</Text>
+                  <Text type="secondary">{t.notRecorded}</Text>
                 )}
               </div>
               <div>
-                <Text strong>Check-out Time: </Text>
+                <Text strong>{t.checkOutTime}: </Text>
                 {record?.checkOutTime ? (
-                  <Text>{new Date(record.checkOutTime).toLocaleTimeString('es-CO', { 
+                  <Text>{new Date(record.checkOutTime).toLocaleTimeString(intlLocale, { 
                     hour: '2-digit', 
                     minute: '2-digit' 
                   })}</Text>
                 ) : (
-                  <Text type="secondary">No registrada</Text>
+                  <Text type="secondary">{t.notRecorded}</Text>
                 )}
               </div>
             </Space>
@@ -116,10 +174,10 @@ export const AttendanceShow: React.FC = () => {
         </Col>
         
         <Col span={12}>
-          <Card title="Responsible Persons" size="small">
+          <Card title={t.responsiblePersons} size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Delivered by: </Text>
+                <Text strong>{t.deliveredBy}: </Text>
                 {record?.deliveredBy2 ? (
                   <div>
                     <Text>{record.deliveredBy2.name}</Text>
@@ -129,11 +187,11 @@ export const AttendanceShow: React.FC = () => {
                     </Text>
                   </div>
                 ) : (
-                  <Text type="secondary">No especificado</Text>
+                  <Text type="secondary">{t.notSpecified}</Text>
                 )}
               </div>
               <div>
-                <Text strong>Picked up by: </Text>
+                <Text strong>{t.pickedUpBy}: </Text>
                 {record?.pickedUpBy2 ? (
                   <div>
                     <Text>{record.pickedUpBy2.name}</Text>
@@ -143,7 +201,7 @@ export const AttendanceShow: React.FC = () => {
                     </Text>
                   </div>
                 ) : (
-                  <Text type="secondary">No especificado</Text>
+                  <Text type="secondary">{t.notSpecified}</Text>
                 )}
               </div>
             </Space>
@@ -155,22 +213,22 @@ export const AttendanceShow: React.FC = () => {
 
       <Row gutter={16}>
         <Col span={24}>
-          <Card title="Notes" size="small">
+          <Card title={t.notes} size="small">
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
-                <Text strong>Check-in Notes: </Text>
+                <Text strong>{t.checkInNotes}: </Text>
                 {record?.checkInNotes ? (
                   <Text>{record.checkInNotes}</Text>
                 ) : (
-                  <Text type="secondary">Sin notas</Text>
+                  <Text type="secondary">{t.noNotes}</Text>
                 )}
               </div>
               <div>
-                <Text strong>Check-out Notes: </Text>
+                <Text strong>{t.checkOutNotes}: </Text>
                 {record?.checkOutNotes ? (
                   <Text>{record.checkOutNotes}</Text>
                 ) : (
-                  <Text type="secondary">Sin notas</Text>
+                  <Text type="secondary">{t.noNotes}</Text>
                 )}
               </div>
             </Space>

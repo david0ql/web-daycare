@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Upload, Button, List, Image, Typography, Space, message, Modal } from 'antd';
 import { UploadOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { useAddIncidentAttachment, useRemoveIncidentAttachment, getAttachmentUrl } from '../../domains/incidents';
+import { useAddIncidentAttachment, useRemoveIncidentAttachment, getAttachmentUrl, getFileTypeLabelByLanguage } from '../../domains/incidents';
 import { axiosInstance } from '../../shared';
+import { useLanguage } from '../../shared/contexts/language.context';
+import { getIntlLocale } from '../../shared/i18n/locale';
 
 const { Text } = Typography;
 
@@ -12,11 +14,44 @@ interface IncidentAttachmentsProps {
   onAttachmentsChange: () => void;
 }
 
+const INCIDENT_ATTACHMENTS_TRANSLATIONS = {
+  english: {
+    uploadSuccess: "File uploaded successfully",
+    uploadError: "Error uploading file:",
+    deleteSuccess: "File deleted successfully",
+    deleteError: "Error deleting file",
+    invalidFileType: "Only image, PDF, or document files are allowed",
+    fileTooLarge: "File must be less than 10MB",
+    uploadFile: "Upload File",
+    view: "View",
+    delete: "Delete",
+    preview: "Preview",
+    uploadedBy: "Uploaded by",
+  },
+  spanish: {
+    uploadSuccess: "Archivo subido correctamente",
+    uploadError: "Error al subir archivo:",
+    deleteSuccess: "Archivo eliminado correctamente",
+    deleteError: "Error al eliminar archivo",
+    invalidFileType: "Solo se permiten imágenes, PDF o documentos",
+    fileTooLarge: "El archivo debe ser menor de 10MB",
+    uploadFile: "Subir archivo",
+    view: "Ver",
+    delete: "Eliminar",
+    preview: "Vista previa",
+    uploadedBy: "Subido por",
+  },
+} as const;
+
 export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
   incidentId,
   attachments,
   onAttachmentsChange,
 }) => {
+  const { language } = useLanguage();
+  const t = INCIDENT_ATTACHMENTS_TRANSLATIONS[language];
+  const intlLocale = getIntlLocale(language);
+
   const [fileList, setFileList] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -50,11 +85,11 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
         fileType: file.type.startsWith('image/') ? 'image' : 'document',
       });
 
-      message.success('File uploaded successfully');
+      message.success(t.uploadSuccess);
       onAttachmentsChange();
       setFileList([]);
     } catch (error: any) {
-      message.error('Error uploading file: ' + (error.response?.data?.message || error.message));
+      message.error(`${t.uploadError} ${error.response?.data?.message || error.message}`);
     } finally {
       setIsUploading(false);
     }
@@ -63,10 +98,10 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
   const handleRemoveAttachment = async (attachmentId: number) => {
     try {
       await removeAttachmentMutation.mutateAsync(attachmentId);
-      message.success('File deleted successfully');
+      message.success(t.deleteSuccess);
       onAttachmentsChange();
     } catch (error: any) {
-      message.error('Error deleting file');
+      message.error(t.deleteError);
     }
   };
 
@@ -82,13 +117,13 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
                        file.type.includes('text');
     
     if (!isValidType) {
-      message.error('Only image, PDF, or document files are allowed');
+      message.error(t.invalidFileType);
       return false;
     }
 
     const isLt10M = file.size / 1024 / 1024 < 10;
     if (!isLt10M) {
-      message.error('File must be less than 10MB');
+      message.error(t.fileTooLarge);
       return false;
     }
 
@@ -110,7 +145,7 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
           loading={isUploading}
           disabled={isUploading}
         >
-          Upload File
+          {t.uploadFile}
         </Button>
       </Upload>
 
@@ -128,7 +163,7 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
                   onClick={() => handlePreview(attachment.filePath)}
                   disabled={attachment.fileType !== 'image'}
                 >
-                  View
+                  {t.view}
                 </Button>,
                 <Button
                   key="delete"
@@ -138,7 +173,7 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
                   onClick={() => handleRemoveAttachment(attachment.id)}
                   loading={removeAttachmentMutation.isPending}
                 >
-                  Delete
+                  {t.delete}
                 </Button>,
               ]}
             >
@@ -171,13 +206,13 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
                 description={
                   <Space>
                     <Text type="secondary">
-                      {attachment.fileType === 'image' ? 'Image' : 'Document'}
+                      {getFileTypeLabelByLanguage(attachment.fileType, language)}
                     </Text>
                     <Text type="secondary">
-                      Uploaded by: {attachment.uploadedBy2?.firstName} {attachment.uploadedBy2?.lastName}
+                      {t.uploadedBy}: {attachment.uploadedBy2?.firstName} {attachment.uploadedBy2?.lastName}
                     </Text>
                     <Text type="secondary">
-                      {new Date(attachment.createdAt).toLocaleDateString()}
+                      {new Date(attachment.createdAt).toLocaleDateString(intlLocale)}
                     </Text>
                   </Space>
                 }
@@ -189,7 +224,7 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
 
       <Modal
         open={previewVisible}
-        title="Preview"
+        title={t.preview}
         footer={null}
         onCancel={() => setPreviewVisible(false)}
       >

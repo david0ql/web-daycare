@@ -8,17 +8,82 @@ import { clearDataProviderCache } from '../../dataProvider-stable-fixed';
 import { useCreateDocument, useDocumentTypes, canUploadMultiple } from '../../domains/documents';
 import { UploadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import 'dayjs/locale/es';
+import { useLanguage } from '../../shared/contexts/language.context';
 
 const { Title } = Typography;
 const { Option } = Select;
 const { Dragger } = Upload;
+
+const DOCUMENT_CREATE_TRANSLATIONS = {
+  english: {
+    title: "Upload Document",
+    save: "Save",
+    child: "Child",
+    childRequired: "Please select a child",
+    childPlaceholder: "Select a child",
+    loading: "Loading...",
+    noChildren: "No children available",
+    documentType: "Document Type",
+    documentTypeRequired: "Please select a document type",
+    documentTypePlaceholder: "Select a document type",
+    firstSelectChild: "First select a child",
+    noDocumentTypes: "No document types available",
+    expirationOptional: "Expiration Date (Optional)",
+    expirationPlaceholder: "Select expiration date",
+    file: "File",
+    fileRequired: "Please select a file",
+    dragText: "Click or drag a file to upload",
+    dragHint: "Supports PDF files, images, documents and spreadsheets (max 10MB)",
+    invalidFileType: "Only PDF files, images, documents and spreadsheets are allowed",
+    fileTooLarge: "File must be less than 10MB",
+    uploadErrorTitle: "Error uploading document",
+    selectFileToUpload: "Please select a file to upload",
+    couldNotGetFile: "Could not get the selected file",
+    uploadSuccessTitle: "Document uploaded successfully",
+    uploadSuccessDesc: "The document has been uploaded correctly",
+    seedSuccessTitle: "Document types created successfully",
+    seedSuccessDesc: "Basic document types have been created",
+    seedErrorTitle: "Error creating document types",
+  },
+  spanish: {
+    title: "Subir documento",
+    save: "Guardar",
+    child: "Niño",
+    childRequired: "Por favor selecciona un niño",
+    childPlaceholder: "Selecciona un niño",
+    loading: "Cargando...",
+    noChildren: "No hay niños disponibles",
+    documentType: "Tipo de documento",
+    documentTypeRequired: "Por favor selecciona un tipo de documento",
+    documentTypePlaceholder: "Selecciona un tipo de documento",
+    firstSelectChild: "Primero selecciona un niño",
+    noDocumentTypes: "No hay tipos de documento disponibles",
+    expirationOptional: "Fecha de vencimiento (Opcional)",
+    expirationPlaceholder: "Selecciona fecha de vencimiento",
+    file: "Archivo",
+    fileRequired: "Por favor selecciona un archivo",
+    dragText: "Haz clic o arrastra un archivo para subirlo",
+    dragHint: "Soporta archivos PDF, imágenes, documentos y hojas de cálculo (máx 10MB)",
+    invalidFileType: "Solo se permiten archivos PDF, imágenes, documentos y hojas de cálculo",
+    fileTooLarge: "El archivo debe ser menor de 10MB",
+    uploadErrorTitle: "Error al subir documento",
+    selectFileToUpload: "Por favor selecciona un archivo para subir",
+    couldNotGetFile: "No se pudo obtener el archivo seleccionado",
+    uploadSuccessTitle: "Documento subido correctamente",
+    uploadSuccessDesc: "El documento ha sido subido correctamente",
+    seedSuccessTitle: "Tipos de documento creados correctamente",
+    seedSuccessDesc: "Se han creado los tipos de documento básicos",
+    seedErrorTitle: "Error al crear tipos de documento",
+  },
+} as const;
 
 export const DocumentCreate: React.FC = () => {
   const go = useGo();
   const invalidate = useInvalidate();
   const { open } = useNotification();
   const queryClient = useQueryClient();
+  const { language } = useLanguage();
+  const t = DOCUMENT_CREATE_TRANSLATIONS[language];
 
   const [selectedChildId, setSelectedChildId] = useState<number | undefined>(undefined);
   const [selectedDocumentTypeId, setSelectedDocumentTypeId] = useState<number | undefined>(undefined);
@@ -27,9 +92,6 @@ export const DocumentCreate: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form] = Form.useForm();
-
-  // Set dayjs locale
-  dayjs.locale('es');
 
   // Fetch children for the select
   const { data: childrenData, isLoading: childrenLoading } = useQuery({
@@ -58,13 +120,13 @@ export const DocumentCreate: React.FC = () => {
       await refetchDocumentTypes();
       open?.({
         type: "success",
-        message: "Document types created successfully",
-        description: "Basic document types have been created",
+        message: t.seedSuccessTitle,
+        description: t.seedSuccessDesc,
       });
     } catch (error: any) {
       open?.({
         type: "error",
-        message: "Error creating document types",
+        message: t.seedErrorTitle,
         description: error.response?.data?.message || error.message,
       });
     }
@@ -139,8 +201,8 @@ export const DocumentCreate: React.FC = () => {
     if (fileList.length === 0) {
       open?.({
         type: "error",
-        message: "Error uploading document",
-        description: "Please select a file to upload",
+        message: t.uploadErrorTitle,
+        description: t.selectFileToUpload,
       });
       return;
     }
@@ -149,8 +211,8 @@ export const DocumentCreate: React.FC = () => {
     if (!file) {
       open?.({
         type: "error",
-        message: "Error uploading document",
-        description: "Could not get the selected file",
+        message: t.uploadErrorTitle,
+        description: t.couldNotGetFile,
       });
       return;
     }
@@ -211,8 +273,8 @@ export const DocumentCreate: React.FC = () => {
       // Show success notification
       open?.({
         type: "success",
-        message: "Document uploaded successfully",
-        description: "The document has been uploaded correctly",
+        message: t.uploadSuccessTitle,
+        description: t.uploadSuccessDesc,
       });
       
       // Navigate back to documents list with a small delay for better UX
@@ -227,7 +289,7 @@ export const DocumentCreate: React.FC = () => {
       console.log('🔍 Upload error:', error);
       open?.({
         type: "error",
-        message: "Error uploading document",
+        message: t.uploadErrorTitle,
         description: error.response?.data?.message || error.message,
       });
     } finally {
@@ -246,13 +308,13 @@ export const DocumentCreate: React.FC = () => {
                          file.type.includes('spreadsheet');
       
       if (!isValidType) {
-        message.error('Only PDF files, images, documents and spreadsheets are allowed');
+        message.error(t.invalidFileType);
         return false;
       }
 
       const isLt10M = file.size / 1024 / 1024 < 10;
       if (!isLt10M) {
-        message.error('File must be less than 10MB');
+        message.error(t.fileTooLarge);
         return false;
       }
 
@@ -271,9 +333,10 @@ export const DocumentCreate: React.FC = () => {
 
   return (
     <Create
-      title="Upload Document"
+      title={t.title}
       saveButtonProps={{
         loading: isSubmitting,
+        children: t.save,
         onClick: () => {
           form.submit();
         },
@@ -287,15 +350,15 @@ export const DocumentCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              label="Child"
+              label={t.child}
               name="childId"
-              rules={[{ required: true, message: 'Please select a child' }]}
+              rules={[{ required: true, message: t.childRequired }]}
             >
               <Select
-                placeholder="Select a child"
+                placeholder={t.childPlaceholder}
                 showSearch
                 loading={childrenLoading}
-                notFoundContent={childrenLoading ? "Loading..." : "No children available"}
+                notFoundContent={childrenLoading ? t.loading : t.noChildren}
                 onChange={(value) => {
                   setSelectedChildId(value);
                   setSelectedDocumentTypeId(undefined);
@@ -319,19 +382,19 @@ export const DocumentCreate: React.FC = () => {
 
           <Col span={12}>
             <Form.Item
-              label="Document Type"
+              label={t.documentType}
               name="documentTypeId"
-              rules={[{ required: true, message: 'Please select a document type' }]}
+              rules={[{ required: true, message: t.documentTypeRequired }]}
             >
               <Select
-                placeholder="Select a document type"
+                placeholder={t.documentTypePlaceholder}
                 loading={documentTypesLoading}
                 disabled={!selectedChildId}
                 notFoundContent={
-                  documentTypesLoading ? "Loading..." : 
-                  !selectedChildId ? "First select a child" :
-                  availableDocumentTypes.length === 0 ? "No document types available" :
-                  "No document types available"
+                  documentTypesLoading ? t.loading : 
+                  !selectedChildId ? t.firstSelectChild :
+                  availableDocumentTypes.length === 0 ? t.noDocumentTypes :
+                  t.noDocumentTypes
                 }
                 showSearch
                 onChange={(value) => setSelectedDocumentTypeId(value)}
@@ -350,28 +413,28 @@ export const DocumentCreate: React.FC = () => {
         </Row>
 
         <Form.Item
-          label="Expiration Date (Optional)"
+          label={t.expirationOptional}
           name="expiresAt"
         >
           <DatePicker
             style={{ width: '100%' }}
             format="DD/MM/YYYY"
-            placeholder="Select expiration date"
+            placeholder={t.expirationPlaceholder}
           />
         </Form.Item>
 
         <Form.Item
-          label="File"
+          label={t.file}
           name="file"
-          rules={[{ required: true, message: 'Please select a file' }]}
+          rules={[{ required: true, message: t.fileRequired }]}
         >
           <Dragger {...uploadProps}>
             <p className="ant-upload-drag-icon">
               <UploadOutlined />
             </p>
-            <p className="ant-upload-text">Click or drag a file to upload</p>
+            <p className="ant-upload-text">{t.dragText}</p>
             <p className="ant-upload-hint">
-              Supports PDF files, images, documents and spreadsheets (max 10MB)
+              {t.dragHint}
             </p>
           </Dragger>
         </Form.Item>

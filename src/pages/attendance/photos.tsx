@@ -4,11 +4,41 @@ import { Table, Avatar, Tooltip, Tag, Space, Button, Card, Typography, Image } f
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import dayjs from 'dayjs';
+import { useLanguage } from "../../shared/contexts/language.context";
 
 const { Title, Text } = Typography;
 
+const ATTENDANCE_PHOTOS_TRANSLATIONS = {
+  english: {
+    title: "Activity Photos",
+    uploadPhoto: "Upload Photo",
+    child: "Child",
+    photo: "Photo",
+    description: "Description",
+    noDescription: "No description",
+    date: "Date",
+    uploadedBy: "Uploaded by",
+    created: "Created",
+    actions: "Actions",
+  },
+  spanish: {
+    title: "Fotos de actividades",
+    uploadPhoto: "Subir foto",
+    child: "Niño",
+    photo: "Foto",
+    description: "Descripción",
+    noDescription: "Sin descripción",
+    date: "Fecha",
+    uploadedBy: "Subido por",
+    created: "Creado",
+    actions: "Acciones",
+  },
+} as const;
+
 export const AttendancePhotos: React.FC = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const t = ATTENDANCE_PHOTOS_TRANSLATIONS[language];
   const today = dayjs().format('YYYY-MM-DD');
   const { tableProps } = useTable({
     resource: "attendance/activity-photos",
@@ -39,7 +69,7 @@ export const AttendancePhotos: React.FC = () => {
 
   return (
     <List
-      title="Activity Photos"
+      title={t.title}
       headerButtons={[
         <Button 
           type="primary" 
@@ -47,14 +77,14 @@ export const AttendancePhotos: React.FC = () => {
           icon={<PlusOutlined />}
           onClick={() => navigate('/attendance/photos/create')}
         >
-          Upload Photo
+          {t.uploadPhoto}
         </Button>,
       ]}
     >
       <Table {...tableProps} rowKey="id">
         <Table.Column
           dataIndex="child"
-          title="Child"
+          title={t.child}
           render={(child: any) => (
             <Space>
               <Avatar 
@@ -69,7 +99,7 @@ export const AttendancePhotos: React.FC = () => {
         />
         <Table.Column
           dataIndex="filename"
-          title="Photo"
+          title={t.photo}
           render={(filename: string, record: any) => (
             <Image
               width={60}
@@ -82,25 +112,25 @@ export const AttendancePhotos: React.FC = () => {
         />
         <Table.Column
           dataIndex="caption"
-          title="Description"
+          title={t.description}
           render={(caption: string) => (
             <Tooltip title={caption}>
               <Text ellipsis style={{ maxWidth: 200 }}>
-                {caption || 'No description'}
+                {caption || t.noDescription}
               </Text>
             </Tooltip>
           )}
         />
         <Table.Column
           dataIndex="attendance"
-          title="Date"
+          title={t.date}
           render={(attendance: any) => (
             <DateField value={attendance?.attendanceDate} format="DD/MM/YYYY" />
           )}
         />
         <Table.Column
           dataIndex="uploadedBy2"
-          title="Uploaded by"
+          title={t.uploadedBy}
           render={(user: any) => (
             <Text type="secondary">
               {user?.firstName} {user?.lastName}
@@ -109,13 +139,13 @@ export const AttendancePhotos: React.FC = () => {
         />
         <Table.Column
           dataIndex="createdAt"
-          title="Created"
+          title={t.created}
           render={(value: string) => (
             <DateField value={value} format="DD/MM/YYYY HH:mm" />
           )}
         />
         <Table.Column
-          title="Actions"
+          title={t.actions}
           dataIndex="actions"
           render={(_, record: any) => (
             <Space>
