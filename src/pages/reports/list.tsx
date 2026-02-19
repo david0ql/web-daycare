@@ -3,7 +3,10 @@ import { Card, Row, Col, Button, DatePicker, Space, Typography, Divider, message
 import { FileTextOutlined, DownloadOutlined, CalendarOutlined, UserOutlined } from '@ant-design/icons';
 import { axiosInstance } from '../../shared';
 import dayjs, { Dayjs } from 'dayjs';
+import isoWeek from 'dayjs/plugin/isoWeek';
 import { useLanguage } from '../../shared/contexts/language.context';
+
+dayjs.extend(isoWeek);
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -125,25 +128,22 @@ export const ReportList: React.FC = () => {
     fetchChildren();
   }, []);
 
-  const handleGenerateReport = async (reportType: string, endpoint: string, filename: string) => {
-    if (!dateRange) {
-      message.error(t.selectDateRange);
-      return;
-    }
-
+  const doDownloadReport = async (
+    reportType: string,
+    endpoint: string,
+    filename: string,
+    startDate: dayjs.Dayjs,
+    endDate: dayjs.Dayjs
+  ) => {
     setLoading(reportType);
     try {
-      const [startDate, endDate] = dateRange;
       const payload = {
         startDate: startDate.format('YYYY-MM-DD'),
         endDate: endDate.format('YYYY-MM-DD'),
       };
-
       const response = await axiosInstance.post(endpoint, payload, {
         responseType: 'blob',
       });
-
-      // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -152,7 +152,6 @@ export const ReportList: React.FC = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-
       message.success(`${reportType} ${t.generatedSuccess}`);
     } catch (error: any) {
       console.error('Error generating report:', error);
@@ -160,6 +159,39 @@ export const ReportList: React.FC = () => {
     } finally {
       setLoading(null);
     }
+  };
+
+  const handleGenerateReport = async (reportType: string, endpoint: string, filename: string) => {
+    if (!dateRange) {
+      message.error(t.selectDateRange);
+      return;
+    }
+    const [startDate, endDate] = dateRange;
+    await doDownloadReport(reportType, endpoint, filename, startDate, endDate);
+  };
+
+  const handleGenerateWeeklyAttendanceReport = async () => {
+    const startDate = dayjs().startOf('isoWeek');
+    const endDate = dayjs().endOf('isoWeek');
+    await doDownloadReport(
+      t.weeklyAttendanceReport,
+      '/reports/attendance/weekly',
+      'weekly-attendance-report.pdf',
+      startDate,
+      endDate
+    );
+  };
+
+  const handleGenerateMonthlyAttendanceReport = async () => {
+    const startDate = dayjs().startOf('month');
+    const endDate = dayjs().endOf('month');
+    await doDownloadReport(
+      t.monthlyAttendanceReport,
+      '/reports/attendance/monthly',
+      'monthly-attendance-report.pdf',
+      startDate,
+      endDate
+    );
   };
 
   const handleGeneratePaymentAlerts = async () => {
@@ -267,21 +299,15 @@ export const ReportList: React.FC = () => {
       title: t.weeklyAttendanceReport,
       description: t.weeklyAttendanceReportDesc,
       icon: <CalendarOutlined style={{ fontSize: '24px', color: '#52c41a' }} />,
-      action: () => handleGenerateReport(
-        t.weeklyAttendanceReport,
-        '/reports/attendance/weekly',
-        'weekly-attendance-report.pdf'
-      ),
+      action: handleGenerateWeeklyAttendanceReport,
+      noDateRequired: true,
     },
     {
       title: t.monthlyAttendanceReport,
       description: t.monthlyAttendanceReportDesc,
       icon: <CalendarOutlined style={{ fontSize: '24px', color: '#fa8c16' }} />,
-      action: () => handleGenerateReport(
-        t.monthlyAttendanceReport,
-        '/reports/attendance/monthly',
-        'monthly-attendance-report.pdf'
-      ),
+      action: handleGenerateMonthlyAttendanceReport,
+      noDateRequired: true,
     },
     {
       title: t.paymentAlerts,
