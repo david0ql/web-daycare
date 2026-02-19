@@ -92,7 +92,7 @@ export const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
               strong 
               style={{ 
                 fontSize: "18px", 
-                color: colors.text.primary,
+                color: colors.secondary.light,
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",

@@ -366,8 +366,8 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
         <div style={{ 
           padding: "20px 16px",
           borderBottom: `1px solid ${colors.border.light}`,
-          background: colors.gradients.primary,
-          color: "white",
+          background: "transparent",
+          color: colors.text.primary,
           textAlign: "center"
         }}>
           <img 
@@ -384,7 +384,7 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           />
           {!collapsed && (
             <>
-              <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "4px" }}>
+              <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "4px", color: colors.secondary.light }}>
                 {t.appName}
               </div>
               <div style={{ fontSize: "12px", opacity: 0.9 }}>
