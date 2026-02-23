@@ -71,7 +71,7 @@ export const ChildList: React.FC = () => {
   const formatBirthCity = (birthCity?: string) =>
     birthCity || t.notSpecified;
   const formatBirthDate = (birthDate: string) =>
-    new Date(birthDate).toLocaleDateString(language === "spanish" ? "es-ES" : "en-US", {
+    ChildUtils.parseDateOnly(birthDate).toLocaleDateString(language === "spanish" ? "es-ES" : "en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",

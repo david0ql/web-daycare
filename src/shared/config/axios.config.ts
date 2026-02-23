@@ -10,7 +10,8 @@ declare module 'axios' {
   }
 }
 
-const API_URL = "https://api.thechildrenworld.com/api";
+// const API_URL = "https://api.thechildrenworld.com/api";
+const API_URL = "http://localhost:30002/api";
 const TOKEN_KEY = "refine-auth";
 
 /**

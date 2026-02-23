@@ -17,10 +17,23 @@ export class ChildUtils {
   }
 
   /**
+   * Parse a date-only string (YYYY-MM-DD) as local date to avoid timezone shifting.
+   * new Date("2026-02-17") is interpreted as UTC midnight and can show the previous day in local time.
+   */
+  static parseDateOnly(isoDateStr: string): Date {
+    const parts = isoDateStr.split("-").map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) {
+      return new Date(isoDateStr);
+    }
+    const [y, m, d] = parts;
+    return new Date(y, m - 1, d);
+  }
+
+  /**
    * Calculate age in years and months
    */
   static calculateAge(birthDate: string): { years: number; months: number } {
-    const birth = new Date(birthDate);
+    const birth = ChildUtils.parseDateOnly(birthDate);
     const today = new Date();
     
     let years = today.getFullYear() - birth.getFullYear();
@@ -47,10 +60,10 @@ export class ChildUtils {
   }
 
   /**
-   * Format birth date for display
+   * Format birth date for display (parses YYYY-MM-DD as local date to avoid timezone shift)
    */
   static formatBirthDate(birthDate: string, language: Language = "english"): string {
-    return new Date(birthDate).toLocaleDateString(language === "spanish" ? "es-CO" : "en-US", {
+    return ChildUtils.parseDateOnly(birthDate).toLocaleDateString(language === "spanish" ? "es-CO" : "en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",

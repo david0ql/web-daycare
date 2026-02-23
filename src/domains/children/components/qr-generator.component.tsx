@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button, Space, Typography, Card, Row, Col, message, Spin } from 'antd';
 import { QrcodeOutlined, DownloadOutlined, FilePdfOutlined, FileImageOutlined } from '@ant-design/icons';
 import { Child } from '../types/child.types';
+import { ChildUtils } from '../utils/child.utils';
 import { useQRGenerator } from '../hooks/use-qr-generator.hook';
 import { useLanguage } from '../../../shared/contexts/language.context';
 import { getIntlLocale } from '../../../shared/i18n/locale';
@@ -122,7 +123,7 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({ child, visible, onClos
               <Text>{child.firstName} {child.lastName}</Text>
               <br />
               <Text strong>{t.birthDate}: </Text>
-              <Text>{new Date(child.birthDate).toLocaleDateString(intlLocale)}</Text>
+              <Text>{ChildUtils.parseDateOnly(child.birthDate).toLocaleDateString(intlLocale)}</Text>
             </Col>
 
             <Col span={24}>

@@ -409,7 +409,7 @@ export const ChildEdit: React.FC = () => {
               <DatePicker
                 style={{ width: "100%" }}
                 placeholder={t.birthDatePlaceholder}
-                format="YYYY-MM-DD"
+                format={language === "english" ? "MM-DD-YYYY" : "YYYY-MM-DD"}
               />
             </Form.Item>
           </Col>

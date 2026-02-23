@@ -2,6 +2,7 @@ import { useState } from 'react';
 import QRCode from 'qrcode';
 import jsPDF from 'jspdf';
 import { Child } from '../types/child.types';
+import { ChildUtils } from '../utils/child.utils';
 
 interface QRData {
   id: number;
@@ -81,7 +82,7 @@ export const useQRGenerator = () => {
       pdf.setFontSize(12);
       pdf.text(`ID: ${child.id}`, 20, 35);
       pdf.text(`Name: ${child.firstName} ${child.lastName}`, 20, 45);
-      pdf.text(`Date of Birth: ${new Date(child.birthDate).toLocaleDateString()}`, 20, 55);
+      pdf.text(`Date of Birth: ${ChildUtils.parseDateOnly(child.birthDate).toLocaleDateString()}`, 20, 55);
       pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 65);
 
       // Add QR code

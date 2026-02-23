@@ -352,13 +352,13 @@ export const ChildCreate: React.FC = () => {
               label={t.birthDate}
               name="birthDate"
               rules={[{ required: true, message: t.birthDateRequired }]}
-                getValueFromEvent={(date) => date ? dayjs(date).format("YYYY-MM-DD") : undefined}
-                getValueProps={(value) => ({ value: value ? dayjs(value) : undefined })}
+              getValueFromEvent={(date) => date ? dayjs(date).format("YYYY-MM-DD") : undefined}
+              getValueProps={(value) => ({ value: value ? dayjs(value) : undefined })}
             >
               <DatePicker
                 style={{ width: "100%" }}
-                  placeholder={t.birthDatePlaceholder}
-                  format="YYYY-MM-DD"
+                placeholder={t.birthDatePlaceholder}
+                format={language === "english" ? "MM-DD-YYYY" : "YYYY-MM-DD"}
               />
             </Form.Item>
           </Col>
