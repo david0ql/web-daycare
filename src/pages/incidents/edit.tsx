@@ -8,6 +8,7 @@ import { useUpdateIncident } from '../../domains/incidents';
 import { IncidentAttachmentsMultiple } from './attachments-multiple';
 import dayjs from 'dayjs';
 import { useLanguage } from '../../shared/contexts/language.context';
+import { getIncidentTypeLabelByLanguage, getSeverityLabelByLanguage } from '../../domains/incidents';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -290,12 +291,12 @@ export const IncidentsEdit: React.FC = () => {
                 loading={incidentTypesLoading}
                 notFoundContent={incidentTypesLoading ? t.loading : t.noTypesAvailable}
               >
-                {(incidentTypesData || []).map((type: any) => (
-                  <Option key={type.id} value={type.id}>
+{(incidentTypesData || []).map((type: any) => (
+                <Option key={type.id} value={type.id}>
                     <div>
-                      <div>{type.name}</div>
+                      <div>{getIncidentTypeLabelByLanguage(type.name, language)}</div>
                       <div style={{ fontSize: '12px', color: '#666' }}>
-                        {type.severityLevel} - {type.description}
+                        {getSeverityLabelByLanguage(type.severityLevel, language)}
                       </div>
                     </div>
                   </Option>

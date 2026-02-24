@@ -3,7 +3,7 @@ import { List, EditButton, DeleteButton, ShowButton, CreateButton, useTable } fr
 import { Table, Space, Tag, Button, Tooltip, Image, Typography } from 'antd';
 import { PlusOutlined, BellOutlined } from '@ant-design/icons';
 import { useDeleteIncident } from '../../domains/incidents';
-import { getSeverityColor, getSeverityLabelByLanguage, formatIncidentDateByLanguage, getIncidentStatusByLanguage, getAttachmentUrl } from '../../domains/incidents';
+import { getSeverityColor, getSeverityLabelByLanguage, getIncidentTypeLabelByLanguage, formatIncidentDateByLanguage, getIncidentStatusByLanguage, getAttachmentUrl } from '../../domains/incidents';
 import { useInvalidate, useCustomMutation, useNotification } from '@refinedev/core';
 import { useLanguage } from '../../shared/contexts/language.context';
 
@@ -172,7 +172,7 @@ export const IncidentsList: React.FC = () => {
       key: 'incidentType',
       render: (record: any) => (
         <div>
-          <Text strong>{record.incidentType?.name}</Text>
+          <Text strong>{getIncidentTypeLabelByLanguage(record.incidentType?.name, language)}</Text>
           <br />
           <Tag color={getSeverityColor(record.incidentType?.severityLevel)}>
             {getSeverityLabelByLanguage(record.incidentType?.severityLevel, language)}

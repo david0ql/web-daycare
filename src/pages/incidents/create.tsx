@@ -7,6 +7,7 @@ import { axiosInstance } from '../../shared';
 import { useCreateIncident } from '../../domains/incidents';
 import { IncidentAttachmentsMultiple } from './attachments-multiple';
 import { useLanguage } from '../../shared/contexts/language.context';
+import { getIncidentTypeLabelByLanguage, getSeverityLabelByLanguage } from '../../domains/incidents';
 import dayjs from 'dayjs';
 
 const { Title } = Typography;
@@ -257,9 +258,9 @@ export const IncidentsCreate: React.FC = () => {
                 {(incidentTypesData || []).map((type: any) => (
                   <Option key={type.id} value={type.id}>
                     <div>
-                      <div>{type.name}</div>
+                      <div>{getIncidentTypeLabelByLanguage(type.name, language)}</div>
                       <div style={{ fontSize: '12px', color: '#666' }}>
-                        {type.severityLevel} - {type.description}
+                        {getSeverityLabelByLanguage(type.severityLevel, language)}
                       </div>
                     </div>
                   </Option>

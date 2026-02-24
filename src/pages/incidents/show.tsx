@@ -4,7 +4,7 @@ import { Show, EditButton, DeleteButton } from '@refinedev/antd';
 import { useOne } from '@refinedev/core';
 import { Form, Input, Row, Col, Typography, Button, List, Image } from 'antd';
 import { BellOutlined, EditOutlined, DeleteOutlined, FileOutlined } from '@ant-design/icons';
-import { useMarkParentNotified, getSeverityLabelByLanguage, formatIncidentDateByLanguage, getAttachmentUrl } from '../../domains/incidents';
+import { useMarkParentNotified, getSeverityLabelByLanguage, getIncidentTypeLabelByLanguage, formatIncidentDateByLanguage, getAttachmentUrl } from '../../domains/incidents';
 import { message } from 'antd';
 import { useLanguage } from '../../shared/contexts/language.context';
 
@@ -111,7 +111,7 @@ export const IncidentsShow: React.FC = () => {
 
   const attachments = incident.incidentAttachments || [];
   const incidentTypeDisplay = incident.incidentType
-    ? `${incident.incidentType.name} - ${getSeverityLabelByLanguage(incident.incidentType.severityLevel, language)}${incident.incidentType.description ? ` - ${incident.incidentType.description}` : ''}`
+    ? `${getIncidentTypeLabelByLanguage(incident.incidentType.name, language)} - ${getSeverityLabelByLanguage(incident.incidentType.severityLevel, language)}`
     : '';
 
   return (

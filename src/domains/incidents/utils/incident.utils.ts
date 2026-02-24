@@ -28,6 +28,57 @@ const INCIDENT_UTILS_TRANSLATIONS = {
   },
 } as const;
 
+/** API incident type keys (name field). Used only for display; API always receives incidentTypeId. */
+export type IncidentTypeKey =
+  | 'minor_fall'
+  | 'scrape_cut'
+  | 'biting'
+  | 'fever'
+  | 'allergic_reaction'
+  | 'serious_injury'
+  | 'unauthorized_pickup'
+  | 'behavioral_issue'
+  | 'other';
+
+const INCIDENT_TYPE_LABELS: Record<Language, Record<IncidentTypeKey, string>> = {
+  english: {
+    minor_fall: 'Minor fall or stumble',
+    scrape_cut: 'Minor scrape or cut',
+    biting: 'Child biting incident',
+    fever: 'Child develops fever',
+    allergic_reaction: 'Allergic reaction',
+    serious_injury: 'Serious injury requiring medical attention',
+    unauthorized_pickup: 'Unauthorized pickup attempt',
+    behavioral_issue: 'Behavioral incident',
+    other: 'Other incidents',
+  },
+  spanish: {
+    minor_fall: 'Caída o tropiezo menor',
+    scrape_cut: 'Rasguño o corte menor',
+    biting: 'Incidente de mordida',
+    fever: 'El niño presenta fiebre',
+    allergic_reaction: 'Reacción alérgica',
+    serious_injury: 'Lesión grave que requiere atención médica',
+    unauthorized_pickup: 'Intento de recogida no autorizada',
+    behavioral_issue: 'Incidente conductual',
+    other: 'Otros incidentes',
+  },
+};
+
+/**
+ * Returns the display label for an incident type by its API key (name).
+ * Use only for UI; API still uses incidentTypeId. Language change only affects display.
+ */
+export const getIncidentTypeLabelByLanguage = (
+  typeName: string | undefined | null,
+  language: Language = 'english',
+): string => {
+  if (!typeName) return '';
+  const labels = INCIDENT_TYPE_LABELS[language];
+  const key = typeName as IncidentTypeKey;
+  return labels[key] ?? typeName;
+};
+
 export const getSeverityColor = (severityLevel: 'low' | 'medium' | 'high' | 'critical') => {
   switch (severityLevel) {
     case 'low':
