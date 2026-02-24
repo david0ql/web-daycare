@@ -193,7 +193,7 @@ export const AttendanceActivitiesCreate: React.FC = () => {
               >
                 {(attendanceData || []).map((attendance: any) => (
                   <Option key={attendance.id} value={attendance.id}>
-                    {attendance.child?.firstName} {attendance.child?.lastName} - {dayjs(attendance.attendanceDate).format('DD/MM/YYYY')}
+                    {attendance.child?.firstName} {attendance.child?.lastName} - {dayjs(attendance.attendanceDate).format(language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY")}
                   </Option>
                 ))}
               </Select>
@@ -259,9 +259,10 @@ export const AttendanceActivitiesCreate: React.FC = () => {
 	                    name="timeCompleted"
 	                    rules={[{ required: true, message: t.selectCompletionTimeRequired }]}
 	                  >
-	                    <TimePicker 
+	                    <TimePicker
 	                      style={{ width: '100%' }}
-	                      format="HH:mm"
+	                      format="h:mm A"
+	                      use12Hours
 	                      placeholder={t.selectTime}
 	                    />
 	                  </Form.Item>

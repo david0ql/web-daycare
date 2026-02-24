@@ -85,7 +85,7 @@ export const AttendanceActivities: React.FC = () => {
 
   const getTimeCompleted = (record: any) => {
     if (record.completed && record.timeCompleted) {
-      return dayjs(record.timeCompleted).format('HH:mm');
+      return dayjs(record.timeCompleted).format('h:mm A');
     }
     return null;
   };
@@ -146,7 +146,10 @@ export const AttendanceActivities: React.FC = () => {
           dataIndex="attendance"
           title={t.date}
           render={(attendance: any) => (
-            <DateField value={attendance?.attendanceDate} format="DD/MM/YYYY" />
+            <DateField
+              value={attendance?.attendanceDate}
+              format={language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY"}
+            />
           )}
         />
         <Table.Column
@@ -172,9 +175,10 @@ export const AttendanceActivities: React.FC = () => {
         <Table.Column
           dataIndex="createdAt"
           title={t.created}
-          render={(value: string) => (
-            <DateField value={value} format="DD/MM/YYYY HH:mm" />
-          )}
+          render={(value: string) => {
+            const dateFormat = language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY";
+            return <Text>{dayjs(value).format(`${dateFormat} h:mm A`)}</Text>;
+          }}
         />
         <Table.Column
           title={t.actions}

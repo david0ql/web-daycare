@@ -81,7 +81,8 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
 
   const getTimeCompleted = (activity: DailyActivity) => {
     if (activity.completed && activity.timeCompleted) {
-      return dayjs(activity.timeCompleted).format('HH:mm');
+      const dateFormat = language === 'spanish' ? 'YYYY-MM-DD' : 'MM-DD-YYYY';
+      return dayjs(activity.timeCompleted).format(`${dateFormat} h:mm A`);
     }
     return null;
   };
