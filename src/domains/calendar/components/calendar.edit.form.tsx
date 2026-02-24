@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, DatePicker, TimePicker, Switch, Card, Row, Col, Typography, Button, message } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { UpdateCalendarEventData, EventTypeEnum, EVENT_TYPE_LABELS_BY_LANGUAGE } from '../types/calendar.types';
 import { useCalendarEvent } from '../hooks/use-calendar.hook';
@@ -175,9 +176,18 @@ export const CalendarEditForm: React.FC<CalendarEditFormProps> = ({ eventId, onS
 
   return (
     <Card>
-      <Title level={4} style={{ marginBottom: '24px' }}>
-        {t.header}
-      </Title>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+        <Button
+          type="text"
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate('/calendar')}
+          style={{ padding: '4px 0', display: 'flex', alignItems: 'center' }}
+          aria-label={t.cancel}
+        />
+        <Title level={4} style={{ margin: 0 }}>
+          {t.header}
+        </Title>
+      </div>
       
       <Form
         form={form}

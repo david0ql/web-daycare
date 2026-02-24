@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Form, Input, Select, DatePicker, TimePicker, Switch, Card, Row, Col, Typography, Button } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { EventTypeEnum, EVENT_TYPE_LABELS_BY_LANGUAGE } from '../types/calendar.types';
 import { useCalendarEvent } from '../hooks/use-calendar.hook';
@@ -92,9 +93,18 @@ export const CalendarShowForm: React.FC<CalendarShowFormProps> = ({ eventId }) =
 
   return (
     <Card>
-      <Title level={4} style={{ marginBottom: '24px' }}>
-        {t.header}
-      </Title>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+        <Button
+          type="text"
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate('/calendar')}
+          style={{ padding: '4px 0', display: 'flex', alignItems: 'center' }}
+          aria-label={t.backToCalendar}
+        />
+        <Title level={4} style={{ margin: 0 }}>
+          {t.header}
+        </Title>
+      </div>
       
       <Form form={form} layout="vertical" disabled>
         <Row gutter={16}>
