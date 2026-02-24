@@ -418,7 +418,7 @@ export const DocumentCreate: React.FC = () => {
         >
           <DatePicker
             style={{ width: '100%' }}
-            format="DD/MM/YYYY"
+            format={language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY"}
             placeholder={t.expirationPlaceholder}
           />
         </Form.Item>

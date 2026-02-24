@@ -149,3 +149,25 @@ export const useUploadDocument = () => {
     },
   });
 };
+
+// Hook para reemplazar el archivo de un documento existente
+export const useReplaceDocumentFile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, file }: { id: number; file: File }) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await axiosInstance.patch(`/documents/${id}/file`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      queryClient.invalidateQueries({ queryKey: ['documents', id] });
+    },
+  });
+};

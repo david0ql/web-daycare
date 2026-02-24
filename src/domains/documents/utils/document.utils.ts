@@ -36,11 +36,18 @@ export const formatDocumentDate = (date: string): string => {
   return dayjs(date).format('DD/MM/YYYY HH:mm');
 };
 
-// Formatear fecha de expiración
+/** Upload date: date by language (YYYY-MM-DD / MM-DD-YYYY) and time in 12h (AM/PM). */
+export const formatDocumentDateByLanguage = (date: string, language: Language = "english"): string => {
+  const dateFormat = language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY";
+  return dayjs(date).format(`${dateFormat} h:mm A`);
+};
+
+// Formatear fecha de expiración (date format by language)
 export const formatExpirationDate = (date: string | null, language: Language = "english"): string => {
   const t = DOCUMENT_UTILS_TRANSLATIONS[language];
   if (!date) return t.noExpirationDate;
-  return dayjs(date).format('DD/MM/YYYY');
+  const dateFormat = language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY";
+  return dayjs(date).format(dateFormat);
 };
 
 // Obtener color del estado de expiración

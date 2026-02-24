@@ -1,10 +1,10 @@
 import React from 'react';
-import { List, DeleteButton, CreateButton, useTable } from '@refinedev/antd';
+import { List, DeleteButton, CreateButton, ShowButton, EditButton, useTable } from '@refinedev/antd';
 import { Table, Space, Tag, Button, Tooltip, Typography } from 'antd';
 import { PlusOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useDeleteDocument } from '../../domains/documents';
 import { 
-  formatDocumentDate, 
+  formatDocumentDateByLanguage, 
   formatExpirationDate, 
   getExpirationColor, 
   getExpirationLabel, 
@@ -159,7 +159,7 @@ export const DocumentList: React.FC = () => {
     {
       title: t.uploadDate,
       dataIndex: 'createdAt',
-      render: (value: string) => formatDocumentDate(value),
+      render: (value: string) => formatDocumentDateByLanguage(value, language),
       sorter: (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     },
     {
@@ -191,6 +191,8 @@ export const DocumentList: React.FC = () => {
       key: 'actions',
       render: (record: any) => (
         <Space>
+          <ShowButton hideText size="small" recordItemId={record.id} />
+          <EditButton hideText size="small" recordItemId={record.id} />
           <Tooltip title={t.download}>
             <Button
               type="link"

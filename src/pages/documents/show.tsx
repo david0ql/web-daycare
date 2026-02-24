@@ -1,21 +1,22 @@
 import React from 'react';
-import { useOne } from '@refinedev/core';
-import { Show } from '@refinedev/antd';
-import { Typography, Space, Tag, Button, Card, Row, Col, Descriptions } from 'antd';
-import { DownloadOutlined, FileOutlined } from '@ant-design/icons';
-import { 
-  formatDocumentDate, 
-  formatExpirationDate, 
-  getExpirationColor, 
-  getExpirationLabel, 
-  formatFileSize, 
+import { useParams } from 'react-router';
+import { Show, EditButton } from '@refinedev/antd';
+import { Form, Row, Col, Typography, Button, Space, Tag } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
+import {
+  useDocument,
+  formatDocumentDateByLanguage,
+  formatExpirationDate,
+  getExpirationColor,
+  getExpirationLabel,
+  formatFileSize,
   getFileIcon,
   getDocumentUrl,
-  getDaysUntilExpirationText
+  getDaysUntilExpirationText,
 } from '../../domains/documents';
 import { useLanguage } from '../../shared/contexts/language.context';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const DOCUMENT_SHOW_TRANSLATIONS = {
   english: {
@@ -23,18 +24,12 @@ const DOCUMENT_SHOW_TRANSLATIONS = {
     loading: "Loading...",
     notFound: "Document not found",
     download: "Download",
-    documentId: "Document ID",
-    fileType: "File Type",
     child: "Child",
     documentType: "Document Type",
-    fileSize: "File Size",
+    expirationOptional: "Expiration Date (Optional)",
+    file: "File",
     uploadDate: "Upload Date",
-    expirationDate: "Expiration Date",
     uploadedBy: "Uploaded by",
-    typeDescription: "Document Type Description",
-    retentionPolicy: "Retention Policy",
-    retentionText: "This document type is retained for",
-    days: "days.",
     size: "Size",
   },
   spanish: {
@@ -42,32 +37,24 @@ const DOCUMENT_SHOW_TRANSLATIONS = {
     loading: "Cargando...",
     notFound: "Documento no encontrado",
     download: "Descargar",
-    documentId: "ID del documento",
-    fileType: "Tipo de archivo",
     child: "Niño",
     documentType: "Tipo de documento",
-    fileSize: "Tamaño del archivo",
+    expirationOptional: "Fecha de vencimiento (Opcional)",
+    file: "Archivo",
     uploadDate: "Fecha de subida",
-    expirationDate: "Fecha de vencimiento",
     uploadedBy: "Subido por",
-    typeDescription: "Descripción del tipo de documento",
-    retentionPolicy: "Política de retención",
-    retentionText: "Este tipo de documento se conserva por",
-    days: "días.",
     size: "Tamaño",
   },
 } as const;
 
 export const DocumentShow: React.FC = () => {
+  const { id: idFromUrl } = useParams<{ id: string }>();
+  const documentId = idFromUrl != null ? Number(idFromUrl) : undefined;
   const { language } = useLanguage();
   const t = DOCUMENT_SHOW_TRANSLATIONS[language];
 
-  const { result: documentData, query: documentQuery } = useOne({
-    resource: 'documents',
-  }) as any;
-  const isLoading = documentQuery.isLoading;
-
-  const document = documentData;
+  const { data: documentResponse, isLoading } = useDocument(documentId ?? 0);
+  const document = documentResponse?.data ?? documentResponse;
 
   const handleDownload = () => {
     if (document) {
@@ -75,6 +62,14 @@ export const DocumentShow: React.FC = () => {
       window.open(documentUrl, '_blank');
     }
   };
+
+  if (!documentId) {
+    return (
+      <Show title={t.title}>
+        <div>{t.notFound}</div>
+      </Show>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -93,95 +88,75 @@ export const DocumentShow: React.FC = () => {
   }
 
   return (
-    <Show title={t.title}>
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <Title level={2}>{t.title}</Title>
-      </div>
-      
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <Card>
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Title level={3} style={{ margin: 0 }}>
-                  {getFileIcon(document.mimeType)} {document.originalFilename}
-                </Title>
-                <Button 
-                  type="primary" 
-                  icon={<DownloadOutlined />}
-                  onClick={handleDownload}
-                >
-                  {t.download}
-                </Button>
-              </div>
+    <Show
+      title={t.title}
+      headerButtons={
+        <>
+          <EditButton />
+        </>
+      }
+    >
+      <Form layout="vertical">
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item label={t.child}>
+              <Text strong>
+                {document.child?.firstName} {document.child?.lastName}
+              </Text>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label={t.documentType}>
+              <Tag color="blue">{document.documentType?.name}</Tag>
+            </Form.Item>
+          </Col>
+        </Row>
 
-              <Descriptions bordered column={2}>
-                <Descriptions.Item label={t.documentId}>
-                  {document.id}
-                </Descriptions.Item>
-                <Descriptions.Item label={t.fileType}>
-                  <Tag icon={<FileOutlined />}>
-                    {document.mimeType}
-                  </Tag>
-                </Descriptions.Item>
-                
-                <Descriptions.Item label={t.child}>
-                  <Text strong>
-                    {document.child.firstName} {document.child.lastName}
-                  </Text>
-                </Descriptions.Item>
-                <Descriptions.Item label={t.documentType}>
-                  <Tag color="blue">
-                    {document.documentType.name}
-                  </Tag>
-                </Descriptions.Item>
-                
-                <Descriptions.Item label={t.fileSize}>
-                  {formatFileSize(document.fileSize)}
-                </Descriptions.Item>
-                <Descriptions.Item label={t.uploadDate}>
-                  {formatDocumentDate(document.createdAt)}
-                </Descriptions.Item>
-                
-                <Descriptions.Item label={t.expirationDate}>
-                  <Space direction="vertical" size={0}>
-                    <Text>{formatExpirationDate(document.expiresAt, language)}</Text>
-                    <Tag color={getExpirationColor(document)}>
-                      {getExpirationLabel(document, language)}
-                    </Tag>
-                    <Text type="secondary" style={{ fontSize: '12px' }}>
-                      {getDaysUntilExpirationText(document, language)}
-                    </Text>
-                  </Space>
-                </Descriptions.Item>
-                <Descriptions.Item label={t.uploadedBy}>
-                  <Text>
-                    {document.uploadedBy2.firstName} {document.uploadedBy2.lastName}
-                  </Text>
-                </Descriptions.Item>
-              </Descriptions>
+        <Form.Item label={t.expirationOptional}>
+          <Space direction="vertical" size={0}>
+            <Text>{formatExpirationDate(document.expiresAt, language)}</Text>
+            <Tag color={getExpirationColor(document)}>
+              {getExpirationLabel(document, language)}
+            </Tag>
+            {getDaysUntilExpirationText(document, language) && (
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                {getDaysUntilExpirationText(document, language)}
+              </Text>
+            )}
+          </Space>
+        </Form.Item>
 
-              {document.documentType.description && (
-                <div>
-                  <Title level={5}>{t.typeDescription}</Title>
-                  <Text>{document.documentType.description}</Text>
-                </div>
-              )}
+        <Form.Item label={t.file}>
+          <Space>
+            <span>{getFileIcon(document.mimeType)}</span>
+            <Text strong>{document.originalFilename}</Text>
+            <Text type="secondary">({formatFileSize(document.fileSize)})</Text>
+            <Button
+              type="primary"
+              size="small"
+              icon={<DownloadOutlined />}
+              onClick={handleDownload}
+            >
+              {t.download}
+            </Button>
+          </Space>
+        </Form.Item>
 
-              {document.documentType.retentionDays && (
-                <div>
-                  <Title level={5}>{t.retentionPolicy}</Title>
-                  <Text>
-                    {t.retentionText} {document.documentType.retentionDays} {t.days}
-                  </Text>
-                </div>
-              )}
-            </Space>
-          </Card>
-        </Col>
-      </Row>
-    </div>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item label={t.uploadDate}>
+              <Text>{formatDocumentDateByLanguage(document.createdAt, language)}</Text>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label={t.uploadedBy}>
+              <Text>
+                {document.uploadedBy2?.firstName} {document.uploadedBy2?.lastName}
+              </Text>
+            </Form.Item>
+          </Col>
+        </Row>
+      </Form>
     </Show>
   );
 };

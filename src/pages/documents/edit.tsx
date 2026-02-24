@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 import { Edit, useForm } from '@refinedev/antd';
-import { Form, Input, Select, DatePicker, Row, Col, Typography } from 'antd';
+import { Form, Select, DatePicker, Row, Col, Upload, Button, Space, message } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { useGo, useInvalidate, useNotification, useOne } from '@refinedev/core';
+import { useGo, useInvalidate, useNotification } from '@refinedev/core';
 import { axiosInstance } from '../../shared';
-import { useUpdateDocument } from '../../domains/documents';
+import { useUpdateDocument, useDocument, useReplaceDocumentFile, formatFileSize, getFileIcon } from '../../domains/documents';
 import dayjs from 'dayjs';
 import { useLanguage } from '../../shared/contexts/language.context';
 
-const { Title } = Typography;
 const { Option } = Select;
+const { Dragger } = Upload;
 
 const DOCUMENT_EDIT_TRANSLATIONS = {
   english: {
@@ -32,6 +34,12 @@ const DOCUMENT_EDIT_TRANSLATIONS = {
     expirationPlaceholder: "Select expiration date",
     currentFile: "Current File",
     size: "Size",
+    replaceFile: "Replace file",
+    newFile: "New file (optional)",
+    dragText: "Click or drag a file to replace",
+    dragHint: "PDF, images, documents, spreadsheets (max 10MB)",
+    invalidFileType: "Only PDF, images, documents and spreadsheets are allowed",
+    fileTooLarge: "File must be less than 10MB",
   },
   spanish: {
     title: "Editar documento",
@@ -53,6 +61,12 @@ const DOCUMENT_EDIT_TRANSLATIONS = {
     expirationPlaceholder: "Selecciona fecha de vencimiento",
     currentFile: "Archivo actual",
     size: "Tamaño",
+    replaceFile: "Reemplazar archivo",
+    newFile: "Nuevo archivo (opcional)",
+    dragText: "Haz clic o arrastra un archivo para reemplazar",
+    dragHint: "PDF, imágenes, documentos, hojas de cálculo (máx 10MB)",
+    invalidFileType: "Solo se permiten PDF, imágenes, documentos y hojas de cálculo",
+    fileTooLarge: "El archivo debe ser menor de 10MB",
   },
 } as const;
 
@@ -63,8 +77,12 @@ export const DocumentEdit: React.FC = () => {
   const { language } = useLanguage();
   const t = DOCUMENT_EDIT_TRANSLATIONS[language];
 
+  const { id: idFromUrl } = useParams<{ id: string }>();
+  const documentId = idFromUrl != null ? Number(idFromUrl) : undefined;
+
   const { formProps, saveButtonProps } = useForm({
     resource: 'documents',
+    id: documentId,
     onMutationSuccess: async (data) => {
       // Use Refine's useInvalidate for proper cache invalidation (same as children)
       invalidate({
@@ -96,12 +114,13 @@ export const DocumentEdit: React.FC = () => {
   });
 
   const updateDocumentMutation = useUpdateDocument();
-  
-  // Get document data using useOne
-  const { result: documentData, query: documentQuery } = useOne({
-    resource: 'documents',
-  }) as any;
-  const documentLoading = documentQuery.isLoading;
+  const replaceDocumentFileMutation = useReplaceDocumentFile();
+  const [fileList, setFileList] = useState<any[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Get document data using the API hook GET /documents/:id
+  const { data: documentResponse, isLoading: documentLoading } = useDocument(documentId ?? 0);
+  const documentData = documentResponse?.data ?? documentResponse;
 
   // Fetch children for the select
   const { data: childrenData, isLoading: childrenLoading } = useQuery({
@@ -124,41 +143,108 @@ export const DocumentEdit: React.FC = () => {
   });
 
   useEffect(() => {
-    if (documentData) {
-      formProps.form?.setFieldsValue({
-        ...documentData,
+    if (documentData && formProps.form) {
+      const expiresAtValue = documentData.expiresAt
+        ? (typeof documentData.expiresAt === 'string'
+            ? documentData.expiresAt
+            : dayjs(documentData.expiresAt).toISOString?.() ?? String(documentData.expiresAt))
+        : undefined;
+      formProps.form.setFieldsValue({
+        id: documentData.id,
         childId: documentData.child?.id,
         documentTypeId: documentData.documentType?.id,
-        expiresAt: documentData.expiresAt ? dayjs(documentData.expiresAt) : undefined,
+        expiresAt: expiresAtValue,
       });
     }
   }, [documentData, formProps.form]);
 
   const handleFinish = async (values: any) => {
+    if (documentId == null) return;
+    setIsSubmitting(true);
     try {
-      // Validate and format date using dayjs
+      // Validate and format date (form stores string to avoid dayjs serialization issues)
       let expiresAt: string | undefined;
-      if (values.expiresAt && dayjs(values.expiresAt).isValid()) {
-        expiresAt = dayjs(values.expiresAt).toISOString();
+      const rawDate = values.expiresAt;
+      if (rawDate) {
+        const d = typeof rawDate === 'string' ? dayjs(rawDate) : dayjs.isDayjs(rawDate) ? rawDate : dayjs(rawDate);
+        if (d.isValid?.() !== false) {
+          expiresAt = d.toISOString();
+        }
       }
 
-      const documentData = {
-        ...values,
+      const payload = {
+        childId: values.childId,
+        documentTypeId: values.documentTypeId,
         expiresAt,
       };
 
       await updateDocumentMutation.mutateAsync({
-        id: documentData.id,
-        data: documentData,
+        id: documentId,
+        data: payload,
       });
+
+      // If user selected a new file, replace the document file
+      if (fileList.length > 0) {
+        const file = fileList[0].originFileObj ?? fileList[0];
+        if (file) {
+          await replaceDocumentFileMutation.mutateAsync({ id: documentId, file });
+        }
+      }
+
+      invalidate({ resource: "documents", invalidates: ["list"] });
+      invalidate({ resource: "documents", invalidates: ["detail"], id: documentId });
+      open?.({
+        type: "success",
+        message: t.updateSuccess,
+        description: t.updateSuccessDesc,
+      });
+      setTimeout(() => go({ to: "/documents", type: "push" }), 1000);
     } catch (error: any) {
       open?.({
         type: "error",
         message: t.updateError,
         description: error.response?.data?.message || error.message,
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  const uploadProps = {
+    name: 'file',
+    multiple: false,
+    fileList,
+    beforeUpload: (file: any) => {
+      const isValidType =
+        file.type === 'application/pdf' ||
+        file.type.startsWith('image/') ||
+        file.type.includes('document') ||
+        file.type.includes('spreadsheet');
+      if (!isValidType) {
+        message.error(t.invalidFileType);
+        return false;
+      }
+      const isLt10M = file.size / 1024 / 1024 < 10;
+      if (!isLt10M) {
+        message.error(t.fileTooLarge);
+        return false;
+      }
+      setFileList([
+        {
+          uid: file.uid || String(Date.now()),
+          name: file.name,
+          status: 'done',
+          originFileObj: file,
+        },
+      ]);
+      return false;
+    },
+    onRemove: () => setFileList([]),
+  };
+
+  if (documentId == null) {
+    return <div>{t.notFound}</div>;
+  }
 
   if (documentLoading) {
     return <div>{t.loading}</div>;
@@ -173,6 +259,7 @@ export const DocumentEdit: React.FC = () => {
       title={t.title}
       saveButtonProps={{
         ...saveButtonProps,
+        loading: isSubmitting,
         children: t.save,
         onClick: () => formProps.form?.submit(),
       }}
@@ -231,24 +318,49 @@ export const DocumentEdit: React.FC = () => {
         <Form.Item
           label={t.expirationDate}
           name="expiresAt"
+          getValueProps={(v: string | undefined) => ({ value: v ? dayjs(v) : null })}
+          getValueFromEvent={(d: ReturnType<typeof dayjs> | null) => (d && d.isValid?.() ? d.toISOString() : undefined)}
         >
           <DatePicker
             style={{ width: '100%' }}
-            format="DD/MM/YYYY"
+            format={language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY"}
             placeholder={t.expirationPlaceholder}
           />
         </Form.Item>
 
-        <Form.Item
-          label={t.currentFile}
-        >
-          <div style={{ padding: '8px 12px', background: '#f5f5f5', borderRadius: '6px' }}>
-            <strong>{documentData.originalFilename}</strong>
-            <br />
-            <span style={{ color: '#666', fontSize: '12px' }}>
-              {t.size}: {(documentData.fileSize / 1024 / 1024).toFixed(2)} MB
-            </span>
-          </div>
+        <Form.Item label={t.currentFile}>
+          <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <div
+              style={{
+                padding: '12px 16px',
+                background: '#fafafa',
+                borderRadius: '8px',
+                border: '1px solid #f0f0f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 8,
+              }}
+            >
+              <span>
+                {getFileIcon(documentData.mimeType)} <strong>{documentData.originalFilename}</strong>
+                <span style={{ color: '#666', fontSize: '12px', marginLeft: 8 }}>
+                  ({documentData.fileSize != null ? formatFileSize(documentData.fileSize) : '—'})
+                </span>
+              </span>
+            </div>
+            <div>
+              <div style={{ marginBottom: 8, fontWeight: 500 }}>{t.newFile}</div>
+              <Dragger {...uploadProps}>
+                <p className="ant-upload-drag-icon">
+                  <UploadOutlined />
+                </p>
+                <p className="ant-upload-text">{t.dragText}</p>
+                <p className="ant-upload-hint">{t.dragHint}</p>
+              </Dragger>
+            </div>
+          </Space>
         </Form.Item>
       </Form>
     </Edit>
