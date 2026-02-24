@@ -147,30 +147,23 @@ export const DocumentCreate: React.FC = () => {
   // Filter document types based on existing documents
   const availableDocumentTypes = useMemo(() => {
     try {
-      console.log('🔍 availableDocumentTypes - selectedChildId:', selectedChildId);
-      console.log('🔍 availableDocumentTypes - documentTypesData:', documentTypesData);
-      console.log('🔍 availableDocumentTypes - existingDocumentsData:', existingDocumentsData);
 
       // Si no hay niño seleccionado, no mostrar tipos
       if (!selectedChildId) {
-        console.log('🔍 No child selected, returning empty array');
         return [];
       }
 
       // Si no hay tipos de documento cargados, no mostrar nada
       if (!documentTypesData || !documentTypesData.data || !Array.isArray(documentTypesData.data)) {
-        console.log('🔍 No document types data or not array, returning empty array');
         return [];
       }
 
       // Si no hay documentos existentes para este niño, mostrar todos los tipos
       if (!existingDocumentsData?.data || !Array.isArray(existingDocumentsData.data) || existingDocumentsData.data.length === 0) {
-        console.log('🔍 No existing documents, returning all types:', documentTypesData.data);
         return documentTypesData.data;
       }
 
       const existingDocumentTypeIds = existingDocumentsData.data.map((doc: any) => doc.documentTypeId);
-      console.log('🔍 Existing document type IDs:', existingDocumentTypeIds);
       
       const availableTypes = documentTypesData.data.filter((type: any) => {
         // Allow 'other' type multiple times
@@ -181,12 +174,10 @@ export const DocumentCreate: React.FC = () => {
         return !existingDocumentTypeIds.includes(type.id);
       });
 
-      console.log('🔍 Available types after filtering:', availableTypes);
 
       // Si no hay tipos disponibles (todos ya subidos), solo mostrar 'other'
       if (availableTypes.length === 0) {
         const otherTypes = documentTypesData.data.filter((type: any) => canUploadMultiple(type));
-        console.log('🔍 No available types, returning other types:', otherTypes);
         return otherTypes;
       }
 
@@ -217,9 +208,6 @@ export const DocumentCreate: React.FC = () => {
       return;
     }
 
-    console.log('🔍 File to upload:', file);
-    console.log('🔍 File type:', file.type);
-    console.log('🔍 File size:', file.size);
 
     setIsSubmitting(true);
     
@@ -233,9 +221,7 @@ export const DocumentCreate: React.FC = () => {
         formData.append('expiresAt', dayjs(values.expiresAt).toISOString());
       }
 
-      console.log('🔍 FormData entries:');
       formData.forEach((value, key) => {
-        console.log(`  ${key}:`, value);
       });
 
       const response = await axiosInstance.post('/documents/upload', formData, {
@@ -244,7 +230,6 @@ export const DocumentCreate: React.FC = () => {
         },
       });
 
-      console.log('🔍 Upload success - response:', response.data);
 
       // Clear dataProvider cache first
       clearDataProviderCache("documents");
@@ -286,7 +271,6 @@ export const DocumentCreate: React.FC = () => {
       }, 1000);
 
     } catch (error: any) {
-      console.log('🔍 Upload error:', error);
       open?.({
         type: "error",
         message: t.uploadErrorTitle,

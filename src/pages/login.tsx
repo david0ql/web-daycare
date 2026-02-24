@@ -49,19 +49,15 @@ export const Login: React.FC = () => {
   const onFinish = async (values: { email: string; password: string }) => {
     setLoginError(null);
     setIsLoading(true);
-    console.log("🚀 Login form submitted with:", { email: values.email });
     
     try {
       // Usar AuthApi directamente para evitar problemas con useLogin
-      console.log("📡 Calling AuthApi.login() directly...");
       const data = await AuthApi.login(values);
-      console.log("✅ AuthApi.login() success:", data);
       
       // Guardar token y usuario
       localStorage.setItem("refine-auth", data.accessToken);
       localStorage.setItem("user", JSON.stringify(data.user));
       
-      console.log("💾 Token and user saved, redirecting...");
       
       // Redirigir al dashboard
       window.location.href = "/";

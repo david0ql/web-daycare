@@ -15,8 +15,6 @@ export const useAttendanceStats = () => {
       const children = childrenResponse.data.data || childrenResponse.data;
       const todayAttendance = attendanceResponse.data;
       
-      console.log("🔍 Attendance Stats - children:", children);
-      console.log("🔍 Attendance Stats - todayAttendance:", todayAttendance);
       
       // Calculate stats based on check-in/check-out times, not isPresent field
       const totalChildren = children.length;
@@ -28,14 +26,6 @@ export const useAttendanceStats = () => {
       const absentToday = totalChildren - presentToday;
       const attendanceRate = totalChildren > 0 ? (presentToday / totalChildren) * 100 : 0;
       
-      console.log("🔍 Attendance Stats - calculated:", {
-        totalChildren,
-        checkedIn,
-        checkedOut,
-        presentToday,
-        absentToday,
-        attendanceRate
-      });
       
       return {
         totalChildren,

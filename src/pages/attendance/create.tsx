@@ -102,9 +102,7 @@ export const AttendanceCreate: React.FC = () => {
     const fetchChildren = async () => {
       try {
         setLoadingChildren(true);
-        console.log("🔍 Fetching children with direct axios call");
         const response = await axiosInstance.get("/children");
-        console.log("🔍 Children response:", response);
         setChildrenData(response.data);
         setChildrenError(null);
       } catch (error) {
@@ -119,17 +117,12 @@ export const AttendanceCreate: React.FC = () => {
   }, []);
 
   // Debug children loading state
-  console.log("🔍 Children loading state:", { loadingChildren, childrenError, childrenData });
 
   // Test direct axios call to children endpoint
   React.useEffect(() => {
     const testChildrenEndpoint = async () => {
       try {
-        console.log("🔍 Testing direct axios call to /children endpoint");
         const response = await axiosInstance.get("/children");
-        console.log("🔍 Direct children response:", response);
-        console.log("🔍 Direct children data:", response.data);
-        console.log("🔍 Direct children data.data:", response.data.data);
       } catch (error) {
         console.error("🔍 Direct children call error:", error);
       }
@@ -149,16 +142,9 @@ export const AttendanceCreate: React.FC = () => {
 
   // Filter active children
   const children = (childrenData?.data || []);
-  console.log("🔍 Raw children from API:", children);
   // const children = (childrenData?.data || []).filter((child: any) => child.isActive === true);
 
   // Debug logs
-  console.log("🔍 Attendance Create - childrenData:", childrenData);
-  console.log("🔍 Attendance Create - children (filtered):", children);
-  console.log("🔍 Attendance Create - childrenError:", childrenError);
-  console.log("🔍 Attendance Create - authorizedPersons:", authorizedPersons);
-  console.log("🔍 Attendance Create - authorizedPersonsError:", authorizedPersonsError);
-  console.log("🔍 Attendance Create - selectedChild:", selectedChild);
 
   const handleCheckIn = (values: any) => {
     checkIn({

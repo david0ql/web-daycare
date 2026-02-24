@@ -95,7 +95,6 @@ export const IncidentsEdit: React.FC = () => {
   const { formProps, saveButtonProps } = useForm({
     resource: 'incidents',
     onMutationSuccess: async (data) => {
-      console.log('🔍 onMutationSuccess - data:', data);
       
       // Use Refine's useInvalidate for proper cache invalidation
       await invalidate({
@@ -126,7 +125,6 @@ export const IncidentsEdit: React.FC = () => {
       }, 1000);
     },
     onMutationError: (error) => {
-      console.log('🔍 onMutationError - error:', error);
       open?.({
         type: "error",
         message: t.updateError,
@@ -140,9 +138,6 @@ export const IncidentsEdit: React.FC = () => {
   const [attachments, setAttachments] = useState<any[]>([]);
   
   // Debug logging
-  console.log('🔍 Edit component - formProps:', formProps);
-  console.log('🔍 Edit component - incidentData:', incidentData);
-  console.log('🔍 Edit component - incidentAttachments:', incidentData?.incidentAttachments);
 
   // Fetch children for the select
   const { data: childrenData, isLoading: childrenLoading } = useQuery({
@@ -168,8 +163,6 @@ export const IncidentsEdit: React.FC = () => {
   const attachmentsData = incidentData?.incidentAttachments || [];
 
   useEffect(() => {
-    console.log('🔍 useEffect - incidentData:', incidentData);
-    console.log('🔍 useEffect - formProps.form:', formProps.form);
     
     if (incidentData) {
       const formValues = {
@@ -182,7 +175,6 @@ export const IncidentsEdit: React.FC = () => {
         actionTaken: incidentData.actionTaken,
       };
       
-      console.log('🔍 useEffect - setting form values:', formValues);
       formProps.form?.setFieldsValue(formValues);
     }
   }, [incidentData, formProps.form]);
@@ -190,22 +182,17 @@ export const IncidentsEdit: React.FC = () => {
   // Update attachments state when incident data is loaded
   useEffect(() => {
     if (incidentData?.incidentAttachments) {
-      console.log('🔍 useEffect - incidentAttachments:', incidentData.incidentAttachments);
       setAttachments(incidentData.incidentAttachments);
     }
   }, [incidentData]);
 
   const handleFinish = async (values: any) => {
-    console.log('🔍 handleFinish - values:', values);
-    console.log('🔍 handleFinish - incidentDate:', values.incidentDate);
-    console.log('🔍 handleFinish - incidentDate type:', typeof values.incidentDate);
     
     // Validate and format date using dayjs
     let incidentDate: string;
     
     // Check if incidentDate exists and is valid
     if (!values.incidentDate) {
-      console.log('🔍 handleFinish - no incidentDate provided');
       open?.({
         type: "error",
         message: t.updateError,
@@ -217,7 +204,6 @@ export const IncidentsEdit: React.FC = () => {
     // Try to parse the date
     const parsedDate = dayjs(values.incidentDate);
     if (!parsedDate.isValid()) {
-      console.log('🔍 handleFinish - invalid date format:', values.incidentDate);
       open?.({
         type: "error",
         message: t.updateError,
@@ -227,7 +213,6 @@ export const IncidentsEdit: React.FC = () => {
     }
     
     incidentDate = parsedDate.toISOString();
-    console.log('🔍 handleFinish - formatted incidentDate:', incidentDate);
 
     const updateData = {
       ...values,
@@ -350,11 +335,9 @@ export const IncidentsEdit: React.FC = () => {
               name="incidentDate"
               rules={[{ required: true, message: t.incidentDateTimeRequired }]}
               getValueFromEvent={(date) => {
-                console.log("🔍 DatePicker getValueFromEvent:", date);
                 return date;
               }}
               getValueProps={(value) => {
-                console.log("🔍 DatePicker getValueProps:", value, typeof value);
                 if (!value) return { value: null };
                 if (dayjs.isDayjs(value)) return { value };
                 if (typeof value === 'string') {

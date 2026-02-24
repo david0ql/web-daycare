@@ -76,7 +76,7 @@ import { CalendarList } from '@/domains/calendar';
 ```tsx
 import { CalendarCreateForm } from '@/domains/calendar';
 
-<CalendarCreateForm onSuccess={() => console.log('Event created!')} />
+<CalendarCreateForm onSuccess={() => {}} />
 ```
 
 ### Upcoming Events Widget

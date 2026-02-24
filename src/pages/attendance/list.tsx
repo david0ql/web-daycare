@@ -99,9 +99,6 @@ export const AttendanceList: React.FC = () => {
   const { data: stats, isLoading: loadingStats } = useAttendanceStats();
 
   // Debug logs
-  console.log("🔍 Attendance List - tableProps:", tableProps);
-  console.log("🔍 Attendance List - tableProps.dataSource:", tableProps.dataSource);
-  console.log("🔍 Attendance List - stats:", stats);
   
 
   const columns = [
@@ -213,8 +210,6 @@ export const AttendanceList: React.FC = () => {
       title: t.actions,
       key: "actions",
       render: (_: any, record: any) => {
-        console.log("🔍 Attendance List - record for actions:", record);
-        console.log("🔍 Attendance List - record.id:", record.id);
         return (
           <Space>
             <EditButton 

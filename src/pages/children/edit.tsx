@@ -14,11 +14,8 @@ const { TextArea } = Input;
 
 // Custom Switch component that always returns boolean
 const BooleanSwitch: React.FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({ value, onChange }) => {
-  console.log("🔍 BooleanSwitch render - value:", value, typeof value);
   
   const handleChange = (checked: boolean) => {
-    console.log("🔍 BooleanSwitch onChange:", checked, typeof checked);
-    console.log("🔍 BooleanSwitch current value:", value);
     
     if (onChange) {
       onChange(checked);
@@ -200,8 +197,6 @@ export const ChildEdit: React.FC = () => {
   
   const { formProps, saveButtonProps } = useForm<UpdateChildData>({
     onMutationSuccess: async (data, variables) => {
-      console.log("🔍 EDIT Child Mutation success - data:", data);
-      console.log("🔍 EDIT Child Mutation success - variables:", variables);
       
       // Force invalidate and refetch all children-related queries
       await queryClient.invalidateQueries({
@@ -235,16 +230,12 @@ export const ChildEdit: React.FC = () => {
       }, 1000);
     },
     onMutationError: (error, variables) => {
-      console.log("🔍 EDIT Child Mutation error:", error);
-      console.log("🔍 EDIT Child Mutation error - variables:", variables);
       if (error?.response?.data?.message) {
-        console.log("🔍 Validation errors:", error.response.data.message);
         const errorMessages = Array.isArray(error.response.data.message) 
           ? error.response.data.message 
           : [error.response.data.message];
         
         errorMessages.forEach((msg: any, index: number) => {
-          console.log(`🔍 Error ${index + 1}:`, msg);
         });
       }
       open?.({ 
@@ -259,7 +250,6 @@ export const ChildEdit: React.FC = () => {
   React.useEffect(() => {
     if (formProps.initialValues) {
       const childData = formProps.initialValues;
-      console.log("🔍 Raw child data from API:", childData);
       
       // Helper function to safely map arrays
       const safeMap = (data: any, mapper: (item: any) => any) => {
@@ -311,20 +301,16 @@ export const ChildEdit: React.FC = () => {
         })),
       };
       
-      console.log("🔍 Transformed form data:", formData);
-      console.log("🔍 Setting form values - hasPaymentAlert:", (formData as any).hasPaymentAlert, "isActive:", (formData as any).isActive);
       form.setFieldsValue(formData);
       
       // Force update switches after setting form values
       setTimeout(() => {
-        console.log("🔍 Form values after setFieldsValue:", form.getFieldsValue());
       }, 100);
     }
   }, [formProps.initialValues, form]);
 
   // Custom onFinish to transform data
   const handleFinish = (values: any) => {
-    console.log("🔍 Form onFinish - original values:", values);
     
     // Validar que haya al menos un padre asignado
     const parentRelationships = values.parentRelationships || [];
@@ -341,11 +327,9 @@ export const ChildEdit: React.FC = () => {
           // Format birth date
           birthDate: values.birthDate ? dayjs(values.birthDate).format("YYYY-MM-DD") : undefined,
         };
-    console.log("🔍 Form onFinish - transformed values:", transformedValues);
     
     // Call the original formProps.onFinish with transformed values
     if (formProps.onFinish) {
-      console.log("🔍 Calling formProps.onFinish with:", transformedValues);
       formProps.onFinish(transformedValues);
     } else {
       console.error("🔍 formProps.onFinish is not available!");
@@ -357,7 +341,6 @@ export const ChildEdit: React.FC = () => {
   const customSaveButtonProps = {
     ...saveButtonProps,
     onClick: () => {
-      console.log("🔍 Save button clicked - triggering form submit");
       form.submit();
     }
   };
@@ -453,11 +436,9 @@ export const ChildEdit: React.FC = () => {
               name="hasPaymentAlert"
               valuePropName="checked"
                   getValueFromEvent={(checked) => {
-                    console.log("🔍 hasPaymentAlert getValueFromEvent:", checked);
                     return checked;
                   }}
                   getValueProps={(value) => {
-                    console.log("🔍 hasPaymentAlert getValueProps:", value, typeof value);
                     return { value: Boolean(value) };
                   }}
                 >
@@ -468,11 +449,9 @@ export const ChildEdit: React.FC = () => {
               name="isActive"
               valuePropName="checked"
                   getValueFromEvent={(checked) => {
-                    console.log("🔍 isActive getValueFromEvent:", checked);
                     return checked;
                   }}
                   getValueProps={(value) => {
-                    console.log("🔍 isActive getValueProps:", value, typeof value);
                     return { value: Boolean(value) };
                   }}
                 >
@@ -545,11 +524,9 @@ export const ChildEdit: React.FC = () => {
                           label={t.principal}
                           valuePropName="checked"
                           getValueFromEvent={(checked) => {
-                            console.log("🔍 isPrimary getValueFromEvent:", checked);
                             return checked;
                           }}
                           getValueProps={(value) => {
-                            console.log("🔍 isPrimary getValueProps:", value, typeof value);
                             return { value: Boolean(value) };
                           }}
                         >
@@ -624,11 +601,9 @@ export const ChildEdit: React.FC = () => {
                           label={t.primary}
                           valuePropName="checked"
                           getValueFromEvent={(checked) => {
-                            console.log("🔍 isPrimary getValueFromEvent:", checked);
                             return checked;
                           }}
                           getValueProps={(value) => {
-                            console.log("🔍 isPrimary getValueProps:", value, typeof value);
                             return { value: Boolean(value) };
                           }}
                         >

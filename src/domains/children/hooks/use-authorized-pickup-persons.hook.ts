@@ -17,28 +17,23 @@ export const useAuthorizedPickupPersons = (childId?: number) => {
     queryKey: ["authorized-pickup-persons", childId],
     queryFn: async () => {
       if (!childId) {
-        console.log("🔍 No childId provided, returning empty array");
         return [];
       }
 
       try {
-        console.log("🔍 Fetching authorized pickup persons for child:", childId);
         
         // Fetch child with relationships
         const childResponse = await axiosInstance.get(`/children/${childId}`);
         const child = childResponse.data;
         
-        console.log("🔍 Child data:", child);
         
         if (!child) {
-          console.log("🔍 Child not found");
           return [];
         }
 
         // Get authorized pickup persons from child data
         const authorizedPersons = child.authorizedPickupPersons || [];
         
-        console.log("🔍 Authorized pickup persons for child:", authorizedPersons);
         
         return authorizedPersons;
       } catch (error) {

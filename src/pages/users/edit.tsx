@@ -77,7 +77,6 @@ const USER_EDIT_TRANSLATIONS = {
 // Custom Switch component that always returns boolean
 const BooleanSwitch: React.FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({ value, onChange }) => {
   const handleChange = (checked: boolean) => {
-    console.log("🔍 BooleanSwitch onChange:", checked, typeof checked);
     onChange?.(checked);
   };
 
@@ -110,10 +109,6 @@ export const UserEdit: React.FC = () => {
   
   const { formProps, saveButtonProps } = useForm({
     onMutationSuccess: async (data, variables) => {
-      console.log("🔍 Mutation success - data:", data);
-      console.log("🔍 Mutation success - variables:", variables);
-      console.log("🔍 Mutation success - roleId sent:", (variables as any).roleId);
-      console.log("🔍 Mutation success - roleId received:", (data as any).roleId);
       
       // Force invalidate and refetch all users-related queries
       await queryClient.invalidateQueries({
@@ -147,8 +142,6 @@ export const UserEdit: React.FC = () => {
       }, 1000);
     },
     onMutationError: (error, variables) => {
-      console.log("🔍 Mutation error:", error);
-      console.log("🔍 Mutation error - variables:", variables);
     }
   });
 
@@ -160,13 +153,9 @@ export const UserEdit: React.FC = () => {
   const roles = rolesQuery.result?.data || [];
 
   // Debug logs
-  console.log("🔍 UserEdit - rolesQuery:", rolesQuery);
-  console.log("🔍 UserEdit - roles:", roles);
 
   // Custom onFinish to transform data
   const handleFinish = (values: any) => {
-    console.log("🔍 Form onFinish - original values:", values);
-    console.log("🔍 Form onFinish - roleId type:", typeof values.roleId, "value:", values.roleId);
     
     const transformedValues = {
       ...values,
@@ -174,8 +163,6 @@ export const UserEdit: React.FC = () => {
       // Ensure roleId is a number
       roleId: Number(values.roleId)
     };
-    console.log("🔍 Form onFinish - transformed values:", transformedValues);
-    console.log("🔍 Form onFinish - transformed roleId type:", typeof transformedValues.roleId, "value:", transformedValues.roleId);
     
     // Call the original formProps.onFinish with transformed values
     if (formProps.onFinish) {

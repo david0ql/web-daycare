@@ -15,9 +15,7 @@ export const useUsersByRole = (roles: string[]) => {
     queryKey: ["users", "by-role", roles],
     queryFn: async () => {
       try {
-        console.log("🔍 Fetching users by roles:", roles);
         const response = await axiosInstance.get("/users");
-        console.log("🔍 Users response:", response);
         
         // Handle different response structures
         let users = [];
@@ -30,12 +28,9 @@ export const useUsersByRole = (roles: string[]) => {
           return [];
         }
         
-        console.log("🔍 All users:", users);
-        console.log("🔍 User roles found:", users.map((u: any) => ({ id: u.id, name: `${u.firstName} ${u.lastName}`, permissions: u.permissions, isActive: u.isActive })));
         const filteredUsers = users.filter((user: any) => 
           user.isActive === true && roles.includes(user.permissions)
         );
-        console.log(`🔍 Users with roles ${roles.join(', ')}:`, filteredUsers);
         
         return filteredUsers;
       } catch (error) {

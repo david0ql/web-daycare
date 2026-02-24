@@ -84,7 +84,6 @@ export const IncidentsList: React.FC = () => {
 
   const handleMarkParentNotified = async (incidentId: number) => {
     try {
-      console.log('🔍 Mark parent notified - incidentId:', incidentId);
       
       await markParentNotifiedMutation.mutateAsync({
         url: '/incidents/mark-parent-notified',
@@ -93,7 +92,6 @@ export const IncidentsList: React.FC = () => {
         successNotification: false,
       });
       
-      console.log('🔍 Mark parent notified - mutation successful');
 
       // Use Refine's useInvalidate for proper cache invalidation (same as children)
       invalidate({
@@ -107,7 +105,6 @@ export const IncidentsList: React.FC = () => {
         description: t.notifiedDesc,
       });
     } catch (error) {
-      console.log('🔍 Mark parent notified - error:', error);
       open?.({
         type: "error",
         message: t.notifiedError,
@@ -118,11 +115,9 @@ export const IncidentsList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      console.log('🔍 Delete incident - id:', id);
       
       await deleteIncidentMutation.mutateAsync(id);
       
-      console.log('🔍 Delete incident - mutation successful');
 
       // Use Refine's useInvalidate for proper cache invalidation (same as children)
       invalidate({
@@ -136,7 +131,6 @@ export const IncidentsList: React.FC = () => {
         description: t.deleteDesc,
       });
     } catch (error) {
-      console.log('🔍 Delete incident - error:', error);
       open?.({
         type: "error",
         message: t.deleteError,

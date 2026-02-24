@@ -117,16 +117,12 @@ export const IncidentsCreate: React.FC = () => {
 
   const handleFinish = async (values: any) => {
     try {
-      console.log('🔍 handleFinish - values:', values);
-      console.log('🔍 handleFinish - incidentDate:', values.incidentDate);
-      console.log('🔍 handleFinish - incidentDate type:', typeof values.incidentDate);
       
       // Validate and format date using dayjs
       let incidentDate: string;
       
       // Check if incidentDate exists and is valid
       if (!values.incidentDate) {
-        console.log('🔍 handleFinish - no incidentDate provided');
         open?.({
           type: "error",
           message: t.errorMessage,
@@ -138,7 +134,6 @@ export const IncidentsCreate: React.FC = () => {
       // Try to parse the date
       const parsedDate = dayjs(values.incidentDate);
       if (!parsedDate.isValid()) {
-        console.log('🔍 handleFinish - invalid date format:', values.incidentDate);
         open?.({
           type: "error",
           message: t.errorMessage,
@@ -148,7 +143,6 @@ export const IncidentsCreate: React.FC = () => {
       }
       
       incidentDate = parsedDate.toISOString();
-      console.log('🔍 handleFinish - formatted incidentDate:', incidentDate);
 
       const incidentData = {
         ...values,
@@ -157,7 +151,6 @@ export const IncidentsCreate: React.FC = () => {
 
           await createIncidentMutation.mutateAsync(incidentData, {
             onSuccess: async (data) => {
-              console.log('🔍 Create success - data:', data);
 
               // Set the created incident ID to enable attachments
               setCreatedIncidentId((data as any).id);
@@ -314,11 +307,9 @@ export const IncidentsCreate: React.FC = () => {
               name="incidentDate"
               rules={[{ required: true, message: t.incidentDateTimeRequired }]}
               getValueFromEvent={(date) => {
-                console.log("🔍 DatePicker getValueFromEvent:", date);
                 return date;
               }}
               getValueProps={(value) => {
-                console.log("🔍 DatePicker getValueProps:", value, typeof value);
                 if (!value) return { value: null };
                 if (dayjs.isDayjs(value)) return { value };
                 if (typeof value === 'string') {

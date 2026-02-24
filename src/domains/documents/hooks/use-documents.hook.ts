@@ -52,7 +52,6 @@ export const useDocumentTypes = () => {
       } catch (error: any) {
         // Si no hay tipos de documento, intentar hacer seed
         if (error.response?.status === 404 || (error.response?.data && Array.isArray(error.response.data) && error.response.data.length === 0)) {
-          console.log('No document types found, attempting to seed...');
           try {
             await axiosInstance.post('/documents/types/seed');
             // Retry getting document types after seeding

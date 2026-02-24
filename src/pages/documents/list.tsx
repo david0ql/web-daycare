@@ -76,9 +76,6 @@ export const DocumentList: React.FC = () => {
     },
   });
 
-  console.log('🔍 DocumentList - tableProps:', tableProps);
-  console.log('🔍 DocumentList - tableProps.dataSource:', tableProps.dataSource);
-  console.log('🔍 DocumentList - tableProps.loading:', tableProps.loading);
 
   const invalidate = useInvalidate();
   const { open } = useNotification();
@@ -87,11 +84,9 @@ export const DocumentList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      console.log('🔍 Delete document - id:', id);
       
       await deleteDocumentMutation.mutateAsync(id);
       
-      console.log('🔍 Delete document - mutation successful');
 
       // Clear dataProvider cache first
       clearDataProviderCache("documents");
@@ -113,7 +108,6 @@ export const DocumentList: React.FC = () => {
         description: t.deleteDesc,
       });
     } catch (error) {
-      console.log('🔍 Delete document - error:', error);
       open?.({
         type: "error",
         message: t.deleteError,

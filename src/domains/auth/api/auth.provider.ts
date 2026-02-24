@@ -23,11 +23,8 @@ const getStoredLanguage = (): Language => {
 
 export class AuthProviderService implements AuthProvider {
   async login({ email, password }: LoginCredentials): Promise<AuthResult> {
-    console.log("🔐 AuthProvider.login() called with:", { email });
     try {
-      console.log("📡 Calling AuthApi.login()...");
       const data = await AuthApi.login({ email, password });
-      console.log("✅ AuthApi.login() returned:", data);
       
 	      if (!data || !data.accessToken || !data.user) {
 	        console.error("❌ Invalid response from AuthApi.login():", data);
@@ -41,16 +38,13 @@ export class AuthProviderService implements AuthProvider {
 	        };
 	      }
       
-      console.log("💾 Setting token and user...");
       AuthUtils.setToken(data.accessToken);
       AuthUtils.setUser(data.user);
-      console.log("✅ Token and user set successfully");
       
       const result = {
         success: true,
         redirectTo: "/",
       };
-      console.log("🎉 AuthProvider.login() returning success:", result);
       return result;
 	    } catch (error: any) {
 	      console.error("❌ AuthProvider.login() error:", error);
@@ -68,21 +62,16 @@ export class AuthProviderService implements AuthProvider {
 	          message: error.response?.data?.message || t.invalidCredentials,
 	        },
 	      };
-      console.log("🚫 AuthProvider.login() returning error:", result);
       return result;
     }
   }
 
   async logout(): Promise<AuthResult> {
-    console.log("🚪 AuthProvider.logout() called");
     const token = AuthUtils.getToken();
-    console.log("🔑 Token exists for logout:", !!token);
     
     if (token) {
       try {
-        console.log("🌐 Calling server logout...");
         await AuthApi.logout();
-        console.log("✅ Server logout successful");
       } catch (error) {
         console.error("❌ Server logout error:", error);
         // Continuar con la limpieza local aunque falle el servidor
@@ -90,9 +79,7 @@ export class AuthProviderService implements AuthProvider {
     }
     
     // Limpiar autenticación local
-    console.log("🧹 Clearing local authentication...");
     AuthUtils.clearAuth();
-    console.log("✅ Local authentication cleared");
     
     return {
       success: true,
@@ -101,12 +88,9 @@ export class AuthProviderService implements AuthProvider {
   }
 
   async check(): Promise<AuthCheckResult> {
-    console.log("🔍 AuthProvider.check() called");
     const token = AuthUtils.getToken();
-    console.log("🔑 Token found:", !!token);
     
     if (!token) {
-      console.log("❌ No token found, redirecting to login");
       return {
         authenticated: false,
         redirectTo: "/login",
@@ -114,7 +98,6 @@ export class AuthProviderService implements AuthProvider {
     }
 
     if (AuthUtils.isTokenExpired(token)) {
-      console.log("⏰ Token expired, clearing authentication");
       AuthUtils.clearAuth();
       return {
         authenticated: false,
@@ -123,17 +106,14 @@ export class AuthProviderService implements AuthProvider {
     }
 
     try {
-      console.log("🌐 Checking token with server...");
       const user = await AuthApi.getProfile();
       AuthUtils.setUser(user);
-      console.log("✅ Authentication check successful");
       
       return {
         authenticated: true,
       };
     } catch (error) {
       console.error("❌ Auth check error:", error);
-      console.log("🚫 Server rejected token, clearing authentication");
       AuthUtils.clearAuth();
       
       return {
@@ -155,7 +135,6 @@ export class AuthProviderService implements AuthProvider {
     console.error("Auth error:", error);
     
     if (error.status === 401) {
-      console.log("401 error detected, clearing authentication");
       AuthUtils.clearAuth();
       return {
         logout: true,

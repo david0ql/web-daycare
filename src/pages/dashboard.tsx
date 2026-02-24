@@ -152,37 +152,23 @@ export const Dashboard: React.FC = () => {
   const attendanceRecords = todayAttendance || [];
   
   // Debug logs for payment alerts
-  console.log("🔍 Dashboard - children data:", children);
-  console.log("🔍 Dashboard - children length:", children.length);
   
   if (children.length > 0) {
     children.forEach((child: any, index: number) => {
-      console.log(`🔍 Dashboard - child ${index}:`, {
-        id: child.id,
-        firstName: child.firstName,
-        lastName: child.lastName,
-        hasPaymentAlert: child.hasPaymentAlert,
-        hasPaymentAlertType: typeof child.hasPaymentAlert,
-        hasPaymentAlertValue: child.hasPaymentAlert
-      });
     });
   }
   
   // Filter children with payment alerts on the frontend since API doesn't support this filter
   const paymentAlerts = children.filter((child: any) => {
-    console.log(`🔍 Dashboard - filtering child ${child.id}: hasPaymentAlert = ${child.hasPaymentAlert} (${typeof child.hasPaymentAlert})`);
     // Handle different possible values: true, 1, "1", "true"
     // MySQL tinyint(1) fields are often returned as 0/1 instead of boolean
     const hasAlert = child.hasPaymentAlert === true || 
                      child.hasPaymentAlert === 1 || 
                      child.hasPaymentAlert === "1" || 
                      child.hasPaymentAlert === "true";
-    console.log(`🔍 Dashboard - child ${child.id} hasAlert result: ${hasAlert}`);
     return hasAlert;
   });
   
-  console.log("🔍 Dashboard - paymentAlerts filtered:", paymentAlerts);
-  console.log("🔍 Dashboard - paymentAlerts length:", paymentAlerts.length);
 
   const stats = {
     totalChildren: attendanceStats?.totalChildren || children.length,

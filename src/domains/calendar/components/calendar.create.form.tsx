@@ -74,7 +74,6 @@ const CALENDAR_CREATE_FORM_TRANSLATIONS = {
 } as const;
 
 export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSuccess }) => {
-  console.log('🔍 CalendarCreateForm: Componente montado');
   
   const navigate = useNavigate();
   const { language } = useLanguage();

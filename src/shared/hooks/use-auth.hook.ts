@@ -89,12 +89,6 @@ export const useAuth = () => {
   const { open: openNotification } = useNotification();
 
   // ===== LOGS DE DEBUG =====
-  console.log("🔍 useAuth - user:", user);
-  console.log("🔍 useAuth - permissions:", permissions);
-  console.log("🔍 useAuth - isAuthenticated:", isAuthenticated);
-  console.log("🔍 useAuth - userLoading:", userLoading);
-  console.log("🔍 useAuth - permissionsLoading:", permissionsLoading);
-  console.log("🔍 useAuth - authCheckLoading:", authCheckLoading);
 
   // ===== FUNCIONES DE AUTENTICACIÓN =====
   
@@ -273,7 +267,6 @@ export const useAuth = () => {
         try {
           const userData = JSON.parse(userFromStorage);
           currentPermissions = userData.role?.name;
-          console.log("🔍 isAdmin - Fallback from localStorage:", currentPermissions);
         } catch (error) {
           console.error("Error parsing user from localStorage:", error);
         }
@@ -281,7 +274,6 @@ export const useAuth = () => {
     }
     
     const isAdminResult = currentPermissions === "administrator";
-    console.log("🔍 isAdmin - Result:", isAdminResult, "Permissions:", currentPermissions);
     return isAdminResult;
   };
 
@@ -331,7 +323,6 @@ export const useAuth = () => {
    * Obtiene el nombre completo del usuario
    */
   const getUserFullName = (): string => {
-    console.log("🔍 getUserFullName - User:", user);
     
     // Fallback: obtener datos directamente del localStorage si user es undefined
     let currentUser = user;
@@ -340,7 +331,6 @@ export const useAuth = () => {
       if (userFromStorage) {
         try {
           currentUser = JSON.parse(userFromStorage);
-          console.log("🔍 getUserFullName - Fallback from localStorage:", currentUser);
         } catch (error) {
           console.error("Error parsing user from localStorage:", error);
         }
@@ -349,7 +339,6 @@ export const useAuth = () => {
     
     if (!currentUser) return t.user;
     const fullName = `${currentUser.firstName || ""} ${currentUser.lastName || ""}`.trim() || t.user;
-    console.log("🔍 getUserFullName - Full name:", fullName);
     return fullName;
   };
 
@@ -357,7 +346,6 @@ export const useAuth = () => {
    * Obtiene el rol del usuario en formato legible
    */
   const getUserRoleLabel = (): string => {
-    console.log("🔍 getUserRoleLabel - Permissions:", permissions);
     
     // Fallback: obtener permisos directamente del localStorage si permissions es undefined
     let currentPermissions = permissions;
@@ -367,7 +355,6 @@ export const useAuth = () => {
         try {
           const userData = JSON.parse(userFromStorage);
           currentPermissions = userData.role?.name;
-          console.log("🔍 getUserRoleLabel - Fallback from localStorage:", currentPermissions);
         } catch (error) {
           console.error("Error parsing user from localStorage:", error);
         }
@@ -390,7 +377,6 @@ export const useAuth = () => {
       default:
         roleLabel = t.user;
     }
-    console.log("🔍 getUserRoleLabel - Role label:", roleLabel);
     return roleLabel;
   };
 

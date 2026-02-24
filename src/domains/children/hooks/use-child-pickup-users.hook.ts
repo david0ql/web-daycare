@@ -15,21 +15,17 @@ export const useChildPickupUsers = (childId?: number) => {
     queryKey: ["users", "pickup", childId],
     queryFn: async () => {
       if (!childId) {
-        console.log("🔍 No childId provided, returning empty array");
         return [];
       }
 
       try {
-        console.log("🔍 Fetching pickup users for child:", childId);
         
         // Fetch child with relationships
         const childResponse = await axiosInstance.get(`/children/${childId}`);
         const child = childResponse.data;
         
-        console.log("🔍 Child data:", child);
         
         if (!child) {
-          console.log("🔍 Child not found");
           return [];
         }
 
@@ -63,10 +59,8 @@ export const useChildPickupUsers = (childId?: number) => {
           });
         }
         
-        console.log("🔍 Pickup user IDs found:", Array.from(pickupUserIds));
         
         if (pickupUserIds.size === 0) {
-          console.log("🔍 No pickup users found for child");
           return [];
         }
 
@@ -83,7 +77,6 @@ export const useChildPickupUsers = (childId?: number) => {
           user.isActive === true && pickupUserIds.has(user.id)
         );
         
-        console.log("🔍 Pickup users for child:", pickupUsers);
         
         return pickupUsers;
       } catch (error) {

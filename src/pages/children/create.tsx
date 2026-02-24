@@ -37,9 +37,6 @@ const BooleanSwitch: React.FC<{ value?: boolean; onChange?: (value: boolean) => 
   }, [value]);
 
   const handleChange = (checked: boolean) => {
-    console.log("🔍 BooleanSwitch onChange:", checked, typeof checked);
-    console.log("🔍 BooleanSwitch current value:", value);
-    console.log("🔍 BooleanSwitch internal value:", internalValue);
     
     setInternalValue(checked);
     
@@ -215,8 +212,6 @@ export const ChildCreate: React.FC = () => {
   
   const { formProps, saveButtonProps } = useForm<CreateChildData>({
     onMutationSuccess: async (data, variables) => {
-      console.log("🔍 CREATE Child Mutation success - data:", data);
-      console.log("🔍 CREATE Child Mutation success - variables:", variables);
       
       // Use Refine's useInvalidate for proper cache invalidation
       invalidate({
@@ -247,18 +242,14 @@ export const ChildCreate: React.FC = () => {
       }, 1000);
     },
     onMutationError: (error, variables) => {
-      console.log("🔍 CREATE Child Mutation error:", error);
-      console.log("🔍 CREATE Child Mutation error - variables:", variables);
       
       // Log specific validation errors
       if (error?.response?.data?.message) {
-        console.log("🔍 Validation errors:", error.response.data.message);
         const errorMessages = Array.isArray(error.response.data.message) 
           ? error.response.data.message 
           : [error.response.data.message];
         
         errorMessages.forEach((msg: any, index: number) => {
-          console.log(`🔍 Error ${index + 1}:`, msg);
         });
       }
       
@@ -273,7 +264,6 @@ export const ChildCreate: React.FC = () => {
 
   // Custom onFinish to transform data
   const handleFinish = (values: any) => {
-    console.log("🔍 Form onFinish - original values:", values);
     
     // Validar que haya al menos una persona autorizada para recoger
     const authorizedPickupPersons = values.authorizedPickupPersons || [];
@@ -290,14 +280,11 @@ export const ChildCreate: React.FC = () => {
       // Format birth date
           birthDate: values.birthDate ? dayjs(values.birthDate).format("YYYY-MM-DD") : undefined,
     };
-    console.log("🔍 Form onFinish - transformed values:", transformedValues);
     
     // Log the data being sent to backend
-    console.log("🔍 Data being sent to backend:", JSON.stringify(transformedValues, null, 2));
     
     // Call the original formProps.onFinish with transformed values
     if (formProps.onFinish) {
-      console.log("🔍 Calling formProps.onFinish with:", transformedValues);
       formProps.onFinish(transformedValues);
     } else {
       console.error("🔍 formProps.onFinish is not available!");
@@ -306,15 +293,12 @@ export const ChildCreate: React.FC = () => {
 
   // Debug form state
   const handleValuesChange = (changedValues: any, allValues: any) => {
-    console.log("🔍 Form values changed:", changedValues);
-    console.log("🔍 All form values:", allValues);
   };
 
   // Override saveButtonProps to use our custom handleFinish
   const customSaveButtonProps = {
     ...saveButtonProps,
     onClick: () => {
-      console.log("🔍 Save button clicked - triggering form submit");
       form.submit();
     }
   };

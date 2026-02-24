@@ -11,11 +11,9 @@ export const clearDataProviderCache = (resource?: string) => {
     // Limpiar cache específico para un resource
     const keysToDelete = Array.from(requestCache.keys()).filter(key => key.includes(resource));
     keysToDelete.forEach(key => requestCache.delete(key));
-    console.log(`🧹 Cleared cache for resource: ${resource}`);
   } else {
     // Limpiar todo el cache
     requestCache.clear();
-    console.log('🧹 Cleared all data provider cache');
   }
 };
 
@@ -27,8 +25,6 @@ export const clearDataProviderCache = (resource?: string) => {
  */
 export const stableFixedDataProvider: DataProvider = {
   getList: async ({ resource, pagination, sorters, filters, meta }) => {
-    console.log('=== STABLE FIXED DATA PROVIDER ===');
-    console.log('Resource:', resource);
 
     const params: any = {};
 
@@ -73,11 +69,9 @@ export const stableFixedDataProvider: DataProvider = {
     // Verificar cache - deshabilitado temporalmente para incidents
     const cached = requestCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION && !resource.includes('incidents')) {
-      console.log('Using cached data for:', resource);
       return cached.data;
     }
 
-    console.log('Final params:', params);
 
     try {
       // Para attendance modules, usar endpoint /all para listas
@@ -93,7 +87,6 @@ export const stableFixedDataProvider: DataProvider = {
         timeout: 10000 // Reducir timeout
       });
       
-      console.log('Response status:', response.status);
       
       const data = response.data;
       
@@ -146,19 +139,16 @@ export const stableFixedDataProvider: DataProvider = {
     // Verificar cache
     const cached = requestCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log('Using cached data for getOne:', resource, id);
       return cached.data;
     }
 
     try {
-      console.log('Fetching getOne data for:', resource, id);
       const response = await axiosInstance.get(`/${resource}/${id}`, {
         timeout: 10000
       });
       const data = response.data;
       const result = { data };
 
-      console.log('getOne response data:', data);
 
       // Guardar en cache
       requestCache.set(cacheKey, {
@@ -199,7 +189,6 @@ export const stableFixedDataProvider: DataProvider = {
 
   update: async ({ resource, id, variables, meta }) => {
     try {
-      console.log('Updating resource:', resource, id, variables);
       
       // Use with-relations endpoint for children updates
       const url = resource === 'children' ? `/${resource}/${id}/with-relations` : `/${resource}/${id}`;
@@ -285,7 +274,6 @@ function clearResourceCache(resource: string) {
     }
   });
   keysToDelete.forEach(key => requestCache.delete(key));
-  console.log(`Cleared cache for resource: ${resource}`);
 }
 
 // Limpiar cache periódicamente

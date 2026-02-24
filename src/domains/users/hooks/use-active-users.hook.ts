@@ -14,11 +14,7 @@ export const useActiveUsers = () => {
     queryKey: ["users", "active"],
     queryFn: async () => {
       try {
-        console.log("🔍 Fetching users from /users endpoint");
-        console.log("🔍 Axios instance baseURL:", axiosInstance.defaults.baseURL);
-        console.log("🔍 Axios instance headers:", axiosInstance.defaults.headers);
         const response = await axiosInstance.get("/users");
-        console.log("🔍 Users response:", response);
         
         // Handle different response structures
         let users = [];
@@ -31,10 +27,8 @@ export const useActiveUsers = () => {
           return [];
         }
         
-        console.log("🔍 All users:", users);
         // Temporarily returning all users for debugging
         // const activeUsers = users.filter((user: any) => user.isActive === true);
-        console.log("🔍 Returning all users for debugging");
         
         return users;
       } catch (error) {

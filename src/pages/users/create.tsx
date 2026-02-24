@@ -75,7 +75,6 @@ const USER_CREATE_TRANSLATIONS = {
 // Custom Switch component that always returns boolean
 const BooleanSwitch: React.FC<{ value?: boolean; onChange?: (value: boolean) => void }> = ({ value, onChange }) => {
   const handleChange = (checked: boolean) => {
-    console.log("🔍 BooleanSwitch onChange:", checked, typeof checked);
     onChange?.(checked);
   };
 
@@ -109,8 +108,6 @@ export const UserCreate: React.FC = () => {
   
   const { formProps, saveButtonProps } = useForm({
     onMutationSuccess: async (data, variables) => {
-      console.log("🔍 CREATE Mutation success - data:", data);
-      console.log("🔍 CREATE Mutation success - variables:", variables);
       
       // Use Refine's useInvalidate for proper cache invalidation
       invalidate({
@@ -151,8 +148,6 @@ export const UserCreate: React.FC = () => {
 
   // Custom onFinish to transform data
   const handleFinish = (values: any) => {
-    console.log("🔍 Form onFinish - original values:", values);
-    console.log("🔍 Form onFinish - roleId type:", typeof values.roleId, "value:", values.roleId);
     
     const transformedValues = {
       ...values,
@@ -160,8 +155,6 @@ export const UserCreate: React.FC = () => {
       // Ensure roleId is a number
       roleId: Number(values.roleId)
     };
-    console.log("🔍 Form onFinish - transformed values:", transformedValues);
-    console.log("🔍 Form onFinish - transformed roleId type:", typeof transformedValues.roleId, "value:", transformedValues.roleId);
     
     // Call the original formProps.onFinish with transformed values
     if (formProps.onFinish) {

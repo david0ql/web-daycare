@@ -10,8 +10,8 @@ declare module 'axios' {
   }
 }
 
-// const API_URL = "https://api.thechildrenworld.com/api";
-const API_URL = "http://localhost:30002/api";
+const API_URL = "https://api.thechildrenworld.com/api";
+// const API_URL = "http://localhost:30002/api";
 const TOKEN_KEY = "refine-auth";
 
 /**
@@ -154,28 +154,16 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem(TOKEN_KEY);
-    console.log('🔍 Token from localStorage:', token ? 'Present' : 'Missing');
     
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('🔍 Authorization header set:', `Bearer ${token.substring(0, 20)}...`);
     } else {
-      console.log('🔍 No token found or no headers object');
     }
     
     // Agregar timestamp para medir tiempo de respuesta
     config.metadata = { startTime: new Date().getTime() };
     
     // Log detallado de la petición
-    console.log('🚀 === AXIOS REQUEST INTERCEPTOR ===');
-    console.log('📡 Method:', config.method?.toUpperCase());
-    console.log('🔗 Full URL:', `${config.baseURL}${config.url}`);
-    console.log('📋 Params:', config.params);
-    console.log('📦 Data:', config.data);
-    console.log('🔑 Headers:', config.headers);
-    console.log('⏱️ Timeout:', config.timeout);
-    console.log('🕐 Request Time:', new Date().toISOString());
-    console.log('=====================================');
     
     return config;
   },
@@ -194,15 +182,6 @@ axiosInstance.interceptors.response.use(
       `${endTime - response.config.metadata.startTime}ms` : 'N/A';
     
     // Log detallado de la respuesta exitosa
-    console.log('✅ === AXIOS RESPONSE INTERCEPTOR (SUCCESS) ===');
-    console.log('📡 Method:', response.config.method?.toUpperCase());
-    console.log('🔗 URL:', response.config.url);
-    console.log('📊 Status:', response.status, response.statusText);
-    console.log('📦 Response Data:', response.data);
-    console.log('🔑 Response Headers:', response.headers);
-    console.log('⏱️ Response Time:', responseTime);
-    console.log('🕐 Response Time:', new Date().toISOString());
-    console.log('==============================================');
     
     return response;
   },
@@ -213,22 +192,6 @@ axiosInstance.interceptors.response.use(
       `${endTime - error.config.metadata.startTime}ms` : 'N/A';
     
     // Log detallado del error
-    console.log('❌ === AXIOS RESPONSE INTERCEPTOR (ERROR) ===');
-    console.log('📡 Method:', error.config?.method?.toUpperCase());
-    console.log('🔗 URL:', error.config?.url);
-    console.log('📊 Status:', error.response?.status, error.response?.statusText);
-    console.log('📦 Error Response Data:', error.response?.data);
-    console.log('🔑 Error Response Headers:', error.response?.headers);
-    console.log('💬 Error Message:', error.message);
-    console.log('🔧 Error Code:', error.code);
-    console.log('⏱️ Response Time:', responseTime);
-    console.log('🕐 Error Time:', new Date().toISOString());
-    console.log('📋 Request Config:', {
-      params: error.config?.params,
-      data: error.config?.data,
-      headers: error.config?.headers
-    });
-    console.log('============================================');
     
     const status = error.response?.status;
     
