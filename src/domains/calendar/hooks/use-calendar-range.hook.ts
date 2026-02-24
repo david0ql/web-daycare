@@ -6,6 +6,7 @@ export const useCalendarRange = (startDate: string, endDate: string) => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -28,7 +29,9 @@ export const useCalendarRange = (startDate: string, endDate: string) => {
     };
 
     fetchEvents();
-  }, [startDate, endDate]);
+  }, [startDate, endDate, refreshKey]);
 
-  return { events, isLoading, error };
+  const refetch = () => setRefreshKey((k) => k + 1);
+
+  return { events, isLoading, error, refetch };
 };

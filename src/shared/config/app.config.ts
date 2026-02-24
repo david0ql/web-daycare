@@ -113,6 +113,7 @@ export const getAppResources = (language: Language): ResourceProps[] => {
       name: "calendar",
       list: "/calendar",
       create: "/calendar/create",
+      show: "/calendar/show/:id",
       edit: "/calendar/edit/:id",
       meta: {
         label: t.calendar,

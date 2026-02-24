@@ -1,6 +1,7 @@
 export { CalendarList } from './components/calendar.list';
 export { CalendarCreateForm } from './components/calendar.create.form';
 export { CalendarEditForm } from './components/calendar.edit.form';
+export { CalendarShowForm } from './components/calendar.show.form';
 export { UpcomingEventsWidget } from './components/upcoming-events.widget';
 
 export type {

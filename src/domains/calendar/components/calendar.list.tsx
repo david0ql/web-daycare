@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Calendar, Card, Tag, Space, Typography, Button, Tooltip, Badge, Empty } from 'antd';
-import { PlusOutlined, CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { Calendar, Card, Tag, Space, Typography, Button, Tooltip, Badge, Empty, Popconfirm, message } from 'antd';
+import { PlusOutlined, CalendarOutlined, ClockCircleOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { CalendarEvent, EventTypeEnum } from '../types/calendar.types';
 import { CalendarUtils } from '../utils/calendar.utils';
 import { useCalendarRange } from '../hooks/use-calendar-range.hook';
+import { calendarApi } from '../api/calendar.api';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { useLanguage } from '../../../shared/contexts/language.context';
@@ -29,6 +30,14 @@ const CALENDAR_LIST_TRANSLATIONS = {
     allDay: "All Day",
     createdBy: "Created by",
     eventTypeLegend: "Event Type Legend",
+    viewEvent: "View event",
+    editEvent: "Edit event",
+    deleteEvent: "Delete event",
+    deleteConfirm: "Are you sure you want to delete this event?",
+    deleteOk: "Yes, delete",
+    cancel: "Cancel",
+    deleteSuccess: "Event deleted successfully",
+    deleteError: "Error deleting event",
   },
   spanish: {
     documentTitle: "Calendario de eventos | The Children's World",
@@ -40,6 +49,14 @@ const CALENDAR_LIST_TRANSLATIONS = {
     allDay: "Todo el día",
     createdBy: "Creado por",
     eventTypeLegend: "Leyenda de tipos de evento",
+    viewEvent: "Ver evento",
+    editEvent: "Editar evento",
+    deleteEvent: "Eliminar evento",
+    deleteConfirm: "¿Está seguro de eliminar este evento?",
+    deleteOk: "Sí, eliminar",
+    cancel: "Cancelar",
+    deleteSuccess: "Evento eliminado correctamente",
+    deleteError: "Error al eliminar evento",
   },
 } as const;
 
@@ -56,7 +73,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
   // Get events for the current month using the range endpoint
   const monthRange = CalendarUtils.getMonthRange(currentYear, currentMonth);
   
-  const { events, isLoading } = useCalendarRange(monthRange.startDate, monthRange.endDate);
+  const { events, isLoading, refetch } = useCalendarRange(monthRange.startDate, monthRange.endDate);
 
   // Transform events for calendar display
   const calendarEvents = useMemo(() => {
@@ -210,13 +227,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
           ) : (
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
               {selectedDateEvents.map((event) => (
-                <Card
-                  key={event.id}
-                  size="small"
-                  hoverable
-                  onClick={() => navigate(`/calendar/edit/${event.id}`)}
-                  style={{ cursor: 'pointer' }}
-                >
+                <Card key={event.id} size="small">
                   <div style={{ marginBottom: '8px' }}>
                     <Title level={5} style={{ margin: 0, marginBottom: '4px' }}>
                       {event.title}
@@ -230,7 +241,7 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
                   
                   <Space wrap>
                     <Tag color={CalendarUtils.getEventTypeColor(event.eventType)}>
-                      {CalendarUtils.getEventTypeLabel(event.eventType)}
+                      {CalendarUtils.getEventTypeLabel(event.eventType, language)}
                     </Tag>
                     
                     {!event.isAllDay && event.startTime && (
@@ -252,6 +263,43 @@ export const CalendarList: React.FC<CalendarListProps> = ({ onCreateEvent }) => 
                       </Text>
                     </div>
                   )}
+
+                  <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'flex-end', gap: '4px' }}>
+                    <Tooltip title={t.viewEvent}>
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => navigate(`/calendar/show/${event.id}`)}
+                      />
+                    </Tooltip>
+                    <Tooltip title={t.editEvent}>
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<EditOutlined />}
+                        onClick={() => navigate(`/calendar/edit/${event.id}`)}
+                      />
+                    </Tooltip>
+                    <Popconfirm
+                      title={t.deleteConfirm}
+                      okText={t.deleteOk}
+                      cancelText={t.cancel}
+                      onConfirm={async () => {
+                        try {
+                          await calendarApi.deleteEvent(event.id);
+                          message.success(t.deleteSuccess);
+                          refetch();
+                        } catch {
+                          message.error(t.deleteError);
+                        }
+                      }}
+                    >
+                      <Tooltip title={t.deleteEvent}>
+                        <Button type="text" size="small" danger icon={<DeleteOutlined />} />
+                      </Tooltip>
+                    </Popconfirm>
+                  </div>
                 </Card>
               ))}
             </Space>
