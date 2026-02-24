@@ -128,28 +128,32 @@ export const CalendarShowForm: React.FC<CalendarShowFormProps> = ({ eventId }) =
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item label={t.startDate} name="startDate">
-              <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
+              <DatePicker
+                style={{ width: '100%' }}
+                format={language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY"}
+              />
             </Form.Item>
           </Col>
-          
           <Col span={12}>
             <Form.Item label={t.endDate} name="endDate">
-              <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
+              <DatePicker
+                style={{ width: '100%' }}
+                format={language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY"}
+              />
             </Form.Item>
           </Col>
         </Row>
 
-        {event.isAllDay === false && (
+        {(!event.isAllDay || event.startTime || event.endTime) && (
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item label={t.startTime} name="startTime">
-                <TimePicker style={{ width: '100%' }} format="HH:mm" />
+                <TimePicker style={{ width: '100%' }} format="h:mm A" use12Hours />
               </Form.Item>
             </Col>
-            
             <Col span={12}>
               <Form.Item label={t.endTime} name="endTime">
-                <TimePicker style={{ width: '100%' }} format="HH:mm" />
+                <TimePicker style={{ width: '100%' }} format="h:mm A" use12Hours />
               </Form.Item>
             </Col>
           </Row>

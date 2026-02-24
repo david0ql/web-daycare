@@ -195,9 +195,9 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
               name="startDate"
               rules={[{ required: true, message: t.startDateRequired }]}
             >
-              <DatePicker 
+              <DatePicker
                 style={{ width: '100%' }}
-                format="DD/MM/YYYY"
+                format={language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY"}
                 placeholder={t.startDatePlaceholder}
               />
             </Form.Item>
@@ -209,9 +209,9 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
               name="endDate"
               rules={[{ required: true, message: t.endDateRequired }]}
             >
-              <DatePicker 
+              <DatePicker
                 style={{ width: '100%' }}
-                format="DD/MM/YYYY"
+                format={language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY"}
                 placeholder={t.endDatePlaceholder}
               />
             </Form.Item>
@@ -226,9 +226,10 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
                 name="startTime"
                 rules={[{ required: true, message: t.startTimeRequired }]}
               >
-                <TimePicker 
+                <TimePicker
                   style={{ width: '100%' }}
-                  format="HH:mm"
+                  format="h:mm A"
+                  use12Hours
                   placeholder={t.startTimePlaceholder}
                 />
               </Form.Item>
@@ -240,9 +241,10 @@ export const CalendarCreateForm: React.FC<CalendarCreateFormProps> = ({ onSucces
                 name="endTime"
                 rules={[{ required: true, message: t.endTimeRequired }]}
               >
-                <TimePicker 
+                <TimePicker
                   style={{ width: '100%' }}
-                  format="HH:mm"
+                  format="h:mm A"
+                  use12Hours
                   placeholder={t.endTimePlaceholder}
                 />
               </Form.Item>
