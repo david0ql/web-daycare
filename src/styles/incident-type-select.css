@@ -1,0 +1,9 @@
+/* Evita que el texto del tipo de incidente se desborde del Select */
+.incident-type-select .ant-select-selector {
+  overflow: hidden;
+}
+.incident-type-select .ant-select-selection-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

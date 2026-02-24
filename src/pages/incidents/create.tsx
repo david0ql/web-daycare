@@ -8,6 +8,7 @@ import { useCreateIncident } from '../../domains/incidents';
 import { IncidentAttachmentsMultiple } from './attachments-multiple';
 import { useLanguage } from '../../shared/contexts/language.context';
 import { getIncidentTypeLabelByLanguage, getSeverityLabelByLanguage } from '../../domains/incidents';
+import '../../styles/incident-type-select.css';
 import dayjs from 'dayjs';
 
 const { Title } = Typography;
@@ -251,12 +252,19 @@ export const IncidentsCreate: React.FC = () => {
               rules={[{ required: true, message: t.selectIncidentTypeRequired }]}
             >
               <Select
+                className="incident-type-select"
                 placeholder={t.selectIncidentType}
                 loading={incidentTypesLoading}
                 notFoundContent={incidentTypesLoading ? t.loading : t.noTypesAvailable}
+                optionLabelProp="label"
+                style={{ width: '100%' }}
               >
                 {(incidentTypesData || []).map((type: any) => (
-                  <Option key={type.id} value={type.id}>
+                  <Option
+                    key={type.id}
+                    value={type.id}
+                    label={getIncidentTypeLabelByLanguage(type.name, language)}
+                  >
                     <div>
                       <div>{getIncidentTypeLabelByLanguage(type.name, language)}</div>
                       <div style={{ fontSize: '12px', color: '#666' }}>
