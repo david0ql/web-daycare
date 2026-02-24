@@ -82,6 +82,12 @@ export const formatIncidentDate = (date: string) => {
   return dayjs(date).format('DD/MM/YYYY HH:mm');
 };
 
+/** Date by language (YYYY-MM-DD for Spanish, MM-DD-YYYY for English) and time in 12-hour format (AM/PM). */
+export const formatIncidentDateByLanguage = (date: string, language: Language = 'english') => {
+  const dateFormat = language === 'spanish' ? 'YYYY-MM-DD' : 'MM-DD-YYYY';
+  return dayjs(date).format(`${dateFormat} h:mm A`);
+};
+
 export const formatIncidentDateShort = (date: string) => {
   return dayjs(date).format('DD/MM/YYYY');
 };
