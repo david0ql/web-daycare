@@ -321,7 +321,8 @@ export const IncidentsCreate: React.FC = () => {
             >
               <DatePicker
                 showTime
-                format="DD/MM/YYYY HH:mm"
+                format={language === "spanish" ? "YYYY-MM-DD h:mm A" : "MM-DD-YYYY h:mm A"}
+                use12Hours
                 placeholder={t.selectDateTime}
                 style={{ width: '100%' }}
               />
