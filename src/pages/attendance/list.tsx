@@ -129,7 +129,12 @@ export const AttendanceList: React.FC = () => {
       title: t.date,
       dataIndex: "attendanceDate",
       key: "attendanceDate",
-      render: (value: string) => <DateField value={value} format="DD/MM/YYYY" />,
+      render: (value: string) => (
+        <DateField
+          value={value}
+          format={language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY"}
+        />
+      ),
     },
     {
       title: t.checkIn,

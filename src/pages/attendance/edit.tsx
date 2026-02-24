@@ -139,6 +139,7 @@ const AttendanceEditForm: React.FC<{
   onFinish: (values: any) => any;
   t: AttendanceEditTranslations;
 }> = ({ formProps, form, record, onFinish, t }) => {
+  const { language } = useLanguage();
   // Get children for the select
   const { selectProps: childrenSelectProps } = useSelect({
     resource: "children",
@@ -181,7 +182,7 @@ const AttendanceEditForm: React.FC<{
       >
         <DatePicker
           style={{ width: '100%' }}
-          format="DD/MM/YYYY"
+          format={language === "english" ? "MM-DD-YYYY" : "YYYY-MM-DD"}
           placeholder={t.selectDate}
         />
       </Form.Item>
@@ -203,7 +204,8 @@ const AttendanceEditForm: React.FC<{
       >
         <TimePicker
           style={{ width: '100%' }}
-          format="HH:mm"
+          format="h:mm A"
+          use12Hours
           placeholder={t.selectCheckInTime}
         />
       </Form.Item>
@@ -225,7 +227,8 @@ const AttendanceEditForm: React.FC<{
       >
         <TimePicker
           style={{ width: '100%' }}
-          format="HH:mm"
+          format="h:mm A"
+          use12Hours
           placeholder={t.selectCheckOutTime}
         />
       </Form.Item>
