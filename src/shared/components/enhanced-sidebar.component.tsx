@@ -20,6 +20,21 @@ import {
 import { useNavigate, useLocation } from "react-router";
 import { colors } from "../styles/colors.styles";
 import { useAuth } from "../hooks/use-auth.hook";
+
+// Colores por sección (igual que app móvil): items principales varían, sub-items uniforme
+const SECTION_ITEM_BG: Record<string, string> = {
+  "/": "#F0F4F8",        // dashboard – gris azulado suave
+  users: "#E3F2FD",      // usuarios – azul muy claro
+  children: "#FFF4D6",   // amarillo pastel
+  attendance: "#D4E8F7", // azul pastel
+  incidents: "#FFE0E8",  // rosa pastel
+  calendar: "#FFE8DC",   // melocotón pastel
+  documents: "#E8F5E9",  // verde pastel
+  reports: "#FFF8E1",   // amarillo muy suave
+  language: "#E8E0F5",  // lavanda
+};
+const SUB_ITEM_BG = "#FFFFFF";
+const DEFAULT_ITEM_BG = "#F0E8F5";
 import { useAppNavigation } from "../hooks/use-navigation.hook";
 import { useLanguage } from "../contexts/language.context";
 
@@ -129,156 +144,85 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
       icon: <DashboardOutlined />,
       label: t.dashboard,
       path: "/",
+      style: { backgroundColor: SECTION_ITEM_BG["/"] ?? DEFAULT_ITEM_BG },
     },
     {
       key: "users",
       icon: <TeamOutlined />,
       label: t.users,
+      style: { backgroundColor: SECTION_ITEM_BG.users ?? DEFAULT_ITEM_BG },
       children: [
-        {
-          key: "/users",
-          icon: <UserOutlined />,
-          label: t.userList,
-          path: "/users",
-        },
-        ...(isAdmin() ? [{
-          key: "/users/create",
-          icon: <UserAddOutlined />,
-          label: t.createUser,
-          path: "/users/create",
-        }] : []),
+        { key: "/users", icon: <UserOutlined />, label: t.userList, path: "/users", style: { backgroundColor: SUB_ITEM_BG } },
+        ...(isAdmin() ? [{ key: "/users/create", icon: <UserAddOutlined />, label: t.createUser, path: "/users/create", style: { backgroundColor: SUB_ITEM_BG } }] : []),
       ],
     },
     {
       key: "children",
       icon: <UserOutlined />,
       label: t.children,
+      style: { backgroundColor: SECTION_ITEM_BG.children ?? DEFAULT_ITEM_BG },
       children: [
-        {
-          key: "/children",
-          icon: <UserOutlined />,
-          label: t.childrenList,
-          path: "/children",
-        },
-        ...((isAdmin() || isEducator()) ? [{
-          key: "/children/create",
-          icon: <UserAddOutlined />,
-          label: t.registerChild,
-          path: "/children/create",
-        }] : []),
+        { key: "/children", icon: <UserOutlined />, label: t.childrenList, path: "/children", style: { backgroundColor: SUB_ITEM_BG } },
+        ...((isAdmin() || isEducator()) ? [{ key: "/children/create", icon: <UserAddOutlined />, label: t.registerChild, path: "/children/create", style: { backgroundColor: SUB_ITEM_BG } }] : []),
       ],
     },
     {
       key: "attendance",
       icon: <FileTextOutlined />,
       label: t.attendance,
+      style: { backgroundColor: SECTION_ITEM_BG.attendance ?? DEFAULT_ITEM_BG },
       children: [
-        {
-          key: "/attendance",
-          icon: <FileTextOutlined />,
-          label: t.attendanceRecord,
-          path: "/attendance",
-        },
-        ...((isAdmin() || isEducator()) ? [{
-          key: "/attendance/create",
-          icon: <UserAddOutlined />,
-          label: t.markAttendance,
-          path: "/attendance/create",
-        }] : []),
-        {
-          key: "/attendance/activities",
-          icon: <CheckCircleOutlined />,
-          label: t.dailyActivities,
-          path: "/attendance/activities",
-        },
-        {
-          key: "/attendance/observations",
-          icon: <EyeOutlined />,
-          label: t.observations,
-          path: "/attendance/observations",
-        },
-        {
-          key: "/attendance/photos",
-          icon: <CameraOutlined />,
-          label: t.activityPhotos,
-          path: "/attendance/photos",
-        },
+        { key: "/attendance", icon: <FileTextOutlined />, label: t.attendanceRecord, path: "/attendance", style: { backgroundColor: SUB_ITEM_BG } },
+        ...((isAdmin() || isEducator()) ? [{ key: "/attendance/create", icon: <UserAddOutlined />, label: t.markAttendance, path: "/attendance/create", style: { backgroundColor: SUB_ITEM_BG } }] : []),
+        { key: "/attendance/activities", icon: <CheckCircleOutlined />, label: t.dailyActivities, path: "/attendance/activities", style: { backgroundColor: SUB_ITEM_BG } },
+        { key: "/attendance/observations", icon: <EyeOutlined />, label: t.observations, path: "/attendance/observations", style: { backgroundColor: SUB_ITEM_BG } },
+        { key: "/attendance/photos", icon: <CameraOutlined />, label: t.activityPhotos, path: "/attendance/photos", style: { backgroundColor: SUB_ITEM_BG } },
       ],
     },
     {
       key: "incidents",
       icon: <WarningOutlined />,
       label: t.incidents,
+      style: { backgroundColor: SECTION_ITEM_BG.incidents ?? DEFAULT_ITEM_BG },
       children: [
-        {
-          key: "/incidents",
-          icon: <WarningOutlined />,
-          label: t.incidentsList,
-          path: "/incidents",
-        },
-        ...((isAdmin() || isEducator()) ? [{
-          key: "/incidents/create",
-          icon: <UserAddOutlined />,
-          label: t.reportIncident,
-          path: "/incidents/create",
-        }] : []),
+        { key: "/incidents", icon: <WarningOutlined />, label: t.incidentsList, path: "/incidents", style: { backgroundColor: SUB_ITEM_BG } },
+        ...((isAdmin() || isEducator()) ? [{ key: "/incidents/create", icon: <UserAddOutlined />, label: t.reportIncident, path: "/incidents/create", style: { backgroundColor: SUB_ITEM_BG } }] : []),
       ],
     },
     {
       key: "calendar",
       icon: <CalendarOutlined />,
       label: t.calendar,
+      style: { backgroundColor: SECTION_ITEM_BG.calendar ?? DEFAULT_ITEM_BG },
       children: [
-        {
-          key: "/calendar",
-          icon: <CalendarOutlined />,
-          label: t.calendarView,
-          path: "/calendar",
-        },
-        ...((isAdmin() || isEducator()) ? [{
-          key: "/calendar/create",
-          icon: <UserAddOutlined />,
-          label: t.createEvent,
-          path: "/calendar/create",
-        }] : []),
+        { key: "/calendar", icon: <CalendarOutlined />, label: t.calendarView, path: "/calendar", style: { backgroundColor: SUB_ITEM_BG } },
+        ...((isAdmin() || isEducator()) ? [{ key: "/calendar/create", icon: <UserAddOutlined />, label: t.createEvent, path: "/calendar/create", style: { backgroundColor: SUB_ITEM_BG } }] : []),
       ],
     },
     {
       key: "documents",
       icon: <BookOutlined />,
       label: t.documents,
+      style: { backgroundColor: SECTION_ITEM_BG.documents ?? DEFAULT_ITEM_BG },
       children: [
-        {
-          key: "/documents",
-          icon: <BookOutlined />,
-          label: t.documentsList,
-          path: "/documents",
-        },
-        ...((isAdmin() || isEducator()) ? [{
-          key: "/documents/create",
-          icon: <UserAddOutlined />,
-          label: t.uploadDocument,
-          path: "/documents/create",
-        }] : []),
+        { key: "/documents", icon: <BookOutlined />, label: t.documentsList, path: "/documents", style: { backgroundColor: SUB_ITEM_BG } },
+        ...((isAdmin() || isEducator()) ? [{ key: "/documents/create", icon: <UserAddOutlined />, label: t.uploadDocument, path: "/documents/create", style: { backgroundColor: SUB_ITEM_BG } }] : []),
       ],
     },
     ...(isAdmin() ? [{
       key: "reports",
       icon: <BarChartOutlined />,
       label: t.reports,
+      style: { backgroundColor: SECTION_ITEM_BG.reports ?? DEFAULT_ITEM_BG },
       children: [
-        {
-          key: "/reports",
-          icon: <BarChartOutlined />,
-          label: t.reportsView,
-          path: "/reports",
-        },
+        { key: "/reports", icon: <BarChartOutlined />, label: t.reportsView, path: "/reports", style: { backgroundColor: SUB_ITEM_BG } },
       ],
     }] : []),
     {
       key: "language",
       icon: <GlobalOutlined />,
       label: t.language,
+      style: { backgroundColor: SECTION_ITEM_BG.language ?? DEFAULT_ITEM_BG },
     },
   ];
 
@@ -437,12 +381,21 @@ export const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
           </Space>
         </div>
 
-        {/* Menu */}
+        {/* Menu: items con colores por sección (como app móvil), sub-items fondo blanco uniforme */}
         <div style={{ 
           flex: 1, 
           overflowY: "auto",
           padding: "8px 0"
-        }}>
+        }} className="enhanced-sidebar-menu">
+          <style>{`
+            .enhanced-sidebar-menu .ant-menu-sub .ant-menu-item,
+            .enhanced-sidebar-menu .ant-menu-sub .ant-menu-item:hover {
+              background: ${SUB_ITEM_BG} !important;
+            }
+            .enhanced-sidebar-menu .ant-menu-sub .ant-menu-item-selected {
+              background: ${colors.background.secondary} !important;
+            }
+          `}</style>
           <Menu
             mode="inline"
             selectedKeys={getSelectedKeys()}
