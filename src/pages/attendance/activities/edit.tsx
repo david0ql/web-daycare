@@ -118,10 +118,15 @@ export const AttendanceActivitiesEdit: React.FC = () => {
     const formData = {
       ...values,
       completed: Boolean(values.completed),
-      timeCompleted: values.completed && values.timeCompleted ? dayjs(values.timeCompleted).format('YYYY-MM-DD HH:mm:ss') : null,
+      timeCompleted: values.completed && values.timeCompleted && dayjs.isDayjs(values.timeCompleted) 
+        ? values.timeCompleted.toISOString() 
+        : values.timeCompleted,
     };
     
-    formProps.onFinish?.(formData);
+    // Call the original formProps.onFinish with transformed values
+    if (formProps.onFinish) {
+      formProps.onFinish(formData);
+    }
   };
 
   return (
@@ -173,12 +178,21 @@ export const AttendanceActivitiesEdit: React.FC = () => {
 	                    label={t.completionTime}
 	                    name="timeCompleted"
 	                    rules={[{ required: true, message: t.selectCompletionTimeRequired }]}
-	                    getValueFromEvent={(time) => time ? dayjs(time) : undefined}
-	                    getValueProps={(value) => ({ value: value ? dayjs(value) : undefined })}
+	                    getValueFromEvent={(time) => time}
+	                    getValueProps={(value) => {
+	                      if (!value) return { value: null };
+	                      if (dayjs.isDayjs(value)) return { value };
+	                      if (typeof value === 'string') {
+	                        const dayjsValue = dayjs(value);
+	                        return { value: dayjsValue.isValid() ? dayjsValue : null };
+	                      }
+	                      return { value: null };
+	                    }}
 	                  >
 	                    <TimePicker 
 	                      style={{ width: '100%' }}
-	                      format="HH:mm"
+	                      format="h:mm A"
+	                      use12Hours
 	                      placeholder={t.selectTime}
 	                    />
 	                  </Form.Item>

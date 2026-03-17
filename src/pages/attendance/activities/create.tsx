@@ -127,10 +127,15 @@ export const AttendanceActivitiesCreate: React.FC = () => {
     const formData = {
       ...values,
       attendanceId: values.attendanceId || (attendanceId ? parseInt(attendanceId) : undefined),
-      timeCompleted: values.completed && values.timeCompleted ? values.timeCompleted.toDate() : undefined,
+      timeCompleted: values.completed && values.timeCompleted && dayjs.isDayjs(values.timeCompleted) 
+        ? values.timeCompleted.toISOString() 
+        : values.timeCompleted,
     };
     
-    formProps.onFinish?.(formData);
+    // Call the original formProps.onFinish with transformed values
+    if (formProps.onFinish) {
+      formProps.onFinish(formData);
+    }
   };
 
   return (
