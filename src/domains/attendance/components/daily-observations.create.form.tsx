@@ -119,7 +119,6 @@ export const DailyObservationsCreateForm: React.FC<DailyObservationsCreateFormPr
             <Form.Item
               label={t.generalObservations}
               name="generalObservations"
-              rules={[{ required: true, message: t.observationsRequired }]}
             >
               <TextArea 
                 rows={4}
