@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Create, useForm } from "@refinedev/antd";
-import { Form, Input, Select, Switch, TimePicker, Row, Col } from "antd";
+import { Form, Input, Select, TimePicker, Row, Col } from "antd";
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ActivityTypeEnum, ACTIVITY_TYPE_LABELS_BY_LANGUAGE } from "../../../domains/attendance/types/daily-activities.types";
+import { ActivityTypeEnum, ActivityStatusEnum, ACTIVITY_TYPE_LABELS_BY_LANGUAGE } from "../../../domains/attendance/types/daily-activities.types";
 import { axiosInstance } from "../../../shared";
 import dayjs from 'dayjs';
 import { useLanguage } from "../../../shared/contexts/language.context";
@@ -30,7 +30,11 @@ const ATTENDANCE_ACTIVITIES_CREATE_TRANSLATIONS = {
     selectActivityType: "Select activity type",
     firstSelectAttendance: "First select an attendance record",
     noActivityTypes: "No activity types available",
-    completed: "Completed",
+    status: "Status",
+    statusRequired: "Please select the status",
+    statusPending: "Pending",
+    statusCompleted: "Completed",
+    statusRejected: "Rejected",
     completionTime: "Completion Time",
     selectCompletionTimeRequired: "Please select completion time",
     selectTime: "Select time",
@@ -55,7 +59,11 @@ const ATTENDANCE_ACTIVITIES_CREATE_TRANSLATIONS = {
     selectActivityType: "Selecciona tipo de actividad",
     firstSelectAttendance: "Primero selecciona un registro de asistencia",
     noActivityTypes: "No hay tipos de actividad disponibles",
-    completed: "Completado",
+    status: "Estado",
+    statusRequired: "Por favor selecciona el estado",
+    statusPending: "Pendiente",
+    statusCompleted: "Completado",
+    statusRejected: "Rechazado",
     completionTime: "Hora de finalización",
     selectCompletionTimeRequired: "Por favor selecciona la hora de finalización",
     selectTime: "Selecciona hora",
@@ -127,9 +135,9 @@ export const AttendanceActivitiesCreate: React.FC = () => {
     const formData = {
       ...values,
       attendanceId: values.attendanceId || (attendanceId ? parseInt(attendanceId) : undefined),
-      timeCompleted: values.completed && values.timeCompleted && dayjs.isDayjs(values.timeCompleted) 
-        ? values.timeCompleted.toISOString() 
-        : values.timeCompleted,
+      timeCompleted: values.completed === ActivityStatusEnum.COMPLETED && values.timeCompleted && dayjs.isDayjs(values.timeCompleted)
+        ? values.timeCompleted.toISOString()
+        : undefined,
     };
     
     // Call the original formProps.onFinish with transformed values
@@ -239,13 +247,16 @@ export const AttendanceActivitiesCreate: React.FC = () => {
           
           <Col span={12}>
             <Form.Item
-              label={t.completed}
+              label={t.status}
               name="completed"
-              valuePropName="checked"
-              getValueFromEvent={(checked) => Boolean(checked)}
-              getValueProps={(value) => ({ value: Boolean(value) })}
+              rules={[{ required: true, message: t.statusRequired }]}
+              initialValue={ActivityStatusEnum.PENDING}
             >
-              <Switch />
+              <Select>
+                <Option value={ActivityStatusEnum.PENDING}>⏳ {t.statusPending}</Option>
+                <Option value={ActivityStatusEnum.COMPLETED}>✅ {t.statusCompleted}</Option>
+                <Option value={ActivityStatusEnum.REJECTED}>❌ {t.statusRejected}</Option>
+              </Select>
             </Form.Item>
           </Col>
         </Row>
@@ -254,28 +265,28 @@ export const AttendanceActivitiesCreate: React.FC = () => {
           noStyle
           shouldUpdate={(prevValues, currentValues) => prevValues.completed !== currentValues.completed}
         >
-	          {({ getFieldValue }) => {
-	            const completed = getFieldValue('completed');
-	            return completed ? (
-	              <Row gutter={16}>
-	                <Col span={12}>
-	                  <Form.Item
-	                    label={t.completionTime}
-	                    name="timeCompleted"
-	                    rules={[{ required: true, message: t.selectCompletionTimeRequired }]}
-	                  >
-	                    <TimePicker
-	                      style={{ width: '100%' }}
-	                      format="h:mm A"
-	                      use12Hours
-	                      placeholder={t.selectTime}
-	                    />
-	                  </Form.Item>
-	                </Col>
-	              </Row>
-	            ) : null;
-	          }}
-	        </Form.Item>
+          {({ getFieldValue }) => {
+            const completedVal = getFieldValue('completed');
+            return completedVal === ActivityStatusEnum.COMPLETED ? (
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label={t.completionTime}
+                    name="timeCompleted"
+                    rules={[{ required: true, message: t.selectCompletionTimeRequired }]}
+                  >
+                    <TimePicker
+                      style={{ width: '100%' }}
+                      format="h:mm A"
+                      use12Hours
+                      placeholder={t.selectTime}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            ) : null;
+          }}
+        </Form.Item>
 
 	        <Row gutter={16}>
 	          <Col span={24}>

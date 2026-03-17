@@ -2,8 +2,8 @@ import React from "react";
 import { Edit, useForm } from "@refinedev/antd";
 import { useGo, useNotification } from "@refinedev/core";
 import { useQueryClient } from "@tanstack/react-query";
-import { Form, Input, Select, Switch, TimePicker, Row, Col } from "antd";
-import { ActivityTypeEnum, ACTIVITY_TYPE_LABELS_BY_LANGUAGE } from "../../../domains/attendance/types/daily-activities.types";
+import { Form, Input, Select, TimePicker, Row, Col } from "antd";
+import { ActivityTypeEnum, ActivityStatusEnum, ACTIVITY_TYPE_LABELS_BY_LANGUAGE } from "../../../domains/attendance/types/daily-activities.types";
 import dayjs from 'dayjs';
 import { useLanguage } from "../../../shared/contexts/language.context";
 
@@ -17,7 +17,11 @@ const ATTENDANCE_ACTIVITIES_EDIT_TRANSLATIONS = {
     activityType: "Activity Type",
     selectActivityTypeRequired: "Please select activity type",
     selectActivityType: "Select activity type",
-    completed: "Completed",
+    status: "Status",
+    statusRequired: "Please select the status",
+    statusPending: "Pending",
+    statusCompleted: "Completed",
+    statusRejected: "Rejected",
     completionTime: "Completion Time",
     selectCompletionTimeRequired: "Please select completion time",
     selectTime: "Select time",
@@ -34,7 +38,11 @@ const ATTENDANCE_ACTIVITIES_EDIT_TRANSLATIONS = {
     activityType: "Tipo de actividad",
     selectActivityTypeRequired: "Por favor selecciona el tipo de actividad",
     selectActivityType: "Selecciona tipo de actividad",
-    completed: "Completado",
+    status: "Estado",
+    statusRequired: "Por favor selecciona el estado",
+    statusPending: "Pendiente",
+    statusCompleted: "Completado",
+    statusRejected: "Rechazado",
     completionTime: "Hora de finalización",
     selectCompletionTimeRequired: "Por favor selecciona la hora de finalización",
     selectTime: "Selecciona hora",
@@ -104,8 +112,8 @@ export const AttendanceActivitiesEdit: React.FC = () => {
       
       const formData = {
         ...activityData,
-        // Convert completed to boolean for Switch
-        completed: Boolean(activityData.completed),
+        // Ensure completed is numeric (0, 1, or 2)
+        completed: Number(activityData.completed ?? 0),
         // Convert timeCompleted to dayjs object for TimePicker
         timeCompleted: activityData.timeCompleted ? dayjs(activityData.timeCompleted) : undefined,
       };
@@ -117,10 +125,10 @@ export const AttendanceActivitiesEdit: React.FC = () => {
   const handleFinish = (values: any) => {
     const formData = {
       ...values,
-      completed: Boolean(values.completed),
-      timeCompleted: values.completed && values.timeCompleted && dayjs.isDayjs(values.timeCompleted) 
-        ? values.timeCompleted.toISOString() 
-        : values.timeCompleted,
+      completed: Number(values.completed),
+      timeCompleted: values.completed === ActivityStatusEnum.COMPLETED && values.timeCompleted && dayjs.isDayjs(values.timeCompleted)
+        ? values.timeCompleted.toISOString()
+        : undefined,
     };
     
     // Call the original formProps.onFinish with transformed values
@@ -154,13 +162,15 @@ export const AttendanceActivitiesEdit: React.FC = () => {
           
           <Col span={12}>
             <Form.Item
-              label={t.completed}
+              label={t.status}
               name="completed"
-              valuePropName="checked"
-              getValueFromEvent={(checked) => Boolean(checked)}
-              getValueProps={(value) => ({ value: Boolean(value) })}
+              rules={[{ required: true, message: t.statusRequired }]}
             >
-              <Switch />
+              <Select>
+                <Option value={ActivityStatusEnum.PENDING}>⏳ {t.statusPending}</Option>
+                <Option value={ActivityStatusEnum.COMPLETED}>✅ {t.statusCompleted}</Option>
+                <Option value={ActivityStatusEnum.REJECTED}>❌ {t.statusRejected}</Option>
+              </Select>
             </Form.Item>
           </Col>
         </Row>
@@ -170,37 +180,37 @@ export const AttendanceActivitiesEdit: React.FC = () => {
           shouldUpdate={(prevValues, currentValues) => prevValues.completed !== currentValues.completed}
         >
           {({ getFieldValue }) => {
-	            const completed = getFieldValue('completed');
-	            return completed ? (
-	              <Row gutter={16}>
-	                <Col span={12}>
-	                  <Form.Item
-	                    label={t.completionTime}
-	                    name="timeCompleted"
-	                    rules={[{ required: true, message: t.selectCompletionTimeRequired }]}
-	                    getValueFromEvent={(time) => time}
-	                    getValueProps={(value) => {
-	                      if (!value) return { value: null };
-	                      if (dayjs.isDayjs(value)) return { value };
-	                      if (typeof value === 'string') {
-	                        const dayjsValue = dayjs(value);
-	                        return { value: dayjsValue.isValid() ? dayjsValue : null };
-	                      }
-	                      return { value: null };
-	                    }}
-	                  >
-	                    <TimePicker 
-	                      style={{ width: '100%' }}
-	                      format="h:mm A"
-	                      use12Hours
-	                      placeholder={t.selectTime}
-	                    />
-	                  </Form.Item>
-	                </Col>
-	              </Row>
-	            ) : null;
-	          }}
-	        </Form.Item>
+            const completedVal = getFieldValue('completed');
+            return completedVal === ActivityStatusEnum.COMPLETED ? (
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label={t.completionTime}
+                    name="timeCompleted"
+                    rules={[{ required: true, message: t.selectCompletionTimeRequired }]}
+                    getValueFromEvent={(time) => time}
+                    getValueProps={(value) => {
+                      if (!value) return { value: null };
+                      if (dayjs.isDayjs(value)) return { value };
+                      if (typeof value === 'string') {
+                        const dayjsValue = dayjs(value);
+                        return { value: dayjsValue.isValid() ? dayjsValue : null };
+                      }
+                      return { value: null };
+                    }}
+                  >
+                    <TimePicker
+                      style={{ width: '100%' }}
+                      format="h:mm A"
+                      use12Hours
+                      placeholder={t.selectTime}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            ) : null;
+          }}
+        </Form.Item>
 
 	        <Row gutter={16}>
 	          <Col span={24}>

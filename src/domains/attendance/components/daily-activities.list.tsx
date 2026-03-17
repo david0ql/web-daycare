@@ -1,6 +1,6 @@
 import React from 'react';
 import { List, Card, Tag, Typography, Space, Button, Popconfirm, message, Empty } from 'antd';
-import { EditOutlined, DeleteOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { useGetIdentity } from '@refinedev/core';
 import { useAuth } from '../../../shared/hooks/use-auth.hook';
 import { useDailyActivities } from '../hooks/use-daily-activities.hook';
@@ -22,6 +22,7 @@ const DAILY_ACTIVITIES_LIST_TRANSLATIONS = {
     deleteError: "Error deleting activity",
     completed: "Completed",
     pending: "Pending",
+    rejected: "Rejected",
     empty: "No activities registered for this day",
     title: "Daily Activities",
     edit: "Edit",
@@ -37,6 +38,7 @@ const DAILY_ACTIVITIES_LIST_TRANSLATIONS = {
     deleteError: "Error al eliminar actividad",
     completed: "Completada",
     pending: "Pendiente",
+    rejected: "Rechazada",
     empty: "No hay actividades registradas para este día",
     title: "Actividades diarias",
     edit: "Editar",
@@ -73,22 +75,18 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
   };
 
   const getActivityStatus = (activity: DailyActivity) => {
-    if (activity.completed) {
-      return (
-        <Tag color="green" icon={<CheckCircleOutlined />}>
-          {t.completed}
-        </Tag>
-      );
+    const status = Number(activity.completed);
+    if (status === 1) {
+      return <Tag color="green" icon={<CheckCircleOutlined />}>{t.completed}</Tag>;
     }
-    return (
-      <Tag color="orange" icon={<ClockCircleOutlined />}>
-        {t.pending}
-      </Tag>
-    );
+    if (status === 2) {
+      return <Tag color="red" icon={<CloseCircleOutlined />}>{t.rejected}</Tag>;
+    }
+    return <Tag color="orange" icon={<ClockCircleOutlined />}>{t.pending}</Tag>;
   };
 
   const getTimeCompleted = (activity: DailyActivity) => {
-    if (activity.completed && activity.timeCompleted) {
+    if (Number(activity.completed) === 1 && activity.timeCompleted) {
       const dateFormat = language === 'spanish' ? 'YYYY-MM-DD' : 'MM-DD-YYYY';
       return dayjs(activity.timeCompleted).tz(FLORIDA_TIMEZONE).format(`${dateFormat} h:mm A`);
     }
@@ -162,7 +160,7 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
               }
               description={
                 <Space direction="vertical" size="small">
-                  {activity.completed && activity.timeCompleted && (
+                  {Number(activity.completed) === 1 && activity.timeCompleted && (
                     <Text type="secondary">
                       {t.completedAt}: {getTimeCompleted(activity)}
                     </Text>

@@ -1,7 +1,7 @@
 import React from "react";
 import { List, useTable, DateField, TextField, EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
 import { Table, Avatar, Tooltip, Tag, Space, Button, Card, Typography } from "antd";
-import { CheckCircleOutlined, ClockCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { ACTIVITY_TYPE_LABELS_BY_LANGUAGE, ACTIVITY_TYPE_ICONS } from "../../domains/attendance/types/daily-activities.types";
 import { useNavigate } from "react-router";
 import dayjs from 'dayjs';
@@ -25,6 +25,7 @@ const ATTENDANCE_ACTIVITIES_TRANSLATIONS = {
     actions: "Actions",
     completed: "Completed",
     pending: "Pending",
+    rejected: "Rejected",
   },
   spanish: {
     title: "Actividades diarias",
@@ -40,6 +41,7 @@ const ATTENDANCE_ACTIVITIES_TRANSLATIONS = {
     actions: "Acciones",
     completed: "Completada",
     pending: "Pendiente",
+    rejected: "Rechazada",
   },
 } as const;
 
@@ -70,22 +72,18 @@ export const AttendanceActivities: React.FC = () => {
   });
 
   const getActivityStatus = (record: any) => {
-    if (record.completed) {
-      return (
-        <Tag color="green" icon={<CheckCircleOutlined />}>
-          {t.completed}
-        </Tag>
-      );
+    const status = Number(record.completed);
+    if (status === 1) {
+      return <Tag color="green" icon={<CheckCircleOutlined />}>{t.completed}</Tag>;
     }
-    return (
-      <Tag color="orange" icon={<ClockCircleOutlined />}>
-        {t.pending}
-      </Tag>
-    );
+    if (status === 2) {
+      return <Tag color="red" icon={<CloseCircleOutlined />}>{t.rejected}</Tag>;
+    }
+    return <Tag color="orange" icon={<ClockCircleOutlined />}>{t.pending}</Tag>;
   };
 
   const getTimeCompleted = (record: any) => {
-    if (record.completed && record.timeCompleted) {
+    if (Number(record.completed) === 1 && record.timeCompleted) {
       return dayjs(record.timeCompleted).tz(FLORIDA_TIMEZONE).format('h:mm A');
     }
     return null;

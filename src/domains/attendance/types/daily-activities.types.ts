@@ -1,3 +1,9 @@
+export enum ActivityStatusEnum {
+  PENDING = 0,
+  COMPLETED = 1,
+  REJECTED = 2,
+}
+
 export enum ActivityTypeEnum {
   BREAKFAST = 'breakfast',
   LUNCH = 'lunch',
@@ -14,7 +20,7 @@ export interface DailyActivity {
   childId: number;
   attendanceId: number;
   activityType: ActivityTypeEnum;
-  completed: boolean;
+  completed: number; // 0=pending, 1=completed, 2=rejected
   timeCompleted?: string;
   notes?: string;
   createdBy: number;
@@ -40,7 +46,7 @@ export interface CreateDailyActivityData {
   childId: number;
   attendanceId: number;
   activityType: ActivityTypeEnum;
-  completed?: boolean;
+  completed?: number; // 0=pending, 1=completed, 2=rejected
   timeCompleted?: Date;
   notes?: string;
 }

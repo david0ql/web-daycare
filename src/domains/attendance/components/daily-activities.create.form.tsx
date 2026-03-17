@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Form, Input, Select, Switch, Button, Card, Row, Col, Typography, message, TimePicker } from 'antd';
+import { Form, Input, Select, Button, Card, Row, Col, Typography, message, TimePicker } from 'antd';
 import { useDailyActivities } from '../hooks/use-daily-activities.hook';
-import { CreateDailyActivityData, ActivityTypeEnum, ACTIVITY_TYPE_LABELS_BY_LANGUAGE } from '../types/daily-activities.types';
+import { CreateDailyActivityData, ActivityTypeEnum, ActivityStatusEnum, ACTIVITY_TYPE_LABELS_BY_LANGUAGE } from '../types/daily-activities.types';
 import dayjs from 'dayjs';
 import { useLanguage } from '../../../shared/contexts/language.context';
 
@@ -21,7 +21,11 @@ const DAILY_ACTIVITIES_CREATE_TRANSLATIONS = {
     activityType: "Activity Type",
     activityTypeRequired: "Please select the activity type",
     activityTypePlaceholder: "Select activity type",
-    completed: "Completed",
+    status: "Status",
+    statusRequired: "Please select the status",
+    statusPending: "Pending",
+    statusCompleted: "Completed",
+    statusRejected: "Rejected",
     completionTime: "Completion Time",
     completionTimeRequired: "Please select the completion time",
     selectTime: "Select time",
@@ -37,7 +41,11 @@ const DAILY_ACTIVITIES_CREATE_TRANSLATIONS = {
     activityType: "Tipo de actividad",
     activityTypeRequired: "Por favor selecciona el tipo de actividad",
     activityTypePlaceholder: "Selecciona tipo de actividad",
-    completed: "Completado",
+    status: "Estado",
+    statusRequired: "Por favor selecciona el estado",
+    statusPending: "Pendiente",
+    statusCompleted: "Completado",
+    statusRejected: "Rechazado",
     completionTime: "Hora de finalización",
     completionTimeRequired: "Por favor selecciona la hora de finalización",
     selectTime: "Selecciona hora",
@@ -59,29 +67,31 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
   const t = DAILY_ACTIVITIES_CREATE_TRANSLATIONS[language];
   const [form] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [completed, setCompleted] = useState(false);
-  
+  const [status, setStatus] = useState<number>(ActivityStatusEnum.PENDING);
+
   const { createActivity } = useDailyActivities();
 
   const handleSubmit = async (values: any) => {
     setIsSubmitting(true);
-    
+
     try {
       const activityData: CreateDailyActivityData = {
         childId,
         attendanceId,
         activityType: values.activityType,
-        completed: completed,
-        timeCompleted: completed && values.timeCompleted ? values.timeCompleted.toDate() : undefined,
+        completed: values.completed,
+        timeCompleted: values.completed === ActivityStatusEnum.COMPLETED && values.timeCompleted
+          ? values.timeCompleted.toDate()
+          : undefined,
         notes: values.notes,
       };
 
       await createActivity(activityData);
-      
+
       message.success(t.success);
       form.resetFields();
-      setCompleted(false);
-      
+      setStatus(ActivityStatusEnum.PENDING);
+
       if (onSuccess) {
         onSuccess();
       }
@@ -93,9 +103,9 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
     }
   };
 
-  const handleCompletedChange = (checked: boolean) => {
-    setCompleted(checked);
-    if (!checked) {
+  const handleStatusChange = (value: number) => {
+    setStatus(value);
+    if (value !== ActivityStatusEnum.COMPLETED) {
       form.setFieldsValue({ timeCompleted: undefined });
     }
   };
@@ -110,9 +120,7 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        initialValues={{
-          completed: false,
-        }}
+        initialValues={{ completed: ActivityStatusEnum.PENDING }}
       >
         <Row gutter={16}>
           <Col span={12}>
@@ -130,24 +138,23 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
               </Select>
             </Form.Item>
           </Col>
-          
+
           <Col span={12}>
             <Form.Item
-              label={t.completed}
+              label={t.status}
               name="completed"
-              valuePropName="checked"
-              getValueFromEvent={(checked) => Boolean(checked)}
-              getValueProps={(value) => ({ value: Boolean(value) })}
+              rules={[{ required: true, message: t.statusRequired }]}
             >
-              <Switch 
-                checked={completed}
-                onChange={handleCompletedChange}
-              />
+              <Select onChange={handleStatusChange}>
+                <Option value={ActivityStatusEnum.PENDING}>⏳ {t.statusPending}</Option>
+                <Option value={ActivityStatusEnum.COMPLETED}>✅ {t.statusCompleted}</Option>
+                <Option value={ActivityStatusEnum.REJECTED}>❌ {t.statusRejected}</Option>
+              </Select>
             </Form.Item>
           </Col>
         </Row>
 
-        {completed && (
+        {status === ActivityStatusEnum.COMPLETED && (
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -155,7 +162,7 @@ export const DailyActivitiesCreateForm: React.FC<DailyActivitiesCreateFormProps>
                 name="timeCompleted"
                 rules={[{ required: true, message: t.completionTimeRequired }]}
               >
-                <TimePicker 
+                <TimePicker
                   style={{ width: '100%' }}
                   format="HH:mm"
                   placeholder={t.selectTime}
