@@ -129,7 +129,7 @@ function handleHttpError(error: AxiosError, status: number): void {
   }
   (error as any).__notificationHandled = true;
   (error as any).skipNotification = true;
-  
+
   // Guardar el error en window para que el notification provider pueda verificar
   if (typeof window !== "undefined") {
     (window as any).__lastAxiosError = error;
@@ -154,17 +154,17 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem(TOKEN_KEY);
-    
+
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     } else {
     }
-    
+
     // Agregar timestamp para medir tiempo de respuesta
     config.metadata = { startTime: new Date().getTime() };
-    
+
     // Log detallado de la petición
-    
+
     return config;
   },
   (error: AxiosError) => {
@@ -178,23 +178,23 @@ axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => {
     // Calcular tiempo de respuesta
     const endTime = new Date().getTime();
-    const responseTime = response.config.metadata?.startTime ? 
+    const responseTime = response.config.metadata?.startTime ?
       `${endTime - response.config.metadata.startTime}ms` : 'N/A';
-    
+
     // Log detallado de la respuesta exitosa
-    
+
     return response;
   },
   (error: AxiosError) => {
     // Calcular tiempo de respuesta para errores
     const endTime = new Date().getTime();
-    const responseTime = error.config?.metadata?.startTime ? 
+    const responseTime = error.config?.metadata?.startTime ?
       `${endTime - error.config.metadata.startTime}ms` : 'N/A';
-    
+
     // Log detallado del error
-    
+
     const status = error.response?.status;
-    
+
     // Handle common error cases
     if (status === 401) {
       console.warn('🔐 Token expired or invalid - clearing token');
@@ -205,7 +205,7 @@ axiosInstance.interceptors.response.use(
       }
       (error as any).__notificationHandled = true;
       (error as any).skipNotification = true;
-      
+
       // Try to get error message from API, otherwise use default
       const errorData = error.response?.data as NestJSErrorResponse | undefined;
       const errorMessage = extractErrorMessage(errorData);
@@ -213,7 +213,7 @@ axiosInstance.interceptors.response.use(
         errorMessage || "Session expired. Please log in again."
       );
     }
-    
+
     // Handle errors with status codes 300-500
     if (status && status >= 300 && status < 600) {
       handleHttpError(error, status);
@@ -227,7 +227,7 @@ axiosInstance.interceptors.response.use(
         "Unable to connect to the server. Please check your internet connection."
       );
     }
-    
+
     return Promise.reject(error);
   }
 );

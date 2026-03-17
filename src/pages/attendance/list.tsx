@@ -93,13 +93,90 @@ export const AttendanceList: React.FC = () => {
   const { language } = useLanguage();
   const t = ATTENDANCE_LIST_TRANSLATIONS[language];
   const intlLocale = getIntlLocale(language);
-  const { tableProps } = useTable();
-  const { data: todayAttendance, isLoading: loadingAttendance } = useTodayAttendance();
+  // Configuramos useTable con ordenamiento inicial por fecha descendente
+  const { tableProps } = useTable({
+    sorters: {
+      initial: [
+        {
+          field: "attendanceDate",
+          order: "desc",
+        },
+      ],
+    },
+    pagination: {
+      pageSize: 10,
+    },
+    syncWithLocation: false,
+  });
+
   const { data: childrenWithStatus, isLoading: loadingChildren } = useChildrenWithStatus();
   const { data: stats, isLoading: loadingStats } = useAttendanceStats();
 
-  // Debug logs
-  
+  // Combinamos los datos para mostrar niños ausentes HOY
+  const combinedDataSource = React.useMemo(() => {
+    if (!tableProps.dataSource || !childrenWithStatus) return tableProps.dataSource;
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const currentData = [...(tableProps.dataSource || [])];
+    
+    // Identificar registros de hoy que ya están en el dataSource
+    const todayRecordsChildIds = new Set(
+      currentData
+        .filter(r => {
+          const rDate = r.attendanceDate ? new Date(r.attendanceDate).toISOString().split('T')[0] : "";
+          return rDate === todayStr;
+        })
+        .map(r => r.childId)
+    );
+
+    // Si estamos en la página 1, inyectamos los niños que faltan por hoy (ausentes)
+    const isFirstPage = (tableProps.pagination as any)?.current === 1 || !(tableProps.pagination as any)?.current;
+    
+    if (isFirstPage) {
+      const absentKids = childrenWithStatus.filter(c => !todayRecordsChildIds.has(c.id));
+      
+      const virtualRecords = absentKids.map(c => ({
+        id: `virtual-absent-${c.id}`,
+        childId: c.id,
+        child: c,
+        attendanceDate: todayStr,
+        isPresent: false,
+        checkInTime: null,
+        checkOutTime: null,
+        isVirtual: true,
+      }));
+
+      // Unimos y ordenamos: Presentes hoy > Ausentes hoy > Resto (Fecha DESC)
+      const todayCombined = [
+        ...currentData.filter(r => {
+          const rDate = r.attendanceDate ? new Date(r.attendanceDate).toISOString().split('T')[0] : "";
+          return rDate === todayStr;
+        }),
+        ...virtualRecords
+      ];
+
+      // Ordenar hoy: Presente (0) → Ausente (1) → Retirado (2)
+      const getStatusOrder = (r: any) => {
+        if (r.checkInTime && !r.checkOutTime) return 0; // Presente
+        if (!r.checkInTime) return 1;                   // Ausente
+        return 2;                                        // Retirado
+      };
+      todayCombined.sort((a, b) => getStatusOrder(a) - getStatusOrder(b));
+
+      const historical = currentData.filter(r => {
+        const rDate = r.attendanceDate ? new Date(r.attendanceDate).toISOString().split('T')[0] : "";
+        return rDate !== todayStr;
+      });
+
+      return [...todayCombined, ...historical];
+    }
+
+    // En páginas > 1 solo mostramos registros históricos (no de hoy)
+    return currentData.filter(r => {
+      const rDate = r.attendanceDate ? new Date(r.attendanceDate).toISOString().split('T')[0] : "";
+      return rDate !== todayStr;
+    });
+  }, [tableProps.dataSource, childrenWithStatus, tableProps.pagination]);
 
   const columns = [
     {
@@ -210,6 +287,7 @@ export const AttendanceList: React.FC = () => {
       title: t.actions,
       key: "actions",
       render: (_: any, record: any) => {
+        if (record.isVirtual) return null; // No mostrar acciones para registros virtuales
         return (
           <Space>
             <EditButton 
@@ -277,9 +355,10 @@ export const AttendanceList: React.FC = () => {
       <List title={t.title}>
         <Table
           {...tableProps}
+          dataSource={combinedDataSource}
           columns={columns}
           rowKey="id"
-          loading={loadingAttendance}
+          loading={tableProps.loading || loadingChildren}
           pagination={{
             ...tableProps.pagination,
             showSizeChanger: true,
