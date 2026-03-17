@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { usePermissions } from "@refinedev/core";
 import { List, useTable, ShowButton, EditButton, DeleteButton, TagField } from "@refinedev/antd";
 import { Table, Space, Avatar, Typography } from "antd";
@@ -57,16 +57,25 @@ export const ChildList: React.FC = () => {
     sorters: {
       initial: [
         {
-          field: "createdAt",
-          order: "desc",
+          field: "firstName",
+          order: "asc",
         },
       ],
     },
   });
 
+  const sortedDataSource = useMemo(() => {
+    if (!tableProps.dataSource) return tableProps.dataSource;
+    return [...tableProps.dataSource].sort((a, b) => {
+      const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
+      const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }, [tableProps.dataSource]);
+
   return (
     <List title={t.title}>
-      <Table {...tableProps} rowKey="id">
+      <Table {...tableProps} dataSource={sortedDataSource} rowKey="id">
         <Table.Column
           dataIndex="profilePicture"
           title={t.photo}

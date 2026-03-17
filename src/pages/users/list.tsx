@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { List, useTable, EditButton, DeleteButton, TagField } from "@refinedev/antd";
 import { Table, Space, Tag, Avatar, Typography, Button } from "antd";
 import { UserOutlined, UserAddOutlined } from "@ant-design/icons";
@@ -71,12 +71,21 @@ export const UserList: React.FC = () => {
     sorters: {
       initial: [
         {
-          field: "createdAt",
-          order: "desc",
+          field: "firstName",
+          order: "asc",
         },
       ],
     },
   });
+
+  const sortedDataSource = useMemo(() => {
+    if (!tableProps.dataSource) return tableProps.dataSource;
+    return [...tableProps.dataSource].sort((a, b) => {
+      const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
+      const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }, [tableProps.dataSource]);
 
   const getRoleColor = (roleName: string) => {
     switch (roleName) {
@@ -106,7 +115,7 @@ export const UserList: React.FC = () => {
         ) : undefined
       }
     >
-      <Table {...tableProps} rowKey="id">
+      <Table {...tableProps} dataSource={sortedDataSource} rowKey="id">
         <Table.Column
           dataIndex="profilePicture"
           title={t.avatar}

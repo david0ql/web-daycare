@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { List, useTable, EditButton, DeleteButton, CreateButton } from "@refinedev/antd";
 import { Table, Space, Tag, Avatar, Typography } from "antd";
 import { UserOutlined, UserAddOutlined } from "@ant-design/icons";
@@ -106,12 +106,21 @@ export const UserList: React.FC = () => {
     sorters: {
       initial: [
         {
-          field: "createdAt",
-          order: "desc",
+          field: "firstName",
+          order: "asc",
         },
       ],
     },
   });
+
+  const sortedDataSource = useMemo(() => {
+    if (!tableProps.dataSource) return tableProps.dataSource;
+    return [...tableProps.dataSource].sort((a, b) => {
+      const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
+      const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }, [tableProps.dataSource]);
 
   return (
     <List
@@ -127,7 +136,7 @@ export const UserList: React.FC = () => {
         ) : undefined
       }
     >
-      <Table {...tableProps} rowKey="id" locale={{ emptyText: t.noData }}>
+      <Table {...tableProps} dataSource={sortedDataSource} rowKey="id" locale={{ emptyText: t.noData }}>
         <Table.Column
           dataIndex="profilePicture"
           title={t.avatar}
