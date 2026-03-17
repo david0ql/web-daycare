@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useList, useInvalidate, useGo, useNotification } from "@refinedev/core";
 import { Edit, useForm, ListButton, RefreshButton } from "@refinedev/antd";
 import { useQueryClient } from "@tanstack/react-query";
-import { Form, Input, Select, Switch } from "antd";
+import { Form, Input, Select, Switch, Upload, Button, Avatar } from "antd";
+import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import { useLanguage } from "../../shared/contexts/language.context";
+import axiosInstance from "../../shared/config/axios.config";
 
 const USER_EDIT_TRANSLATIONS = {
   english: {
@@ -28,7 +30,7 @@ const USER_EDIT_TRANSLATIONS = {
     rolePlaceholder: "Select a role",
     activeStatus: "Active Status",
     profilePicture: "Profile Picture",
-    profilePicturePlaceholder: "Image URL (optional)",
+    selectPhoto: "Select Photo",
     successMessage: "User updated successfully",
     successDescription: "Changes have been saved correctly",
     save: "Save",
@@ -61,7 +63,7 @@ const USER_EDIT_TRANSLATIONS = {
     rolePlaceholder: "Seleccionar un rol",
     activeStatus: "Estado activo",
     profilePicture: "Foto de perfil",
-    profilePicturePlaceholder: "URL de imagen (opcional)",
+    selectPhoto: "Seleccionar foto",
     successMessage: "Usuario actualizado correctamente",
     successDescription: "Los cambios han sido guardados correctamente",
     save: "Guardar",
@@ -96,6 +98,7 @@ export const UserEdit: React.FC = () => {
   const { open } = useNotification();
   const { language } = useLanguage();
   const t = USER_EDIT_TRANSLATIONS[language];
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
 
   const getRoleDisplayName = (roleName: string) => {
     const map: Record<string, string> = {
@@ -107,7 +110,7 @@ export const UserEdit: React.FC = () => {
     return map[roleName] || roleName.charAt(0).toUpperCase() + roleName.slice(1);
   };
   
-  const { formProps, saveButtonProps } = useForm({
+  const { formProps, saveButtonProps, id } = useForm({
     onMutationSuccess: async (data, variables) => {
       
       // Force invalidate and refetch all users-related queries
@@ -152,7 +155,34 @@ export const UserEdit: React.FC = () => {
 
   const roles = rolesQuery.result?.data || [];
 
-  // Debug logs
+  // Sync preview with current profilePicture value from form
+  useEffect(() => {
+    const currentPicture = formProps.initialValues?.profilePicture;
+    if (currentPicture && !profilePreview) {
+      const previewUrl = currentPicture.startsWith('http')
+        ? currentPicture
+        : `https://api.thechildrenworld.com/api/uploads${currentPicture}`;
+      setProfilePreview(previewUrl);
+    }
+  }, [formProps.initialValues]);
+
+  const handleProfileUpload = async (file: File) => {
+    if (!id) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const response = await axiosInstance.post(`/users/${id}/profile-photo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const newPath = response.data?.profilePicture;
+      if (newPath) {
+        formProps.form?.setFieldValue('profilePicture', newPath);
+        setProfilePreview(`https://api.thechildrenworld.com/api/uploads${newPath}`);
+      }
+    } catch {
+      // Error handled by axios interceptor
+    }
+  };
 
   // Custom onFinish to transform data
   const handleFinish = (values: any) => {
@@ -247,11 +277,30 @@ export const UserEdit: React.FC = () => {
           <BooleanSwitch />
         </Form.Item>
 
-        <Form.Item
-          label={t.profilePicture}
-          name="profilePicture"
-        >
-          <Input placeholder={t.profilePicturePlaceholder} />
+        <Form.Item label={t.profilePicture} name="profilePicture" hidden>
+          <Input />
+        </Form.Item>
+        <Form.Item label={t.profilePicture}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <Avatar
+              size={64}
+              src={profilePreview}
+              icon={<UserOutlined />}
+            />
+            <Upload
+              accept="image/*"
+              showUploadList={false}
+              beforeUpload={(file) => {
+                const reader = new FileReader();
+                reader.onload = (e) => setProfilePreview(e.target?.result as string);
+                reader.readAsDataURL(file);
+                handleProfileUpload(file);
+                return false;
+              }}
+            >
+              <Button icon={<UploadOutlined />}>{t.selectPhoto}</Button>
+            </Upload>
+          </div>
         </Form.Item>
       </Form>
     </Edit>

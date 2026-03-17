@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useList, useInvalidate, useGo, useNotification } from "@refinedev/core";
 import { Create, useForm } from "@refinedev/antd";
 import { useQueryClient } from "@tanstack/react-query";
-import { Form, Input, Select, Switch } from "antd";
+import { Form, Input, Select, Switch, Upload, Button, Avatar } from "antd";
+import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import { useLanguage } from "../../shared/contexts/language.context";
+import axiosInstance from "../../shared/config/axios.config";
 
 const USER_CREATE_TRANSLATIONS = {
   english: {
@@ -29,7 +31,7 @@ const USER_CREATE_TRANSLATIONS = {
     rolePlaceholder: "Select a role",
     activeStatus: "Active Status",
     profilePicture: "Profile Picture",
-    profilePicturePlaceholder: "Image URL (optional)",
+    selectPhoto: "Select Photo",
     successMessage: "User created successfully",
     successDescription: "The new user has been registered correctly",
     save: "Save",
@@ -61,7 +63,7 @@ const USER_CREATE_TRANSLATIONS = {
     rolePlaceholder: "Seleccionar un rol",
     activeStatus: "Estado activo",
     profilePicture: "Foto de perfil",
-    profilePicturePlaceholder: "URL de imagen (opcional)",
+    selectPhoto: "Seleccionar foto",
     successMessage: "Usuario creado correctamente",
     successDescription: "El nuevo usuario ha sido registrado correctamente",
     save: "Guardar",
@@ -95,6 +97,8 @@ export const UserCreate: React.FC = () => {
   const { open } = useNotification();
   const { language } = useLanguage();
   const t = USER_CREATE_TRANSLATIONS[language];
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
 
   const getRoleDisplayName = (roleName: string) => {
     const map: Record<string, string> = {
@@ -108,27 +112,41 @@ export const UserCreate: React.FC = () => {
   
   const { formProps, saveButtonProps } = useForm({
     onMutationSuccess: async (data, variables) => {
-      
+      const newUserId = (data as any).id;
+
+      // Upload profile photo if a file was selected
+      if (profileFile && newUserId) {
+        try {
+          const formData = new FormData();
+          formData.append('file', profileFile);
+          await axiosInstance.post(`/users/${newUserId}/profile-photo`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+        } catch {
+          // Photo upload failure is non-blocking
+        }
+      }
+
       // Use Refine's useInvalidate for proper cache invalidation
       invalidate({
         resource: "users",
         invalidates: ["list"],
       });
-      
+
       // Also invalidate the specific user data
       invalidate({
         resource: "users",
         invalidates: ["detail"],
-        id: (data as any).id,
+        id: newUserId,
       });
-      
+
       // Show success notification
       open?.({
         type: "success",
         message: t.successMessage,
         description: t.successDescription,
       });
-      
+
       // Navigate back to users list with a small delay for better UX
       setTimeout(() => {
         go({
@@ -232,11 +250,27 @@ export const UserCreate: React.FC = () => {
           <BooleanSwitch />
         </Form.Item>
 
-        <Form.Item
-          label={t.profilePicture}
-          name="profilePicture"
-        >
-          <Input placeholder={t.profilePicturePlaceholder} />
+        <Form.Item label={t.profilePicture}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <Avatar
+              size={64}
+              src={profilePreview}
+              icon={<UserOutlined />}
+            />
+            <Upload
+              accept="image/*"
+              showUploadList={false}
+              beforeUpload={(file) => {
+                setProfileFile(file);
+                const reader = new FileReader();
+                reader.onload = (e) => setProfilePreview(e.target?.result as string);
+                reader.readAsDataURL(file);
+                return false;
+              }}
+            >
+              <Button icon={<UploadOutlined />}>{t.selectPhoto}</Button>
+            </Upload>
+          </div>
         </Form.Item>
       </Form>
     </Create>

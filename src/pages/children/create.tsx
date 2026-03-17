@@ -3,23 +3,26 @@ import { useInvalidate, useGo, useNotification } from "@refinedev/core";
 import { Create, useForm } from "@refinedev/antd";
 import { useLanguage } from "../../shared/contexts/language.context";
 import { useQueryClient } from "@tanstack/react-query";
-import { 
-  Form, 
-  Input, 
-  DatePicker, 
-  Switch, 
-  Button, 
-  Select, 
-  Card, 
-  Space, 
-  Typography, 
+import {
+  Form,
+  Input,
+  DatePicker,
+  Switch,
+  Button,
+  Select,
+  Card,
+  Space,
+  Typography,
   Divider,
   Row,
   Col,
   InputNumber,
+  Upload,
+  Avatar,
   message
 } from "antd";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { PlusOutlined, DeleteOutlined, UploadOutlined } from "@ant-design/icons";
+import axiosInstance from "../../shared/config/axios.config";
 import { CreateChildData, AvailableParent } from "../../domains/children/types/child.types";
 import { useAvailableParents } from "../../domains/children/hooks";
 import dayjs from "dayjs";
@@ -71,7 +74,7 @@ const CHILD_CREATE_TRANSLATIONS = {
     address: "Address",
     addressPlaceholder: "Child's address (optional)",
     profilePicture: "Profile Picture",
-    profilePicturePlaceholder: "Image URL (optional)",
+    selectPhoto: "Select Photo",
     paymentAlert: "Payment Alert",
     activeStatus: "Active Status",
     parentChildRelationships: "Parent-Child Relationships",
@@ -145,8 +148,9 @@ const CHILD_CREATE_TRANSLATIONS = {
     address: "Dirección",
     addressPlaceholder: "Dirección del niño (opcional)",
     profilePicture: "Foto de perfil",
-    profilePicturePlaceholder: "URL de imagen (opcional)",
+    selectPhoto: "Seleccionar foto",
     paymentAlert: "Alerta de pago",
+
     activeStatus: "Estado activo",
     parentChildRelationships: "Relaciones padre-hijo",
     parent: "Padre/Madre",
@@ -207,32 +211,48 @@ export const ChildCreate: React.FC = () => {
   const { language } = useLanguage();
   const t = CHILD_CREATE_TRANSLATIONS[language];
   const { data: availableParents = [], isLoading: loadingParents } = useAvailableParents();
-  
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+
   const [form] = Form.useForm();
   
   const { formProps, saveButtonProps } = useForm<CreateChildData>({
     onMutationSuccess: async (data, variables) => {
-      
+      const newChildId = (data as any).id;
+
+      // Upload profile photo if a file was selected
+      if (profileFile && newChildId) {
+        try {
+          const formData = new FormData();
+          formData.append('file', profileFile);
+          await axiosInstance.post(`/children/${newChildId}/profile-photo`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+        } catch {
+          // Photo upload failure is non-blocking
+        }
+      }
+
       // Use Refine's useInvalidate for proper cache invalidation
       invalidate({
         resource: "children",
         invalidates: ["list"],
       });
-      
+
       // Also invalidate the specific child data
       invalidate({
         resource: "children",
         invalidates: ["detail"],
-        id: (data as any).id,
+        id: newChildId,
       });
-      
+
       // Show success notification
       open?.({
         type: "success",
         message: t.successMessage,
         description: t.successDesc,
       });
-      
+
       // Navigate back to children list with a small delay for better UX
       setTimeout(() => {
         go({
@@ -366,11 +386,27 @@ export const ChildCreate: React.FC = () => {
           />
         </Form.Item>
 
-        <Form.Item
-          label={t.profilePicture}
-          name="profilePicture"
-        >
-          <Input placeholder={t.profilePicturePlaceholder} />
+        <Form.Item label={t.profilePicture}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <Avatar
+              size={64}
+              src={profilePreview}
+              icon={<UploadOutlined />}
+            />
+            <Upload
+              accept="image/*"
+              showUploadList={false}
+              beforeUpload={(file) => {
+                setProfileFile(file);
+                const reader = new FileReader();
+                reader.onload = (e) => setProfilePreview(e.target?.result as string);
+                reader.readAsDataURL(file);
+                return false;
+              }}
+            >
+              <Button icon={<UploadOutlined />}>{t.selectPhoto}</Button>
+            </Upload>
+          </div>
         </Form.Item>
 
         <Row gutter={16}>

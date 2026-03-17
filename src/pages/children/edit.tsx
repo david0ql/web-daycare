@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useInvalidate, useGo, useNotification } from "@refinedev/core";
 import { Edit, useForm, ListButton, RefreshButton } from "@refinedev/antd";
 import { useLanguage } from "../../shared/contexts/language.context";
 import { useQueryClient } from "@tanstack/react-query";
-import { Form, Input, DatePicker, Switch, Button, Select, Card, Space, Typography, Divider, Row, Col, InputNumber, Tabs, message } from "antd";
+import { Form, Input, DatePicker, Switch, Button, Select, Card, Space, Typography, Divider, Row, Col, InputNumber, Tabs, Upload, Avatar, message } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import { UpdateChildData } from "../../domains/children/types/child.types";
 import { useAvailableParents } from "../../domains/children/hooks/use-available-parents.hook";
 import dayjs from "dayjs";
+import axiosInstance from "../../shared/config/axios.config";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -50,7 +52,7 @@ const CHILD_EDIT_TRANSLATIONS = {
     address: "Address",
     addressPlaceholder: "Child's address (optional)",
     profilePicture: "Profile Picture",
-    profilePicturePlaceholder: "Image URL (optional)",
+    selectPhoto: "Select Photo",
     paymentAlert: "Payment Alert",
     activeStatus: "Active Status",
     parentChildRelationships: "Parent-Child Relationships",
@@ -128,7 +130,7 @@ const CHILD_EDIT_TRANSLATIONS = {
     address: "Dirección",
     addressPlaceholder: "Dirección del niño (opcional)",
     profilePicture: "Foto de perfil",
-    profilePicturePlaceholder: "URL de imagen (opcional)",
+    selectPhoto: "Seleccionar foto",
     paymentAlert: "Alerta de pago",
     activeStatus: "Estado activo",
     parentChildRelationships: "Relaciones padre-hijo",
@@ -192,10 +194,11 @@ export const ChildEdit: React.FC = () => {
   const { language } = useLanguage();
   const t = CHILD_EDIT_TRANSLATIONS[language];
   const { data: availableParents = [], isLoading: loadingParents } = useAvailableParents();
-  
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+
   const [form] = Form.useForm();
-  
-  const { formProps, saveButtonProps } = useForm<UpdateChildData>({
+
+  const { formProps, saveButtonProps, id } = useForm<UpdateChildData>({
     onMutationSuccess: async (data, variables) => {
       
       // Force invalidate and refetch all children-related queries
@@ -246,10 +249,35 @@ export const ChildEdit: React.FC = () => {
     }
   });
 
+  const handleProfileUpload = async (file: File) => {
+    if (!id) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const response = await axiosInstance.post(`/children/${id}/profile-photo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const newPath = response.data?.profilePicture;
+      if (newPath) {
+        form.setFieldValue('profilePicture', newPath);
+        setProfilePreview(`https://api.thechildrenworld.com/api/uploads${newPath}`);
+      }
+    } catch {
+      // Error handled by axios interceptor
+    }
+  };
+
   // Transform data for form - using formProps.initialValues
   React.useEffect(() => {
     if (formProps.initialValues) {
       const childData = formProps.initialValues;
+      // Sync profile picture preview
+      if (childData.profilePicture && !profilePreview) {
+        const previewUrl = childData.profilePicture.startsWith('http')
+          ? childData.profilePicture
+          : `https://api.thechildrenworld.com/api/uploads${childData.profilePicture}`;
+        setProfilePreview(previewUrl);
+      }
       
       // Helper function to safely map arrays
       const safeMap = (data: any, mapper: (item: any) => any) => {
@@ -422,11 +450,30 @@ export const ChildEdit: React.FC = () => {
 
           <Row gutter={16}>
             <Col span={12}>
-        <Form.Item
-          label={t.profilePicture}
-          name="profilePicture"
-        >
-          <Input placeholder={t.profilePicturePlaceholder} />
+        <Form.Item label={t.profilePicture} name="profilePicture" hidden>
+          <Input />
+        </Form.Item>
+        <Form.Item label={t.profilePicture}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <Avatar
+              size={64}
+              src={profilePreview}
+              icon={<UploadOutlined />}
+            />
+            <Upload
+              accept="image/*"
+              showUploadList={false}
+              beforeUpload={(file) => {
+                const reader = new FileReader();
+                reader.onload = (e) => setProfilePreview(e.target?.result as string);
+                reader.readAsDataURL(file);
+                handleProfileUpload(file);
+                return false;
+              }}
+            >
+              <Button icon={<UploadOutlined />}>{t.selectPhoto}</Button>
+            </Upload>
+          </div>
         </Form.Item>
             </Col>
           <Col span={12}>
