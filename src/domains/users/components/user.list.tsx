@@ -140,16 +140,39 @@ export const UserList: React.FC = () => {
         <Table.Column
           dataIndex="profilePicture"
           title={t.avatar}
-          render={(_, record: User) => (
-            <Avatar
-              size={40}
-              src={record.profilePicture}
-              icon={<UserOutlined />}
-              style={{ backgroundColor: "#1890ff" }}
-            >
-              {UserUtils.getInitials(record)}
-            </Avatar>
-          )}
+          render={(_, record: User) => {
+            const src = record.profilePicture
+              ? record.profilePicture.startsWith("http")
+                ? record.profilePicture
+                : `https://api.thechildrenworld.com/api${record.profilePicture}`
+              : null;
+            return src ? (
+              <img
+                src={src}
+                alt={UserUtils.getFullName(record)}
+                width={40}
+                height={40}
+                style={{ borderRadius: "50%", objectFit: "cover", display: "block" }}
+              />
+            ) : (
+              <span
+                style={{
+                  display: "inline-flex",
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  backgroundColor: "#1890ff",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: 16,
+                  fontWeight: "bold",
+                }}
+              >
+                {UserUtils.getInitials(record)}
+              </span>
+            );
+          }}
         />
         <Table.Column
           dataIndex="firstName"

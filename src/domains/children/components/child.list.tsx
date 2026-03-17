@@ -1,7 +1,17 @@
 import React, { useState, useMemo } from "react";
-import { List, useTable, EditButton, DeleteButton, CreateButton } from "@refinedev/antd";
+import {
+  List,
+  useTable,
+  EditButton,
+  DeleteButton,
+  CreateButton,
+} from "@refinedev/antd";
 import { Table, Space, Tag, Avatar, Typography, Button } from "antd";
-import { UserOutlined, UserAddOutlined, QrcodeOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  UserAddOutlined,
+  QrcodeOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import { Child } from "../types/child.types";
 import { ChildUtils } from "../utils/child.utils";
@@ -33,7 +43,7 @@ const CHILD_LIST_TRANSLATIONS = {
     notSpecified: "Not specified",
   },
   spanish: {
-    childrenList: "Lista de niños",
+    childrenList: "Lista de niños4",
     newChild: "Nuevo niño",
     avatar: "Avatar",
     name: "Nombre",
@@ -67,15 +77,21 @@ export const ChildList: React.FC = () => {
   const getActiveStatusText = (isActive: boolean) =>
     isActive ? t.active : t.inactive;
   const formatAddress = (address?: string) =>
-    address ? (address.length > 50 ? `${address.substring(0, 50)}...` : address) : t.notSpecified;
-  const formatBirthCity = (birthCity?: string) =>
-    birthCity || t.notSpecified;
+    address
+      ? address.length > 50
+        ? `${address.substring(0, 50)}...`
+        : address
+      : t.notSpecified;
+  const formatBirthCity = (birthCity?: string) => birthCity || t.notSpecified;
   const formatBirthDate = (birthDate: string) =>
-    ChildUtils.parseDateOnly(birthDate).toLocaleDateString(language === "spanish" ? "es-ES" : "en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    ChildUtils.parseDateOnly(birthDate).toLocaleDateString(
+      language === "spanish" ? "es-ES" : "en-US",
+      {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      },
+    );
 
   const { tableProps } = useTable<Child>({
     syncWithLocation: false, // Desactivar sincronización con URL para evitar problemas
@@ -92,8 +108,8 @@ export const ChildList: React.FC = () => {
   const sortedDataSource = useMemo(() => {
     if (!tableProps.dataSource) return tableProps.dataSource;
     return [...tableProps.dataSource].sort((a, b) => {
-      const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
-      const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
+      const nameA = `${a.firstName ?? ""} ${a.lastName ?? ""}`.toLowerCase();
+      const nameB = `${b.firstName ?? ""} ${b.lastName ?? ""}`.toLowerCase();
       return nameA.localeCompare(nameB);
     });
   }, [tableProps.dataSource]);
@@ -124,20 +140,48 @@ export const ChildList: React.FC = () => {
         ) : undefined
       }
     >
-      <Table {...tableProps} dataSource={sortedDataSource} rowKey="id" locale={{ emptyText: t.noData }}>
+      <Table
+        {...tableProps}
+        dataSource={sortedDataSource}
+        rowKey="id"
+        locale={{ emptyText: t.noData }}
+      >
         <Table.Column
           dataIndex="profilePicture"
           title={t.avatar}
-          render={(_, record: Child) => (
-            <Avatar
-              size={40}
-              src={record.profilePicture}
-              icon={<UserOutlined />}
-              style={{ backgroundColor: "#1890ff" }}
-            >
-              {ChildUtils.getInitials(record)}
-            </Avatar>
-          )}
+          render={(_, record: Child) => {
+            const src = record.profilePicture
+              ? record.profilePicture.startsWith("http")
+                ? record.profilePicture
+                : `https://api.thechildrenworld.com/api${record.profilePicture}`
+              : null;
+            return src ? (
+              <img
+                src={src}
+                alt={ChildUtils.getFullName(record)}
+                width={40}
+                height={40}
+                style={{ borderRadius: "50%", objectFit: "cover", display: "block" }}
+              />
+            ) : (
+              <span
+                style={{
+                  display: "inline-flex",
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  backgroundColor: "#1890ff",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: 16,
+                  fontWeight: "bold",
+                }}
+              >
+                {ChildUtils.getInitials(record)}
+              </span>
+            );
+          }}
         />
         <Table.Column
           dataIndex="firstName"
@@ -203,7 +247,9 @@ export const ChildList: React.FC = () => {
           title={t.registrationDate}
           render={(date) => (
             <Text type="secondary" style={{ fontSize: "12px" }}>
-              {new Date(date).toLocaleDateString(language === "spanish" ? "es-ES" : "en-US")}
+              {new Date(date).toLocaleDateString(
+                language === "spanish" ? "es-ES" : "en-US",
+              )}
             </Text>
           )}
         />
@@ -223,7 +269,11 @@ export const ChildList: React.FC = () => {
                 <>
                   <EditButton hideText size="small" recordItemId={record.id} />
                   {isAdmin() && (
-                    <DeleteButton hideText size="small" recordItemId={record.id} />
+                    <DeleteButton
+                      hideText
+                      size="small"
+                      recordItemId={record.id}
+                    />
                   )}
                 </>
               )}
@@ -231,7 +281,7 @@ export const ChildList: React.FC = () => {
           )}
         />
       </Table>
-      
+
       {selectedChild && (
         <QRGenerator
           child={selectedChild}

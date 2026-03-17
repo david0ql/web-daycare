@@ -1,7 +1,14 @@
 import React, { useMemo } from "react";
 import { usePermissions } from "@refinedev/core";
-import { List, useTable, ShowButton, EditButton, DeleteButton, TagField } from "@refinedev/antd";
-import { Table, Space, Avatar, Typography } from "antd";
+import {
+  List,
+  useTable,
+  ShowButton,
+  EditButton,
+  DeleteButton,
+  TagField,
+} from "@refinedev/antd";
+import { Table, Space, Typography } from "antd";
 import { UserOutlined, WarningOutlined } from "@ant-design/icons";
 import { ChildUtils } from "../../domains/children/utils/child.utils";
 import { useLanguage } from "../../shared/contexts/language.context";
@@ -34,7 +41,7 @@ const CHILDREN_LIST_TRANSLATIONS = {
     actions: "Actions",
   },
   spanish: {
-    title: "Lista de niños",
+    title: "Lista de niños2",
     photo: "Foto",
     fullName: "Nombre completo",
     birthDate: "Fecha de nacimiento",
@@ -67,8 +74,8 @@ export const ChildList: React.FC = () => {
   const sortedDataSource = useMemo(() => {
     if (!tableProps.dataSource) return tableProps.dataSource;
     return [...tableProps.dataSource].sort((a, b) => {
-      const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
-      const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
+      const nameA = `${a.firstName ?? ""} ${a.lastName ?? ""}`.toLowerCase();
+      const nameB = `${b.firstName ?? ""} ${b.lastName ?? ""}`.toLowerCase();
       return nameA.localeCompare(nameB);
     });
   }, [tableProps.dataSource]);
@@ -81,16 +88,39 @@ export const ChildList: React.FC = () => {
           title={t.photo}
           render={(value, record: Child) => {
             const src = value
-              ? value.startsWith('http')
+              ? value.startsWith("http")
                 ? value
                 : `https://api.thechildrenworld.com/api${value}`
-              : undefined;
-            return (
-              <Avatar
+              : null;
+            console.log(src);
+            return src ? (
+              <img
                 src={src}
-                icon={<UserOutlined />}
                 alt={`${record.firstName} ${record.lastName}`}
+                width={40}
+                height={40}
+                style={{
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
               />
+            ) : (
+              <span
+                style={{
+                  display: "inline-flex",
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  background: "#1890ff",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: 20,
+                }}
+              >
+                <UserOutlined />
+              </span>
             );
           }}
           width="80px"
@@ -111,7 +141,9 @@ export const ChildList: React.FC = () => {
         <Table.Column
           dataIndex="birthDate"
           title={t.birthDate}
-          render={(value) => new Date(value).toLocaleDateString(intlLocale, { timeZone: 'UTC' })}
+          render={(value) =>
+            new Date(value).toLocaleDateString(intlLocale, { timeZone: "UTC" })
+          }
         />
         <Table.Column
           dataIndex="address"
@@ -152,7 +184,11 @@ export const ChildList: React.FC = () => {
                 <>
                   <EditButton hideText size="small" recordItemId={record.id} />
                   {permissions === "administrator" && (
-                    <DeleteButton hideText size="small" recordItemId={record.id} />
+                    <DeleteButton
+                      hideText
+                      size="small"
+                      recordItemId={record.id}
+                    />
                   )}
                 </>
               )}

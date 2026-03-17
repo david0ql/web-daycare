@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { List, useTable, EditButton, DeleteButton, TagField } from "@refinedev/antd";
-import { Table, Space, Tag, Avatar, Typography, Button } from "antd";
+import { Table, Space, Tag, Typography, Button } from "antd";
 import { UserOutlined, UserAddOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import { useAuth } from "../../shared/hooks/use-auth.hook";
@@ -121,16 +121,34 @@ export const UserList: React.FC = () => {
           title={t.avatar}
           render={(value, record: User) => {
             const src = value
-              ? value.startsWith('http')
+              ? value.startsWith("http")
                 ? value
                 : `https://api.thechildrenworld.com/api${value}`
-              : undefined;
-            return (
-              <Avatar
+              : null;
+            return src ? (
+              <img
                 src={src}
-                icon={<UserOutlined />}
                 alt={`${record.firstName} ${record.lastName}`}
+                width={40}
+                height={40}
+                style={{ borderRadius: "50%", objectFit: "cover", display: "block" }}
               />
+            ) : (
+              <span
+                style={{
+                  display: "inline-flex",
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  background: "#1890ff",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: 20,
+                }}
+              >
+                <UserOutlined />
+              </span>
             );
           }}
           width="80px"
