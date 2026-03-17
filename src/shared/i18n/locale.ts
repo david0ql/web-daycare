@@ -2,12 +2,21 @@ import type { Locale } from "antd/es/locale";
 import enUS from "antd/locale/en_US";
 import esES from "antd/locale/es_ES";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import moment from "moment";
 
 import type { Language } from "../contexts/language.context";
 
 import "dayjs/locale/es";
 import "moment/locale/es";
+
+// Configura dayjs con soporte de timezone
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+/** Timezone de Florida (Eastern Time) */
+export const FLORIDA_TIMEZONE = "America/New_York";
 
 export const getAntdLocale = (language: Language): Locale => {
   return language === "spanish" ? esES : enUS;

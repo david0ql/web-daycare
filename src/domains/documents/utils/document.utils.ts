@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { Document, DocumentType } from '../types/document.types';
 import type { Language } from '../../../shared/contexts/language.context';
+import { FLORIDA_TIMEZONE } from '../../../shared/i18n/locale';
 
 const DOCUMENT_UTILS_TRANSLATIONS = {
   english: {
@@ -33,13 +34,13 @@ const DOCUMENT_UTILS_TRANSLATIONS = {
 
 // Formatear fecha de documento
 export const formatDocumentDate = (date: string): string => {
-  return dayjs(date).format('DD/MM/YYYY HH:mm');
+  return dayjs(date).tz(FLORIDA_TIMEZONE).format('DD/MM/YYYY HH:mm');
 };
 
 /** Upload date: date by language (YYYY-MM-DD / MM-DD-YYYY) and time in 12h (AM/PM). */
 export const formatDocumentDateByLanguage = (date: string, language: Language = "english"): string => {
   const dateFormat = language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY";
-  return dayjs(date).format(`${dateFormat} h:mm A`);
+  return dayjs(date).tz(FLORIDA_TIMEZONE).format(`${dateFormat} h:mm A`);
 };
 
 // Formatear fecha de expiración (date format by language)

@@ -116,7 +116,7 @@ export const AttendanceList: React.FC = () => {
   const combinedDataSource = React.useMemo(() => {
     if (!tableProps.dataSource || !childrenWithStatus) return tableProps.dataSource;
 
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
     const currentData = [...(tableProps.dataSource || [])];
     
     // Identificar registros de hoy que ya están en el dataSource
@@ -215,9 +215,10 @@ export const AttendanceList: React.FC = () => {
       dataIndex: "checkInTime",
       key: "checkInTime",
       render: (value: string) => value ? (
-        <Text>{new Date(value).toLocaleTimeString(intlLocale, { 
-          hour: '2-digit', 
-          minute: '2-digit' 
+        <Text>{new Date(value).toLocaleTimeString(intlLocale, {
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'America/New_York',
         })}</Text>
       ) : <Text type="secondary">-</Text>,
     },
@@ -226,9 +227,10 @@ export const AttendanceList: React.FC = () => {
       dataIndex: "checkOutTime",
       key: "checkOutTime",
       render: (value: string) => value ? (
-        <Text>{new Date(value).toLocaleTimeString(intlLocale, { 
-          hour: '2-digit', 
-          minute: '2-digit' 
+        <Text>{new Date(value).toLocaleTimeString(intlLocale, {
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'America/New_York',
         })}</Text>
       ) : <Text type="secondary">-</Text>,
     },

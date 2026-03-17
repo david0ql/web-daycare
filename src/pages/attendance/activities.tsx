@@ -6,6 +6,7 @@ import { ACTIVITY_TYPE_LABELS_BY_LANGUAGE, ACTIVITY_TYPE_ICONS } from "../../dom
 import { useNavigate } from "react-router";
 import dayjs from 'dayjs';
 import { useLanguage } from "../../shared/contexts/language.context";
+import { FLORIDA_TIMEZONE } from "../../shared/i18n/locale";
 
 const { Title, Text } = Typography;
 
@@ -85,7 +86,7 @@ export const AttendanceActivities: React.FC = () => {
 
   const getTimeCompleted = (record: any) => {
     if (record.completed && record.timeCompleted) {
-      return dayjs(record.timeCompleted).format('h:mm A');
+      return dayjs(record.timeCompleted).tz(FLORIDA_TIMEZONE).format('h:mm A');
     }
     return null;
   };

@@ -212,7 +212,7 @@ export const IncidentAttachments: React.FC<IncidentAttachmentsProps> = ({
                       {t.uploadedBy}: {attachment.uploadedBy2?.firstName} {attachment.uploadedBy2?.lastName}
                     </Text>
                     <Text type="secondary">
-                      {new Date(attachment.createdAt).toLocaleDateString(intlLocale)}
+                      {new Date(attachment.createdAt).toLocaleDateString(intlLocale, { timeZone: 'America/New_York' })}
                     </Text>
                   </Space>
                 }

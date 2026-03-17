@@ -83,7 +83,7 @@ export const useQRGenerator = () => {
       pdf.text(`ID: ${child.id}`, 20, 35);
       pdf.text(`Name: ${child.firstName} ${child.lastName}`, 20, 45);
       pdf.text(`Date of Birth: ${ChildUtils.parseDateOnly(child.birthDate).toLocaleDateString()}`, 20, 55);
-      pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 65);
+      pdf.text(`Generated on: ${new Date().toLocaleDateString('en-US', { timeZone: 'America/New_York' })}`, 20, 65);
 
       // Add QR code
       const imgWidth = 60;

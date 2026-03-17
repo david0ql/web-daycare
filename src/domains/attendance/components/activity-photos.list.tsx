@@ -5,6 +5,7 @@ import { useActivityPhotos } from '../hooks/use-activity-photos.hook';
 import { ActivityPhoto } from '../types/activity-photos.types';
 import dayjs from 'dayjs';
 import { useLanguage } from '../../../shared/contexts/language.context';
+import { FLORIDA_TIMEZONE } from '../../../shared/i18n/locale';
 
 const { Title, Text } = Typography;
 
@@ -48,7 +49,10 @@ export const ActivityPhotosList: React.FC<ActivityPhotosListProps> = ({
 }) => {
   const { language } = useLanguage();
   const t = ACTIVITY_PHOTOS_LIST_TRANSLATIONS[language];
-  const { photos, isLoading, deletePhoto } = useActivityPhotos(attendanceId);
+  const { photos: rawPhotos, isLoading, deletePhoto } = useActivityPhotos(attendanceId);
+  const photos = [...rawPhotos].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   const handleDelete = async (id: number) => {
     try {
@@ -136,7 +140,7 @@ export const ActivityPhotosList: React.FC<ActivityPhotosListProps> = ({
                       {t.uploadedBy}: {photo.uploadedByUser?.firstName} {photo.uploadedByUser?.lastName}
                     </Text>
                     <Text type="secondary" style={{ fontSize: '11px' }}>
-                      {dayjs(photo.createdAt).format('DD/MM/YYYY HH:mm')}
+                      {dayjs(photo.createdAt).tz(FLORIDA_TIMEZONE).format('DD/MM/YYYY HH:mm')}
                     </Text>
                   </Space>
                 }

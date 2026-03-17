@@ -5,6 +5,7 @@ import { useDailyObservations } from '../hooks/use-daily-observations.hook';
 import { DailyObservation, MOOD_LABELS_BY_LANGUAGE, MOOD_ICONS, MOOD_COLORS } from '../types/daily-observations.types';
 import dayjs from 'dayjs';
 import { useLanguage } from '../../../shared/contexts/language.context';
+import { FLORIDA_TIMEZONE } from '../../../shared/i18n/locale';
 
 const { Title, Text } = Typography;
 
@@ -48,7 +49,10 @@ export const DailyObservationsList: React.FC<DailyObservationsListProps> = ({
 }) => {
   const { language } = useLanguage();
   const t = DAILY_OBSERVATIONS_LIST_TRANSLATIONS[language];
-  const { observations, isLoading, deleteObservation } = useDailyObservations(attendanceId);
+  const { observations: rawObservations, isLoading, deleteObservation } = useDailyObservations(attendanceId);
+  const observations = [...rawObservations].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   const handleDelete = async (id: number) => {
     try {
@@ -134,7 +138,7 @@ export const DailyObservationsList: React.FC<DailyObservationsListProps> = ({
                   <Text>{observation.generalObservations}</Text>
                   <Text type="secondary" style={{ fontSize: '12px' }}>
                     {t.registeredBy}: {observation.createdByUser?.firstName} {observation.createdByUser?.lastName} • 
-                    {dayjs(observation.createdAt).format('DD/MM/YYYY HH:mm')}
+                    {dayjs(observation.createdAt).tz(FLORIDA_TIMEZONE).format('DD/MM/YYYY HH:mm')}
                   </Text>
                 </Space>
               }

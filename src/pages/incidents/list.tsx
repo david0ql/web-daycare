@@ -70,7 +70,7 @@ export const IncidentsList: React.FC = () => {
     sorters: {
       initial: [
         {
-          field: "id",
+          field: "incidentDate",
           order: "desc",
         },
       ],

@@ -69,7 +69,7 @@ export const DocumentList: React.FC = () => {
     sorters: {
       initial: [
         {
-          field: "id",
+          field: "createdAt",
           order: "desc",
         },
       ],

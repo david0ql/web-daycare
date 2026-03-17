@@ -57,8 +57,8 @@ export const ChildList: React.FC = () => {
     sorters: {
       initial: [
         {
-          field: "firstName",
-          order: "asc",
+          field: "createdAt",
+          order: "desc",
         },
       ],
     },
@@ -95,7 +95,7 @@ export const ChildList: React.FC = () => {
         <Table.Column
           dataIndex="birthDate"
           title={t.birthDate}
-          render={(value) => new Date(value).toLocaleDateString(intlLocale)}
+          render={(value) => new Date(value).toLocaleDateString(intlLocale, { timeZone: 'UTC' })}
         />
         <Table.Column
           dataIndex="address"

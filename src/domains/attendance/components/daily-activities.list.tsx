@@ -1,10 +1,13 @@
 import React from 'react';
 import { List, Card, Tag, Typography, Space, Button, Popconfirm, message, Empty } from 'antd';
 import { EditOutlined, DeleteOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { useGetIdentity } from '@refinedev/core';
+import { useAuth } from '../../../shared/hooks/use-auth.hook';
 import { useDailyActivities } from '../hooks/use-daily-activities.hook';
 import { DailyActivity, ACTIVITY_TYPE_LABELS_BY_LANGUAGE, ACTIVITY_TYPE_ICONS } from '../types/daily-activities.types';
 import dayjs from 'dayjs';
 import { useLanguage } from '../../../shared/contexts/language.context';
+import { FLORIDA_TIMEZONE } from '../../../shared/i18n/locale';
 
 const { Title, Text } = Typography;
 
@@ -52,7 +55,12 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
 }) => {
   const { language } = useLanguage();
   const t = DAILY_ACTIVITIES_LIST_TRANSLATIONS[language];
-  const { activities, isLoading, deleteActivity } = useDailyActivities(attendanceId);
+  const { data: currentUser } = useGetIdentity<{ id: number }>();
+  const { isAdmin } = useAuth();
+  const { activities: rawActivities, isLoading, deleteActivity } = useDailyActivities(attendanceId);
+  const activities = [...rawActivities].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   const handleDelete = async (id: number) => {
     try {
@@ -82,7 +90,7 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
   const getTimeCompleted = (activity: DailyActivity) => {
     if (activity.completed && activity.timeCompleted) {
       const dateFormat = language === 'spanish' ? 'YYYY-MM-DD' : 'MM-DD-YYYY';
-      return dayjs(activity.timeCompleted).format(`${dateFormat} h:mm A`);
+      return dayjs(activity.timeCompleted).tz(FLORIDA_TIMEZONE).format(`${dateFormat} h:mm A`);
     }
     return null;
   };
@@ -121,21 +129,23 @@ export const DailyActivitiesList: React.FC<DailyActivitiesListProps> = ({
               >
                 {t.edit}
               </Button>,
-              <Popconfirm
-                title={t.deleteConfirm}
-                onConfirm={() => handleDelete(activity.id)}
-                okText={t.yes}
-                cancelText={t.no}
-              >
-                <Button
-                  type="text"
-                  danger
-                  icon={<DeleteOutlined />}
-                  size="small"
+              ...(isAdmin() || currentUser?.id === activity.createdBy ? [
+                <Popconfirm
+                  title={t.deleteConfirm}
+                  onConfirm={() => handleDelete(activity.id)}
+                  okText={t.yes}
+                  cancelText={t.no}
                 >
-                  {t.delete}
-                </Button>
-              </Popconfirm>,
+                  <Button
+                    type="text"
+                    danger
+                    icon={<DeleteOutlined />}
+                    size="small"
+                  >
+                    {t.delete}
+                  </Button>
+                </Popconfirm>
+              ] : []),
             ]}
           >
             <List.Item.Meta

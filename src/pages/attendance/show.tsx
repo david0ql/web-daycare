@@ -150,9 +150,10 @@ export const AttendanceShow: React.FC = () => {
               <div>
                 <Text strong>{t.checkInTime}: </Text>
                 {record?.checkInTime ? (
-                  <Text>{new Date(record.checkInTime).toLocaleTimeString(intlLocale, { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
+                  <Text>{new Date(record.checkInTime).toLocaleTimeString(intlLocale, {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'America/New_York',
                   })}</Text>
                 ) : (
                   <Text type="secondary">{t.notRecorded}</Text>
@@ -161,9 +162,10 @@ export const AttendanceShow: React.FC = () => {
               <div>
                 <Text strong>{t.checkOutTime}: </Text>
                 {record?.checkOutTime ? (
-                  <Text>{new Date(record.checkOutTime).toLocaleTimeString(intlLocale, { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
+                  <Text>{new Date(record.checkOutTime).toLocaleTimeString(intlLocale, {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'America/New_York',
                   })}</Text>
                 ) : (
                   <Text type="secondary">{t.notRecorded}</Text>

@@ -248,7 +248,7 @@ export const IncidentAttachmentsMultiple: React.FC<IncidentAttachmentsMultiplePr
                 }
                 description={
                   <Text type="secondary">
-                    {t.uploadedOn} {new Date(attachment.createdAt || '').toLocaleDateString(intlLocale)}
+                    {t.uploadedOn} {new Date(attachment.createdAt || '').toLocaleDateString(intlLocale, { timeZone: 'America/New_York' })}
                   </Text>
                 }
               />
