@@ -119,13 +119,20 @@ export const UserList: React.FC = () => {
         <Table.Column
           dataIndex="profilePicture"
           title={t.avatar}
-          render={(value, record: User) => (
-            <Avatar
-              src={value}
-              icon={<UserOutlined />}
-              alt={`${record.firstName} ${record.lastName}`}
-            />
-          )}
+          render={(value, record: User) => {
+            const src = value
+              ? value.startsWith('http')
+                ? value
+                : `https://api.thechildrenworld.com/api${value}`
+              : undefined;
+            return (
+              <Avatar
+                src={src}
+                icon={<UserOutlined />}
+                alt={`${record.firstName} ${record.lastName}`}
+              />
+            );
+          }}
           width="80px"
         />
         <Table.Column

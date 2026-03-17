@@ -161,7 +161,7 @@ export const UserEdit: React.FC = () => {
     if (currentPicture && !profilePreview) {
       const previewUrl = currentPicture.startsWith('http')
         ? currentPicture
-        : `https://api.thechildrenworld.com/api/uploads${currentPicture}`;
+        : `https://api.thechildrenworld.com/api${currentPicture}`;
       setProfilePreview(previewUrl);
     }
   }, [formProps.initialValues]);
@@ -177,7 +177,10 @@ export const UserEdit: React.FC = () => {
       const newPath = response.data?.profilePicture;
       if (newPath) {
         formProps.form?.setFieldValue('profilePicture', newPath);
-        setProfilePreview(`https://api.thechildrenworld.com/api/uploads${newPath}`);
+        const previewUrl = newPath.startsWith('http')
+          ? newPath
+          : `https://api.thechildrenworld.com/api${newPath}`;
+        setProfilePreview(previewUrl);
       }
     } catch {
       // Error handled by axios interceptor
