@@ -94,8 +94,8 @@ export const AttendanceEdit: React.FC = () => {
     const transformedValues = {
       ...values,
       attendanceDate: values.attendanceDate && dayjs.isDayjs(values.attendanceDate) ? values.attendanceDate.format('YYYY-MM-DD') : values.attendanceDate,
-      checkInTime: values.checkInTime && dayjs.isDayjs(values.checkInTime) ? values.checkInTime.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : values.checkInTime,
-      checkOutTime: values.checkOutTime && dayjs.isDayjs(values.checkOutTime) ? values.checkOutTime.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : values.checkOutTime,
+      checkInTime: values.checkInTime && dayjs.isDayjs(values.checkInTime) ? values.checkInTime.toISOString() : values.checkInTime,
+      checkOutTime: values.checkOutTime && dayjs.isDayjs(values.checkOutTime) ? values.checkOutTime.toISOString() : values.checkOutTime,
     };
 
     // Call the original formProps.onFinish with transformed values
