@@ -232,9 +232,10 @@ export const AttendanceActivitiesCreate: React.FC = () => {
                   >
                     {Object.values(ActivityTypeEnum)
                       .filter((type) => {
-                        // Filter out activity types that already exist for this attendance
                         const existingTypes = (existingActivities || []).map((activity: any) => activity.activityType);
-                        return !existingTypes.includes(type);
+                        // Allow multiple diaper changes; all other types limited to one per attendance
+                        const canRepeatTypes = [ActivityTypeEnum.DIAPER_CHANGE];
+                        return canRepeatTypes.includes(type) || !existingTypes.includes(type);
                       })
                       .map((type) => (
                         <Option key={type} value={type}>
