@@ -94,7 +94,7 @@ const SIDEBAR_TRANSLATIONS = {
     userList: "Lista de usuarios",
     createUser: "Crear usuario",
     children: "Niños",
-    childrenList: "Lista de niños3",
+    childrenList: "Lista de niños",
     registerChild: "Registrar niño",
     attendance: "Asistencia",
     attendanceRecord: "Registro de asistencia",

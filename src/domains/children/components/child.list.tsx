@@ -43,7 +43,7 @@ const CHILD_LIST_TRANSLATIONS = {
     notSpecified: "Not specified",
   },
   spanish: {
-    childrenList: "Lista de niños4",
+    childrenList: "Lista de niños",
     newChild: "Nuevo niño",
     avatar: "Avatar",
     name: "Nombre",
@@ -173,7 +173,11 @@ export const ChildList: React.FC = () => {
                 alt={ChildUtils.getFullName(record)}
                 width={40}
                 height={40}
-                style={{ borderRadius: "50%", objectFit: "cover", display: "block" }}
+                style={{
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
               />
             ) : (
               <span

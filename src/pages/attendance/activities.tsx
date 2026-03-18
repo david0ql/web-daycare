@@ -1,10 +1,35 @@
 import React from "react";
-import { List, useTable, DateField, TextField, EditButton, ShowButton, DeleteButton } from "@refinedev/antd";
-import { Table, Avatar, Tooltip, Tag, Space, Button, Card, Typography } from "antd";
-import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { ACTIVITY_TYPE_LABELS_BY_LANGUAGE, ACTIVITY_TYPE_ICONS } from "../../domains/attendance/types/daily-activities.types";
+import {
+  List,
+  useTable,
+  DateField,
+  TextField,
+  EditButton,
+  ShowButton,
+  DeleteButton,
+} from "@refinedev/antd";
+import {
+  Table,
+  Avatar,
+  Tooltip,
+  Tag,
+  Space,
+  Button,
+  Card,
+  Typography,
+} from "antd";
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import {
+  ACTIVITY_TYPE_LABELS_BY_LANGUAGE,
+  ACTIVITY_TYPE_ICONS,
+} from "../../domains/attendance/types/daily-activities.types";
 import { useNavigate } from "react-router";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import { useLanguage } from "../../shared/contexts/language.context";
 import { FLORIDA_TIMEZONE } from "../../shared/i18n/locale";
 
@@ -52,33 +77,52 @@ export const AttendanceActivities: React.FC = () => {
   const { tableProps } = useTable({
     resource: "attendance/daily-activities",
     syncWithLocation: false,
-    sorters: {
-      initial: [
-        {
-          field: "createdAt",
-          order: "desc",
-        },
-      ],
-    },
     pagination: {
       pageSize: 10,
     },
   });
 
+  const sortedDataSource = [...(tableProps.dataSource ?? [])].sort(
+    (a: any, b: any) => {
+      const dateA = a.attendance?.attendanceDate ?? "";
+      const dateB = b.attendance?.attendanceDate ?? "";
+      if (dateB !== dateA) return dateB.localeCompare(dateA);
+      const nameA = `${a.child?.firstName ?? ""} ${a.child?.lastName ?? ""}`
+        .trim()
+        .toLowerCase();
+      const nameB = `${b.child?.firstName ?? ""} ${b.child?.lastName ?? ""}`
+        .trim()
+        .toLowerCase();
+      return nameA.localeCompare(nameB);
+    },
+  );
+
   const getActivityStatus = (record: any) => {
     const status = Number(record.completed);
     if (status === 1) {
-      return <Tag color="green" icon={<CheckCircleOutlined />}>{t.completed}</Tag>;
+      return (
+        <Tag color="green" icon={<CheckCircleOutlined />}>
+          {t.completed}
+        </Tag>
+      );
     }
     if (status === 2) {
-      return <Tag color="red" icon={<CloseCircleOutlined />}>{t.rejected}</Tag>;
+      return (
+        <Tag color="red" icon={<CloseCircleOutlined />}>
+          {t.rejected}
+        </Tag>
+      );
     }
-    return <Tag color="orange" icon={<ClockCircleOutlined />}>{t.pending}</Tag>;
+    return (
+      <Tag color="orange" icon={<ClockCircleOutlined />}>
+        {t.pending}
+      </Tag>
+    );
   };
 
   const getTimeCompleted = (record: any) => {
     if (Number(record.completed) === 1 && record.timeCompleted) {
-      return dayjs(record.timeCompleted).tz(FLORIDA_TIMEZONE).format('h:mm A');
+      return dayjs(record.timeCompleted).tz(FLORIDA_TIMEZONE).format("h:mm A");
     }
     return null;
   };
@@ -87,11 +131,11 @@ export const AttendanceActivities: React.FC = () => {
     <List
       title={t.title}
       headerButtons={[
-        <Button 
-          type="primary" 
+        <Button
+          type="primary"
           key="create"
           icon={<PlusOutlined />}
-          onClick={() => navigate('/attendance/activities/create')}
+          onClick={() => navigate("/attendance/activities/create")}
         >
           {t.registerActivity}
         </Button>,
@@ -99,6 +143,7 @@ export const AttendanceActivities: React.FC = () => {
     >
       <Table
         {...tableProps}
+        dataSource={sortedDataSource}
         rowKey="id"
         pagination={{
           ...tableProps.pagination,
@@ -115,13 +160,13 @@ export const AttendanceActivities: React.FC = () => {
           title={t.child}
           render={(child: any) => (
             <Space>
-              <Avatar 
-                src={child?.profilePicture} 
-                size="small"
-              >
-                {child?.firstName?.[0]}{child?.lastName?.[0]}
+              <Avatar src={child?.profilePicture} size="small">
+                {child?.firstName?.[0]}
+                {child?.lastName?.[0]}
               </Avatar>
-              <Text strong>{child?.firstName} {child?.lastName}</Text>
+              <Text strong>
+                {child?.firstName} {child?.lastName}
+              </Text>
             </Space>
           )}
         />
@@ -130,10 +175,18 @@ export const AttendanceActivities: React.FC = () => {
           title={t.activity}
           render={(activityType: string) => (
             <Space>
-              <span style={{ fontSize: '16px' }}>
-                {ACTIVITY_TYPE_ICONS[activityType as keyof typeof ACTIVITY_TYPE_ICONS]}
+              <span style={{ fontSize: "16px" }}>
+                {
+                  ACTIVITY_TYPE_ICONS[
+                    activityType as keyof typeof ACTIVITY_TYPE_ICONS
+                  ]
+                }
               </span>
-              {ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][activityType as keyof typeof ACTIVITY_TYPE_LABELS_BY_LANGUAGE.english]}
+              {
+                ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][
+                  activityType as keyof typeof ACTIVITY_TYPE_LABELS_BY_LANGUAGE.english
+                ]
+              }
             </Space>
           )}
         />
@@ -163,7 +216,7 @@ export const AttendanceActivities: React.FC = () => {
           render={(notes: string) => (
             <Tooltip title={notes}>
               <Text ellipsis style={{ maxWidth: 200 }}>
-                {notes || '-'}
+                {notes || "-"}
               </Text>
             </Tooltip>
           )}
@@ -176,14 +229,6 @@ export const AttendanceActivities: React.FC = () => {
               {user?.firstName} {user?.lastName}
             </Text>
           )}
-        />
-        <Table.Column
-          dataIndex="createdAt"
-          title={t.created}
-          render={(value: string) => {
-            const dateFormat = language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY";
-            return <Text>{dayjs(value).format(`${dateFormat} h:mm A`)}</Text>;
-          }}
         />
         <Table.Column
           title={t.actions}
