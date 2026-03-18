@@ -3,7 +3,6 @@ import { List, useTable, DateField, TextField, EditButton, ShowButton, DeleteBut
 import { Table, Avatar, Tooltip, Tag, Space, Button, Card, Typography, Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
-import dayjs from 'dayjs';
 import { useLanguage } from "../../shared/contexts/language.context";
 
 const { Title, Text } = Typography;
@@ -39,9 +38,9 @@ export const AttendancePhotos: React.FC = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const t = ATTENDANCE_PHOTOS_TRANSLATIONS[language];
-  const today = dayjs().format('YYYY-MM-DD');
   const { tableProps } = useTable({
     resource: "attendance/activity-photos",
+    syncWithLocation: false,
     sorters: {
       initial: [
         {
@@ -50,14 +49,8 @@ export const AttendancePhotos: React.FC = () => {
         },
       ],
     },
-    filters: {
-      initial: [
-        {
-          field: "attendance.attendanceDate",
-          operator: "eq",
-          value: today,
-        },
-      ],
+    pagination: {
+      pageSize: 10,
     },
   });
 
@@ -81,7 +74,19 @@ export const AttendancePhotos: React.FC = () => {
         </Button>,
       ]}
     >
-      <Table {...tableProps} rowKey="id">
+      <Table
+        {...tableProps}
+        rowKey="id"
+        pagination={{
+          ...tableProps.pagination,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            language === "spanish"
+              ? `${range[0]}-${range[1]} de ${total} registros`
+              : `${range[0]}-${range[1]} of ${total} records`,
+        }}
+      >
         <Table.Column
           dataIndex="child"
           title={t.child}

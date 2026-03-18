@@ -66,6 +66,9 @@ export const DocumentList: React.FC = () => {
   const { tableProps } = useTable({
     resource: "documents",
     syncWithLocation: false,
+    pagination: {
+      pageSize: 10,
+    },
     sorters: {
       initial: [
         {
@@ -222,6 +225,15 @@ export const DocumentList: React.FC = () => {
             columns={columns}
             rowKey="id"
             scroll={{ x: 1400 }}
+            pagination={{
+              ...tableProps.pagination,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) =>
+                language === "spanish"
+                  ? `${range[0]}-${range[1]} de ${total} registros`
+                  : `${range[0]}-${range[1]} of ${total} records`,
+            }}
           />
     </List>
   );

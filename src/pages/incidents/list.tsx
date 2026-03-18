@@ -67,6 +67,9 @@ export const IncidentsList: React.FC = () => {
   const t = INCIDENTS_LIST_TRANSLATIONS[language];
   const { tableProps } = useTable({
     syncWithLocation: false,
+    pagination: {
+      pageSize: 10,
+    },
     sorters: {
       initial: [
         {
@@ -285,6 +288,15 @@ export const IncidentsList: React.FC = () => {
         columns={columns}
         rowKey="id"
         scroll={{ x: 1200 }}
+        pagination={{
+          ...tableProps.pagination,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            language === "spanish"
+              ? `${range[0]}-${range[1]} de ${total} registros`
+              : `${range[0]}-${range[1]} of ${total} records`,
+        }}
       />
     </List>
   );

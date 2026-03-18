@@ -30,7 +30,7 @@ export const stableFixedDataProvider: DataProvider = {
 
     // Paginación - usando los nombres exactos que espera la API
     if (pagination) {
-      params.page = (pagination as any).current || 1;
+      params.page = pagination.currentPage || 1;
       // Limitar take a máximo 150 según la validación del backend
       const requestedTake = pagination.pageSize || 10;
       params.take = Math.min(requestedTake, 150);

@@ -49,9 +49,9 @@ export const AttendanceActivities: React.FC = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const t = ATTENDANCE_ACTIVITIES_TRANSLATIONS[language];
-  const today = dayjs().format('YYYY-MM-DD');
   const { tableProps } = useTable({
     resource: "attendance/daily-activities",
+    syncWithLocation: false,
     sorters: {
       initial: [
         {
@@ -60,14 +60,8 @@ export const AttendanceActivities: React.FC = () => {
         },
       ],
     },
-    filters: {
-      initial: [
-        {
-          field: "attendance.attendanceDate",
-          operator: "eq",
-          value: today,
-        },
-      ],
+    pagination: {
+      pageSize: 10,
     },
   });
 
@@ -103,7 +97,19 @@ export const AttendanceActivities: React.FC = () => {
         </Button>,
       ]}
     >
-      <Table {...tableProps} rowKey="id">
+      <Table
+        {...tableProps}
+        rowKey="id"
+        pagination={{
+          ...tableProps.pagination,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            language === "spanish"
+              ? `${range[0]}-${range[1]} de ${total} registros`
+              : `${range[0]}-${range[1]} of ${total} records`,
+        }}
+      >
         <Table.Column
           dataIndex="child"
           title={t.child}

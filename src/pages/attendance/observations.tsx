@@ -4,7 +4,6 @@ import { Table, Avatar, Tooltip, Tag, Space, Button, Card, Typography } from "an
 import { PlusOutlined } from "@ant-design/icons";
 import { MOOD_LABELS_BY_LANGUAGE, MOOD_ICONS, MOOD_COLORS } from "../../domains/attendance/types/daily-observations.types";
 import { useNavigate } from "react-router";
-import dayjs from 'dayjs';
 import { useLanguage } from "../../shared/contexts/language.context";
 
 const { Title, Text } = Typography;
@@ -38,9 +37,9 @@ export const AttendanceObservations: React.FC = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const t = ATTENDANCE_OBSERVATIONS_TRANSLATIONS[language];
-  const today = dayjs().format('YYYY-MM-DD');
   const { tableProps } = useTable({
     resource: "attendance/daily-observations",
+    syncWithLocation: false,
     sorters: {
       initial: [
         {
@@ -49,14 +48,8 @@ export const AttendanceObservations: React.FC = () => {
         },
       ],
     },
-    filters: {
-      initial: [
-        {
-          field: "attendance.attendanceDate",
-          operator: "eq",
-          value: today,
-        },
-      ],
+    pagination: {
+      pageSize: 10,
     },
   });
 
@@ -85,7 +78,19 @@ export const AttendanceObservations: React.FC = () => {
         </Button>,
       ]}
     >
-      <Table {...tableProps} rowKey="id">
+      <Table
+        {...tableProps}
+        rowKey="id"
+        pagination={{
+          ...tableProps.pagination,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            language === "spanish"
+              ? `${range[0]}-${range[1]} de ${total} registros`
+              : `${range[0]}-${range[1]} of ${total} records`,
+        }}
+      >
         <Table.Column
           dataIndex="child"
           title={t.child}

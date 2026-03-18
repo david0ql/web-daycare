@@ -102,7 +102,10 @@ export const UserList: React.FC = () => {
   };
 
   const { tableProps } = useTable<User>({
-    syncWithLocation: false, // Desactivar sincronización con URL para evitar problemas
+    syncWithLocation: false,
+    pagination: {
+      pageSize: 10,
+    },
     sorters: {
       initial: [
         {
@@ -136,7 +139,21 @@ export const UserList: React.FC = () => {
         ) : undefined
       }
     >
-      <Table {...tableProps} dataSource={sortedDataSource} rowKey="id" locale={{ emptyText: t.noData }}>
+      <Table
+        {...tableProps}
+        dataSource={sortedDataSource}
+        rowKey="id"
+        locale={{ emptyText: t.noData }}
+        pagination={{
+          ...tableProps.pagination,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            language === "spanish"
+              ? `${range[0]}-${range[1]} de ${total} registros`
+              : `${range[0]}-${range[1]} of ${total} records`,
+        }}
+      >
         <Table.Column
           dataIndex="profilePicture"
           title={t.avatar}
