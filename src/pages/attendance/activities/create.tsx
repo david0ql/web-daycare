@@ -3,9 +3,13 @@ import { Create, useForm } from "@refinedev/antd";
 import { Form, Input, Select, TimePicker, Row, Col } from "antd";
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ActivityTypeEnum, ActivityStatusEnum, ACTIVITY_TYPE_LABELS_BY_LANGUAGE } from "../../../domains/attendance/types/daily-activities.types";
+import {
+  ActivityTypeEnum,
+  ActivityStatusEnum,
+  ACTIVITY_TYPE_LABELS_BY_LANGUAGE,
+} from "../../../domains/attendance/types/daily-activities.types";
 import { axiosInstance } from "../../../shared";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import { useLanguage } from "../../../shared/contexts/language.context";
 
 const { TextArea } = Input;
@@ -65,7 +69,8 @@ const ATTENDANCE_ACTIVITIES_CREATE_TRANSLATIONS = {
     statusCompleted: "Completado",
     statusRejected: "Rechazado",
     completionTime: "Hora de finalización",
-    selectCompletionTimeRequired: "Por favor selecciona la hora de finalización",
+    selectCompletionTimeRequired:
+      "Por favor selecciona la hora de finalización",
     selectTime: "Selecciona hora",
     notes: "Notas",
     notesPlaceholder: "Notas adicionales sobre la actividad (opcional)",
@@ -77,9 +82,13 @@ export const AttendanceActivitiesCreate: React.FC = () => {
   const { language } = useLanguage();
   const t = ATTENDANCE_ACTIVITIES_CREATE_TRANSLATIONS[language];
   const { formProps, saveButtonProps } = useForm();
-  const [selectedChildId, setSelectedChildId] = useState<number | undefined>(undefined);
-  const [selectedAttendanceId, setSelectedAttendanceId] = useState<number | undefined>(undefined);
-  
+  const [selectedChildId, setSelectedChildId] = useState<number | undefined>(
+    undefined,
+  );
+  const [selectedAttendanceId, setSelectedAttendanceId] = useState<
+    number | undefined
+  >(undefined);
+
   // Fetch children for the select
   const { data: childrenData, isLoading: childrenLoading } = useQuery({
     queryKey: ["children"],
@@ -89,7 +98,7 @@ export const AttendanceActivitiesCreate: React.FC = () => {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
-  
+
   // Fetch today's attendance records for the selected child
   const { data: attendanceData, isLoading: attendanceLoading } = useQuery({
     queryKey: ["attendance", "today", selectedChildId],
@@ -97,20 +106,24 @@ export const AttendanceActivitiesCreate: React.FC = () => {
       if (!selectedChildId) {
         return [];
       }
-      
+
       // Get today's attendance and filter by selected child
       const todayResponse = await axiosInstance.get("/attendance/today");
       const todayAttendances = todayResponse.data || [];
-      
+
       // If no today's records, get all attendance records for this child
       if (todayAttendances.length === 0) {
         const allResponse = await axiosInstance.get("/attendance");
         const allAttendances = allResponse.data?.data || [];
-        return allAttendances.filter((attendance: any) => attendance.childId === selectedChildId);
+        return allAttendances.filter(
+          (attendance: any) => attendance.childId === selectedChildId,
+        );
       }
-      
+
       // Filter by selected child
-      return todayAttendances.filter((attendance: any) => attendance.childId === selectedChildId);
+      return todayAttendances.filter(
+        (attendance: any) => attendance.childId === selectedChildId,
+      );
     },
     enabled: !!selectedChildId, // Only run query when a child is selected
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -123,8 +136,10 @@ export const AttendanceActivitiesCreate: React.FC = () => {
       if (!selectedAttendanceId) {
         return [];
       }
-      
-      const response = await axiosInstance.get(`/attendance/daily-activities/attendance/${selectedAttendanceId}`);
+
+      const response = await axiosInstance.get(
+        `/attendance/daily-activities/attendance/${selectedAttendanceId}`,
+      );
       return response.data || [];
     },
     enabled: !!selectedAttendanceId,
@@ -134,12 +149,17 @@ export const AttendanceActivitiesCreate: React.FC = () => {
   const handleFinish = (values: any) => {
     const formData = {
       ...values,
-      attendanceId: values.attendanceId || (attendanceId ? parseInt(attendanceId) : undefined),
-      timeCompleted: values.completed === ActivityStatusEnum.COMPLETED && values.timeCompleted && dayjs.isDayjs(values.timeCompleted)
-        ? values.timeCompleted.toISOString()
-        : undefined,
+      attendanceId:
+        values.attendanceId ||
+        (attendanceId ? parseInt(attendanceId) : undefined),
+      timeCompleted:
+        values.completed === ActivityStatusEnum.COMPLETED &&
+        values.timeCompleted &&
+        dayjs.isDayjs(values.timeCompleted)
+          ? values.timeCompleted.toISOString()
+          : undefined,
     };
-    
+
     // Call the original formProps.onFinish with transformed values
     if (formProps.onFinish) {
       formProps.onFinish(formData);
@@ -154,31 +174,31 @@ export const AttendanceActivitiesCreate: React.FC = () => {
       <Form {...formProps} layout="vertical" onFinish={handleFinish}>
         <Row gutter={16}>
           <Col span={12}>
-                <Form.Item
-                  label={t.child}
-                  name="childId"
-                  rules={[{ required: true, message: t.selectChildRequired }]}
-                >
-                  <Select 
-                    placeholder={t.selectChild} 
-                    showSearch
-                    loading={childrenLoading}
-                    notFoundContent={childrenLoading ? t.loading : t.noChildren}
-                    onChange={(value) => {
-                      setSelectedChildId(value);
-                      // Clear attendance selection when child changes
-                      formProps.form?.setFieldsValue({ attendanceId: undefined });
-                    }}
-                  >
-                    {(childrenData?.data || []).map((child: any) => (
-                      <Option key={child.id} value={child.id}>
-                        {child.firstName} {child.lastName}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
+            <Form.Item
+              label={t.child}
+              name="childId"
+              rules={[{ required: true, message: t.selectChildRequired }]}
+            >
+              <Select
+                placeholder={t.selectChild}
+                showSearch
+                loading={childrenLoading}
+                notFoundContent={childrenLoading ? t.loading : t.noChildren}
+                onChange={(value) => {
+                  setSelectedChildId(value);
+                  // Clear attendance selection when child changes
+                  formProps.form?.setFieldsValue({ attendanceId: undefined });
+                }}
+              >
+                {(childrenData?.data || []).map((child: any) => (
+                  <Option key={child.id} value={child.id}>
+                    {child.firstName} {child.lastName}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
           </Col>
-          
+
           <Col span={12}>
             <Form.Item
               label={t.attendanceRecord}
@@ -186,8 +206,10 @@ export const AttendanceActivitiesCreate: React.FC = () => {
               rules={[{ required: true, message: t.selectAttendanceRequired }]}
               initialValue={attendanceId ? parseInt(attendanceId) : undefined}
             >
-              <Select 
-                placeholder={selectedChildId ? t.selectAttendance : t.firstSelectChild} 
+              <Select
+                placeholder={
+                  selectedChildId ? t.selectAttendance : t.firstSelectChild
+                }
                 showSearch
                 loading={attendanceLoading}
                 disabled={!selectedChildId}
@@ -197,16 +219,19 @@ export const AttendanceActivitiesCreate: React.FC = () => {
                   formProps.form?.setFieldsValue({ activityType: undefined });
                 }}
                 notFoundContent={
-                  attendanceLoading 
-                    ? t.loading 
-                    : !selectedChildId 
-                      ? t.firstSelectChild 
-                      : t.noAttendanceToday
+                  attendanceLoading
+                    ? t.loading
+                    : !selectedChildId
+                    ? t.firstSelectChild
+                    : t.noAttendanceToday
                 }
               >
                 {(attendanceData || []).map((attendance: any) => (
                   <Option key={attendance.id} value={attendance.id}>
-                    {attendance.child?.firstName} {attendance.child?.lastName} - {dayjs(attendance.attendanceDate).format(language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY")}
+                    {attendance.child?.firstName} {attendance.child?.lastName} -{" "}
+                    {dayjs(attendance.attendanceDate).format(
+                      language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY",
+                    )}
                   </Option>
                 ))}
               </Select>
@@ -216,36 +241,43 @@ export const AttendanceActivitiesCreate: React.FC = () => {
 
         <Row gutter={16}>
           <Col span={12}>
-                <Form.Item
-                  label={t.activityType}
-                  name="activityType"
-                  rules={[{ required: true, message: t.selectActivityTypeRequired }]}
-                >
-                  <Select 
-                    placeholder={t.selectActivityType}
-                    disabled={!selectedAttendanceId}
-                    notFoundContent={
-                      !selectedAttendanceId 
-                        ? t.firstSelectAttendance 
-                        : t.noActivityTypes
-                    }
-                  >
-                    {Object.values(ActivityTypeEnum)
-                      .filter((type) => {
-                        const existingTypes = (existingActivities || []).map((activity: any) => activity.activityType);
-                        // Allow multiple diaper changes; all other types limited to one per attendance
-                        const canRepeatTypes = [ActivityTypeEnum.DIAPER_CHANGE];
-                        return canRepeatTypes.includes(type) || !existingTypes.includes(type);
-                      })
-                      .map((type) => (
-                        <Option key={type} value={type}>
-                          {ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][type]}
-                        </Option>
-                      ))}
-                  </Select>
-                </Form.Item>
+            <Form.Item
+              label={t.activityType}
+              name="activityType"
+              rules={[
+                { required: true, message: t.selectActivityTypeRequired },
+              ]}
+            >
+              <Select
+                placeholder={t.selectActivityType}
+                disabled={!selectedAttendanceId}
+                notFoundContent={
+                  !selectedAttendanceId
+                    ? t.firstSelectAttendance
+                    : t.noActivityTypes
+                }
+              >
+                {Object.values(ActivityTypeEnum)
+                  .filter((type) => {
+                    const existingTypes = (existingActivities || []).map(
+                      (activity: any) => activity.activityType,
+                    );
+                    // Allow multiple diaper changes; all other types limited to one per attendance
+                    const canRepeatTypes = [ActivityTypeEnum.DIAPER_CHANGE];
+                    return (
+                      canRepeatTypes.includes(type) ||
+                      !existingTypes.includes(type)
+                    );
+                  })
+                  .map((type) => (
+                    <Option key={type} value={type}>
+                      {ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][type]}
+                    </Option>
+                  ))}
+              </Select>
+            </Form.Item>
           </Col>
-          
+
           <Col span={12}>
             <Form.Item
               label={t.status}
@@ -254,9 +286,15 @@ export const AttendanceActivitiesCreate: React.FC = () => {
               initialValue={ActivityStatusEnum.PENDING}
             >
               <Select>
-                <Option value={ActivityStatusEnum.PENDING}>⏳ {t.statusPending}</Option>
-                <Option value={ActivityStatusEnum.COMPLETED}>✅ {t.statusCompleted}</Option>
-                <Option value={ActivityStatusEnum.REJECTED}>❌ {t.statusRejected}</Option>
+                <Option value={ActivityStatusEnum.PENDING}>
+                  ⏳ {t.statusPending}
+                </Option>
+                <Option value={ActivityStatusEnum.COMPLETED}>
+                  ✅ {t.statusCompleted}
+                </Option>
+                <Option value={ActivityStatusEnum.REJECTED}>
+                  ❌ {t.statusRejected}
+                </Option>
               </Select>
             </Form.Item>
           </Col>
@@ -264,20 +302,27 @@ export const AttendanceActivitiesCreate: React.FC = () => {
 
         <Form.Item
           noStyle
-          shouldUpdate={(prevValues, currentValues) => prevValues.completed !== currentValues.completed}
+          shouldUpdate={(prevValues, currentValues) =>
+            prevValues.completed !== currentValues.completed
+          }
         >
           {({ getFieldValue }) => {
-            const completedVal = getFieldValue('completed');
+            const completedVal = getFieldValue("completed");
             return completedVal === ActivityStatusEnum.COMPLETED ? (
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item
                     label={t.completionTime}
                     name="timeCompleted"
-                    rules={[{ required: true, message: t.selectCompletionTimeRequired }]}
+                    rules={[
+                      {
+                        required: true,
+                        message: t.selectCompletionTimeRequired,
+                      },
+                    ]}
                   >
                     <TimePicker
-                      style={{ width: '100%' }}
+                      style={{ width: "100%" }}
                       format="h:mm A"
                       use12Hours
                       placeholder={t.selectTime}
@@ -289,21 +334,18 @@ export const AttendanceActivitiesCreate: React.FC = () => {
           }}
         </Form.Item>
 
-	        <Row gutter={16}>
-	          <Col span={24}>
-	            <Form.Item
-	              label={t.notes}
-	              name="notes"
-	            >
-	              <TextArea 
-	                rows={3}
-	                placeholder={t.notesPlaceholder}
-	                maxLength={500}
-	                showCount
-	              />
-	            </Form.Item>
-	          </Col>
-	        </Row>
+        <Row gutter={16}>
+          <Col span={24}>
+            <Form.Item label={t.notes} name="notes">
+              <TextArea
+                rows={3}
+                placeholder={t.notesPlaceholder}
+                maxLength={500}
+                showCount
+              />
+            </Form.Item>
+          </Col>
+        </Row>
       </Form>
     </Create>
   );

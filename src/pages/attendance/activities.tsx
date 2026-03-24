@@ -77,25 +77,18 @@ export const AttendanceActivities: React.FC = () => {
   const { tableProps } = useTable({
     resource: "attendance/daily-activities",
     syncWithLocation: false,
+    sorters: {
+      initial: [
+        {
+          field: "createdAt",
+          order: "desc",
+        },
+      ],
+    },
     pagination: {
       pageSize: 10,
     },
   });
-
-  const sortedDataSource = [...(tableProps.dataSource ?? [])].sort(
-    (a: any, b: any) => {
-      const dateA = a.attendance?.attendanceDate ?? "";
-      const dateB = b.attendance?.attendanceDate ?? "";
-      if (dateB !== dateA) return dateB.localeCompare(dateA);
-      const nameA = `${a.child?.firstName ?? ""} ${a.child?.lastName ?? ""}`
-        .trim()
-        .toLowerCase();
-      const nameB = `${b.child?.firstName ?? ""} ${b.child?.lastName ?? ""}`
-        .trim()
-        .toLowerCase();
-      return nameA.localeCompare(nameB);
-    },
-  );
 
   const getActivityStatus = (record: any) => {
     const status = Number(record.completed);
@@ -143,7 +136,6 @@ export const AttendanceActivities: React.FC = () => {
     >
       <Table
         {...tableProps}
-        dataSource={sortedDataSource}
         rowKey="id"
         pagination={{
           ...tableProps.pagination,
@@ -229,6 +221,15 @@ export const AttendanceActivities: React.FC = () => {
               {user?.firstName} {user?.lastName}
             </Text>
           )}
+        />
+        <Table.Column
+          dataIndex="createdAt"
+          title={t.created}
+          render={(value: string) => {
+            const dateFormat =
+              language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY";
+            return <Text>{dayjs(value).format(`${dateFormat} h:mm A`)}</Text>;
+          }}
         />
         <Table.Column
           title={t.actions}
