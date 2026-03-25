@@ -258,7 +258,7 @@ export const AttendanceActivitiesBulkEdit: React.FC = () => {
           disabled={visibleActivities.length === 0}
           style={{ marginLeft: "auto" }}
         >
-          {"je"}
+          {t.save}
         </Button>
       </div>
 

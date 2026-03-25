@@ -12,6 +12,7 @@ import {
   Row,
   Col,
   Tooltip,
+  Popover,
 } from "antd";
 import {
   CheckCircleOutlined,
@@ -66,6 +67,8 @@ const TRANSLATIONS = {
     registeredBy: "Registered by",
     of: "of",
     records: "records",
+    missingActivities: "Missing Activities",
+    nothingMissing: "All activities completed",
   },
   spanish: {
     title: "Actividades diarias",
@@ -87,8 +90,20 @@ const TRANSLATIONS = {
     registeredBy: "Registrado por",
     of: "de",
     records: "registros",
+    missingActivities: "Actividades faltantes",
+    nothingMissing: "Todas las actividades completadas",
   },
 } as const;
+ 
+const MANDATORY_ACTIVITIES = [
+  ActivityTypeEnum.BREAKFAST,
+  ActivityTypeEnum.LUNCH,
+  ActivityTypeEnum.SNACK,
+  ActivityTypeEnum.NAP,
+  ActivityTypeEnum.HYDRATION,
+  ActivityTypeEnum.DIAPER_CHANGE,
+];
+
 
 export const AttendanceActivities: React.FC = () => {
   const navigate = useNavigate();
@@ -175,17 +190,52 @@ export const AttendanceActivities: React.FC = () => {
         <Table.Column
           title={t.child}
           dataIndex="child"
-          render={(_: any, row: GroupedRow) => (
-            <Space>
-              <Avatar src={row.child?.profilePicture} size="small">
-                {row.child?.firstName?.[0]}
-                {row.child?.lastName?.[0]}
-              </Avatar>
-              <Text strong>
-                {row.child?.firstName} {row.child?.lastName}
-              </Text>
-            </Space>
-          )}
+          render={(_: any, row: GroupedRow) => {
+            const registeredTypes = row.activities.map((a) => a.activityType);
+            const missing = MANDATORY_ACTIVITIES.filter(
+              (type) => !registeredTypes.includes(type)
+            );
+
+            const content = (
+              <div style={{ maxWidth: 250 }}>
+                {missing.length > 0 ? (
+                  <Space direction="vertical" size="small" style={{ width: "100%" }}>
+                    {missing.map((type) => (
+                      <div key={type} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 16 }}>{ACTIVITY_TYPE_ICONS[type]}</span>
+                        <Text>{ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][type]}</Text>
+                      </div>
+                    ))}
+                  </Space>
+                ) : (
+                  <Text type="secondary">{t.nothingMissing}</Text>
+                )}
+              </div>
+            );
+
+            return (
+              <Space>
+                <Popover
+                  content={content}
+                  title={t.missingActivities}
+                  trigger="hover"
+                  placement="right"
+                >
+                  <Avatar
+                    src={row.child?.profilePicture}
+                    size="small"
+                    style={{ cursor: "pointer" }}
+                  >
+                    {row.child?.firstName?.[0]}
+                    {row.child?.lastName?.[0]}
+                  </Avatar>
+                </Popover>
+                <Text strong>
+                  {row.child?.firstName} {row.child?.lastName}
+                </Text>
+              </Space>
+            );
+          }}
         />
         <Table.Column
           title={t.date}
