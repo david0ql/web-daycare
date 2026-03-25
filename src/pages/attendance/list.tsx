@@ -118,7 +118,7 @@ export const AttendanceList: React.FC = () => {
 
     const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
     const currentData = [...(tableProps.dataSource || [])];
-    
+
     // Identificar registros de hoy que ya están en el dataSource
     const todayRecordsChildIds = new Set(
       currentData
@@ -131,10 +131,12 @@ export const AttendanceList: React.FC = () => {
 
     // Si estamos en la página 1, inyectamos los niños que faltan por hoy (ausentes)
     const isFirstPage = (tableProps.pagination as any)?.current === 1 || !(tableProps.pagination as any)?.current;
-    
+
+    let allRecords = currentData;
+
     if (isFirstPage) {
       const absentKids = childrenWithStatus.filter(c => !todayRecordsChildIds.has(c.id));
-      
+
       const virtualRecords = absentKids.map(c => ({
         id: `virtual-absent-${c.id}`,
         childId: c.id,
@@ -146,35 +148,19 @@ export const AttendanceList: React.FC = () => {
         isVirtual: true,
       }));
 
-      // Unimos y ordenamos: Presentes hoy > Ausentes hoy > Resto (Fecha DESC)
-      const todayCombined = [
-        ...currentData.filter(r => {
-          const rDate = r.attendanceDate ? new Date(r.attendanceDate).toISOString().split('T')[0] : "";
-          return rDate === todayStr;
-        }),
-        ...virtualRecords
-      ];
-
-      // Ordenar hoy: Presente (0) → Ausente (1) → Retirado (2)
-      const getStatusOrder = (r: any) => {
-        if (r.checkInTime && !r.checkOutTime) return 0; // Presente
-        if (!r.checkInTime) return 1;                   // Ausente
-        return 2;                                        // Retirado
-      };
-      todayCombined.sort((a, b) => getStatusOrder(a) - getStatusOrder(b));
-
-      const historical = currentData.filter(r => {
-        const rDate = r.attendanceDate ? new Date(r.attendanceDate).toISOString().split('T')[0] : "";
-        return rDate !== todayStr;
-      });
-
-      return [...todayCombined, ...historical];
+      allRecords = [...currentData, ...virtualRecords];
     }
 
-    // En páginas > 1 solo mostramos registros históricos (no de hoy)
-    return currentData.filter(r => {
-      const rDate = r.attendanceDate ? new Date(r.attendanceDate).toISOString().split('T')[0] : "";
-      return rDate !== todayStr;
+    // Ordenar: fecha descendente, y dentro de cada fecha por nombre del niño ascendente
+    return allRecords.sort((a, b) => {
+      const dateA = a.attendanceDate ? new Date(a.attendanceDate).toISOString().split('T')[0] : "";
+      const dateB = b.attendanceDate ? new Date(b.attendanceDate).toISOString().split('T')[0] : "";
+
+      if (dateB !== dateA) return dateB.localeCompare(dateA); // Fecha DESC
+
+      const nameA = `${a.child?.firstName ?? ""} ${a.child?.lastName ?? ""}`.trim().toLowerCase();
+      const nameB = `${b.child?.firstName ?? ""} ${b.child?.lastName ?? ""}`.trim().toLowerCase();
+      return nameA.localeCompare(nameB); // Nombre ASC
     });
   }, [tableProps.dataSource, childrenWithStatus, tableProps.pagination]);
 
