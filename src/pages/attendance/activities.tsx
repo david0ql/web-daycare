@@ -1,123 +1,147 @@
-import React from "react";
-import {
-  List,
-  useTable,
-  DateField,
-  TextField,
-  EditButton,
-  ShowButton,
-  DeleteButton,
-} from "@refinedev/antd";
+import React, { useState, useMemo } from "react";
+import { List } from "@refinedev/antd";
 import {
   Table,
   Avatar,
-  Tooltip,
   Tag,
   Space,
   Button,
-  Card,
   Typography,
+  Modal,
+  Card,
+  Row,
+  Col,
+  Tooltip,
 } from "antd";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
   PlusOutlined,
+  EyeOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import {
+  ActivityTypeEnum,
+  ActivityStatusEnum,
   ACTIVITY_TYPE_LABELS_BY_LANGUAGE,
   ACTIVITY_TYPE_ICONS,
 } from "../../domains/attendance/types/daily-activities.types";
 import { useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useLanguage } from "../../shared/contexts/language.context";
+import { axiosInstance } from "../../shared";
 import { FLORIDA_TIMEZONE } from "../../shared/i18n/locale";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
-const ATTENDANCE_ACTIVITIES_TRANSLATIONS = {
+interface GroupedRow {
+  key: string;
+  attendanceId: number;
+  childId: number;
+  child: any;
+  attendance: any;
+  activities: any[];
+}
+
+const TRANSLATIONS = {
   english: {
     title: "Daily Activities",
     registerActivity: "Register Activity",
     child: "Child",
-    activity: "Activity",
-    status: "Status",
-    completionTime: "Completion Time",
+    activities: "Activities",
     date: "Date",
-    notes: "Notes",
-    registeredBy: "Registered by",
-    created: "Created",
     actions: "Actions",
     completed: "Completed",
     pending: "Pending",
     rejected: "Rejected",
+    viewActivities: "View Activities",
+    edit: "Edit",
+    close: "Close",
+    status: "Status",
+    time: "Time",
+    notes: "Notes",
+    noNotes: "No notes",
+    registeredBy: "Registered by",
+    of: "of",
+    records: "records",
   },
   spanish: {
     title: "Actividades diarias",
     registerActivity: "Registrar actividad",
     child: "Niño",
-    activity: "Actividad",
-    status: "Estado",
-    completionTime: "Hora de finalización",
+    activities: "Actividades",
     date: "Fecha",
-    notes: "Notas",
-    registeredBy: "Registrado por",
-    created: "Creado",
     actions: "Acciones",
     completed: "Completada",
     pending: "Pendiente",
     rejected: "Rechazada",
+    viewActivities: "Ver actividades",
+    edit: "Editar",
+    close: "Cerrar",
+    status: "Estado",
+    time: "Hora",
+    notes: "Notas",
+    noNotes: "Sin notas",
+    registeredBy: "Registrado por",
+    of: "de",
+    records: "registros",
   },
 } as const;
 
 export const AttendanceActivities: React.FC = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const t = ATTENDANCE_ACTIVITIES_TRANSLATIONS[language];
-  const { tableProps } = useTable({
-    resource: "attendance/daily-activities",
-    syncWithLocation: false,
-    sorters: {
-      initial: [
-        {
-          field: "createdAt",
-          order: "desc",
-        },
-      ],
-    },
-    pagination: {
-      pageSize: 10,
+  const t = TRANSLATIONS[language];
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<GroupedRow | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
+
+  const { data: rawData, isLoading } = useQuery({
+    queryKey: ["attendance/daily-activities", "grouped-list"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("/attendance/daily-activities/all", {
+        params: { take: 200, page: 1, order: "DESC" },
+      });
+      return response.data?.data ?? response.data ?? [];
     },
   });
 
-  const getActivityStatus = (record: any) => {
-    const status = Number(record.completed);
-    if (status === 1) {
-      return (
-        <Tag color="green" icon={<CheckCircleOutlined />}>
-          {t.completed}
-        </Tag>
-      );
+  const groupedRows = useMemo<GroupedRow[]>(() => {
+    if (!rawData?.length) return [];
+    const map = new Map<string, GroupedRow>();
+    for (const activity of rawData) {
+      const key = `${activity.childId}-${activity.attendanceId}`;
+      if (!map.has(key)) {
+        map.set(key, {
+          key,
+          attendanceId: activity.attendanceId,
+          childId: activity.childId,
+          child: activity.child,
+          attendance: activity.attendance,
+          activities: [],
+        });
+      }
+      map.get(key)!.activities.push(activity);
     }
-    if (status === 2) {
-      return (
-        <Tag color="red" icon={<CloseCircleOutlined />}>
-          {t.rejected}
-        </Tag>
-      );
-    }
-    return (
-      <Tag color="orange" icon={<ClockCircleOutlined />}>
-        {t.pending}
-      </Tag>
-    );
-  };
+    return Array.from(map.values()).sort((a, b) => {
+      const dateA = a.attendance?.attendanceDate ?? "";
+      const dateB = b.attendance?.attendanceDate ?? "";
+      if (dateB !== dateA) return dateB.localeCompare(dateA);
+      const nameA = `${a.child?.firstName ?? ""} ${a.child?.lastName ?? ""}`.trim().toLowerCase();
+      const nameB = `${b.child?.firstName ?? ""} ${b.child?.lastName ?? ""}`.trim().toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }, [rawData]);
 
-  const getTimeCompleted = (record: any) => {
-    if (Number(record.completed) === 1 && record.timeCompleted) {
-      return dayjs(record.timeCompleted).tz(FLORIDA_TIMEZONE).format("h:mm A");
-    }
-    return null;
+  const getStatusTag = (completed: number) => {
+    if (completed === ActivityStatusEnum.COMPLETED)
+      return <Tag color="green" icon={<CheckCircleOutlined />}>{t.completed}</Tag>;
+    if (completed === ActivityStatusEnum.REJECTED)
+      return <Tag color="red" icon={<CloseCircleOutlined />}>{t.rejected}</Tag>;
+    return <Tag color="orange" icon={<ClockCircleOutlined />}>{t.pending}</Tag>;
   };
 
   return (
@@ -135,113 +159,175 @@ export const AttendanceActivities: React.FC = () => {
       ]}
     >
       <Table
-        {...tableProps}
-        rowKey="id"
+        dataSource={groupedRows}
+        rowKey="key"
+        loading={isLoading}
         pagination={{
-          ...tableProps.pagination,
-          showSizeChanger: true,
-          showQuickJumper: true,
+          current: page,
+          pageSize,
+          total: groupedRows.length,
+          onChange: (p) => setPage(p),
+          showSizeChanger: false,
           showTotal: (total, range) =>
-            language === "spanish"
-              ? `${range[0]}-${range[1]} de ${total} registros`
-              : `${range[0]}-${range[1]} of ${total} records`,
+            `${range[0]}-${range[1]} ${t.of} ${total} ${t.records}`,
         }}
       >
         <Table.Column
-          dataIndex="child"
           title={t.child}
-          render={(child: any) => (
+          dataIndex="child"
+          render={(_: any, row: GroupedRow) => (
             <Space>
-              <Avatar src={child?.profilePicture} size="small">
-                {child?.firstName?.[0]}
-                {child?.lastName?.[0]}
+              <Avatar src={row.child?.profilePicture} size="small">
+                {row.child?.firstName?.[0]}
+                {row.child?.lastName?.[0]}
               </Avatar>
               <Text strong>
-                {child?.firstName} {child?.lastName}
+                {row.child?.firstName} {row.child?.lastName}
               </Text>
             </Space>
           )}
         />
         <Table.Column
-          dataIndex="activityType"
-          title={t.activity}
-          render={(activityType: string) => (
-            <Space>
-              <span style={{ fontSize: "16px" }}>
-                {
-                  ACTIVITY_TYPE_ICONS[
-                    activityType as keyof typeof ACTIVITY_TYPE_ICONS
-                  ]
-                }
-              </span>
-              {
-                ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][
-                  activityType as keyof typeof ACTIVITY_TYPE_LABELS_BY_LANGUAGE.english
-                ]
-              }
-            </Space>
-          )}
-        />
-        <Table.Column
-          dataIndex="completed"
-          title={t.status}
-          render={(_, record: any) => getActivityStatus(record)}
-        />
-        <Table.Column
-          dataIndex="timeCompleted"
-          title={t.completionTime}
-          render={(_, record: any) => getTimeCompleted(record)}
-        />
-        <Table.Column
-          dataIndex="attendance"
           title={t.date}
-          render={(attendance: any) => (
-            <DateField
-              value={attendance?.attendanceDate}
-              format={language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY"}
-            />
-          )}
-        />
-        <Table.Column
-          dataIndex="notes"
-          title={t.notes}
-          render={(notes: string) => (
-            <Tooltip title={notes}>
-              <Text ellipsis style={{ maxWidth: 200 }}>
-                {notes || "-"}
-              </Text>
-            </Tooltip>
-          )}
-        />
-        <Table.Column
-          dataIndex="createdBy2"
-          title={t.registeredBy}
-          render={(user: any) => (
-            <Text type="secondary">
-              {user?.firstName} {user?.lastName}
+          render={(_: any, row: GroupedRow) => (
+            <Text>
+              {row.attendance?.attendanceDate
+                ? dayjs(row.attendance.attendanceDate).format(
+                    language === "spanish" ? "YYYY-MM-DD" : "MM/DD/YYYY"
+                  )
+                : "-"}
             </Text>
           )}
         />
         <Table.Column
-          dataIndex="createdAt"
-          title={t.created}
-          render={(value: string) => {
-            const dateFormat =
-              language === "spanish" ? "YYYY-MM-DD" : "MM-DD-YYYY";
-            return <Text>{dayjs(value).format(`${dateFormat} h:mm A`)}</Text>;
-          }}
+          title={t.activities}
+          render={(_: any, row: GroupedRow) => (
+            <Space wrap>
+              {row.activities.map((act) => (
+                <Tooltip
+                  key={act.id}
+                  title={
+                    ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][
+                      act.activityType as ActivityTypeEnum
+                    ]
+                  }
+                >
+                  <Tag
+                    color={
+                      act.completed === ActivityStatusEnum.COMPLETED
+                        ? "green"
+                        : act.completed === ActivityStatusEnum.REJECTED
+                        ? "red"
+                        : "orange"
+                    }
+                  >
+                    {ACTIVITY_TYPE_ICONS[act.activityType as keyof typeof ACTIVITY_TYPE_ICONS]}{" "}
+                    {ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][act.activityType as ActivityTypeEnum]}
+                  </Tag>
+                </Tooltip>
+              ))}
+            </Space>
+          )}
         />
         <Table.Column
           title={t.actions}
-          dataIndex="actions"
-          render={(_, record: any) => (
+          render={(_: any, row: GroupedRow) => (
             <Space>
-              <EditButton hideText size="small" recordItemId={record.id} />
-              <DeleteButton hideText size="small" recordItemId={record.id} />
+              <Tooltip title={t.viewActivities}>
+                <Button
+                  icon={<EyeOutlined />}
+                  size="small"
+                  onClick={() => {
+                    setSelectedRow(row);
+                    setViewModalOpen(true);
+                  }}
+                />
+              </Tooltip>
+              <Tooltip title={t.edit}>
+                <Button
+                  icon={<EditOutlined />}
+                  size="small"
+                  onClick={() =>
+                    navigate(`/attendance/activities/bulk-edit/${row.attendanceId}`)
+                  }
+                />
+              </Tooltip>
             </Space>
           )}
         />
       </Table>
+
+      {/* View Modal */}
+      <Modal
+        title={
+          <Space>
+            <Avatar src={selectedRow?.child?.profilePicture} size="small">
+              {selectedRow?.child?.firstName?.[0]}
+              {selectedRow?.child?.lastName?.[0]}
+            </Avatar>
+            <Text strong>
+              {selectedRow?.child?.firstName} {selectedRow?.child?.lastName}
+            </Text>
+            {selectedRow?.attendance?.attendanceDate && (
+              <Text type="secondary">
+                —{" "}
+                {dayjs(selectedRow.attendance.attendanceDate).format(
+                  language === "spanish" ? "YYYY-MM-DD" : "MM/DD/YYYY"
+                )}
+              </Text>
+            )}
+          </Space>
+        }
+        open={viewModalOpen}
+        onCancel={() => setViewModalOpen(false)}
+        footer={[
+          <Button key="close" onClick={() => setViewModalOpen(false)}>
+            {t.close}
+          </Button>,
+        ]}
+        width={700}
+      >
+        <Row gutter={[12, 12]} style={{ marginTop: 8 }}>
+          {selectedRow?.activities.map((act) => (
+            <Col key={act.id} xs={24} sm={12}>
+              <Card
+                size="small"
+                title={
+                  <Space>
+                    <span style={{ fontSize: 18 }}>
+                      {ACTIVITY_TYPE_ICONS[act.activityType as keyof typeof ACTIVITY_TYPE_ICONS]}
+                    </span>
+                    {ACTIVITY_TYPE_LABELS_BY_LANGUAGE[language][act.activityType as ActivityTypeEnum]}
+                  </Space>
+                }
+              >
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <div>
+                    <Text strong>{t.status}: </Text>
+                    {getStatusTag(act.completed)}
+                  </div>
+                  {act.completed === ActivityStatusEnum.COMPLETED && act.timeCompleted && (
+                    <div>
+                      <Text strong>{t.time}: </Text>
+                      <Text>{dayjs(act.timeCompleted).tz(FLORIDA_TIMEZONE).format("h:mm A")}</Text>
+                    </div>
+                  )}
+                  <div>
+                    <Text strong>{t.notes}: </Text>
+                    <Text type="secondary">{act.notes || t.noNotes}</Text>
+                  </div>
+                  <div>
+                    <Text strong>{t.registeredBy}: </Text>
+                    <Text type="secondary">
+                      {act.createdBy2?.firstName} {act.createdBy2?.lastName}
+                    </Text>
+                  </div>
+                </Space>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Modal>
     </List>
   );
 };

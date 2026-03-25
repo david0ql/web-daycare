@@ -16,17 +16,18 @@ import { ChildList } from "../../domains/children";
 // Import legacy pages
 import { UserCreate, UserEdit, Register } from "../../pages/users";
 import { ChildCreate, ChildEdit, ChildShow } from "../../pages/children";
-import { 
-  AttendanceList, 
-  AttendanceCreate, 
-  AttendanceShow, 
-  AttendanceEdit, 
-  AttendanceActivities, 
-  AttendanceObservations, 
+import {
+  AttendanceList,
+  AttendanceCreate,
+  AttendanceShow,
+  AttendanceEdit,
+  AttendanceActivities,
+  AttendanceObservations,
   AttendancePhotos,
   AttendanceActivitiesCreate,
   AttendanceActivitiesEdit,
   AttendanceActivitiesShow,
+  AttendanceActivitiesBulkEdit,
   AttendanceObservationsCreate,
   AttendanceObservationsEdit,
   AttendanceObservationsShow,
@@ -93,6 +94,7 @@ export const AppRoutes: React.FC = () => {
             <Route index element={<AttendanceActivities />} />
             <Route path="create" element={<AttendanceActivitiesCreate />} />
             <Route path="create/:attendanceId" element={<AttendanceActivitiesCreate />} />
+            <Route path="bulk-edit/:attendanceId" element={<AttendanceActivitiesBulkEdit />} />
             <Route path="edit/:id" element={<AttendanceActivitiesEdit />} />
             <Route path="show/:id" element={<AttendanceActivitiesShow />} />
           </Route>

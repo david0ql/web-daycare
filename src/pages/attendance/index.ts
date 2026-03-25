@@ -8,6 +8,7 @@ export { AttendancePhotos } from "./photos";
 export { AttendanceActivitiesCreate } from "./activities/create";
 export { AttendanceActivitiesEdit } from "./activities/edit";
 export { AttendanceActivitiesShow } from "./activities/show";
+export { AttendanceActivitiesBulkEdit } from "./activities/bulk-edit";
 export { AttendanceObservationsCreate } from "./observations/create";
 export { AttendanceObservationsEdit } from "./observations/edit";
 export { AttendanceObservationsShow } from "./observations/show";
