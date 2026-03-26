@@ -121,7 +121,7 @@ interface ActivityCardProps {
   formState?: ActivityFormState;
   onToggle: () => void;
   onChange: (data: Partial<ActivityFormState>) => void;
-  t: typeof TRANSLATIONS["english"];
+  t: typeof TRANSLATIONS["english"] | typeof TRANSLATIONS["spanish"];
   language: "english" | "spanish";
 }
 
