@@ -111,10 +111,21 @@ export const AttendanceShow: React.FC = () => {
             <Space direction="vertical" style={{ width: '100%' }}>
               <div>
                 <Avatar 
-                  src={record?.child?.profilePicture} 
+                  src={record?.child?.profilePicture ? (
+                    record.child.profilePicture.startsWith("http")
+                    ? record.child.profilePicture
+                    : `https://api.thechildrenworld.com/api${record.child.profilePicture}`
+                  ) : null} 
                   icon={<UserOutlined />}
                   size="large"
-                />
+                >
+                  {!record?.child?.profilePicture && (
+                    <>
+                      {record?.child?.firstName?.[0]}
+                      {record?.child?.lastName?.[0]}
+                    </>
+                  )}
+                </Avatar>
                 <div style={{ marginTop: 8 }}>
                   <Text strong>{record?.child?.firstName} {record?.child?.lastName}</Text>
                   <br />

@@ -229,9 +229,20 @@ export const AttendanceCreate: React.FC = () => {
                 <Col>
                   <Avatar
                     size={64}
-                    src={selectedChild.profilePicture}
+                    src={selectedChild.profilePicture ? (
+                      selectedChild.profilePicture.startsWith("http")
+                        ? selectedChild.profilePicture
+                        : `https://api.thechildrenworld.com/api${selectedChild.profilePicture}`
+                    ) : null}
                     icon={<UserOutlined />}
-                  />
+                  >
+                    {!selectedChild.profilePicture && (
+                      <span style={{ fontSize: 24 }}>
+                        {selectedChild.firstName?.[0]}
+                        {selectedChild.lastName?.[0]}
+                      </span>
+                    )}
+                  </Avatar>
                 </Col>
                 <Col>
                   <Title level={4} style={{ margin: 0 }}>
@@ -325,9 +336,20 @@ export const AttendanceCreate: React.FC = () => {
                 <Col>
                   <Avatar
                     size={64}
-                    src={selectedChild.profilePicture}
+                    src={selectedChild.profilePicture ? (
+                      selectedChild.profilePicture.startsWith("http")
+                        ? selectedChild.profilePicture
+                        : `https://api.thechildrenworld.com/api${selectedChild.profilePicture}`
+                    ) : null}
                     icon={<UserOutlined />}
-                  />
+                  >
+                    {!selectedChild.profilePicture && (
+                      <span style={{ fontSize: 24 }}>
+                        {selectedChild.firstName?.[0]}
+                        {selectedChild.lastName?.[0]}
+                      </span>
+                    )}
+                  </Avatar>
                 </Col>
                 <Col>
                   <Title level={4} style={{ margin: 0 }}>

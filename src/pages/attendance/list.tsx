@@ -169,21 +169,36 @@ export const AttendanceList: React.FC = () => {
       title: t.child,
       dataIndex: ["child", "firstName"],
       key: "child",
-      render: (_: any, record: any) => (
-        <Space>
-          <Avatar 
-            src={record.child?.profilePicture} 
-            icon={<UserOutlined />}
-            size="small"
-          />
-          <div>
-            <div>{record.child?.firstName} {record.child?.lastName}</div>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              {t.id}: {record.childId}
-            </Text>
-          </div>
-        </Space>
-      ),
+      render: (_: any, record: any) => {
+        const profilePicture = record.child?.profilePicture;
+        const avatarSrc = profilePicture
+          ? profilePicture.startsWith("http")
+            ? profilePicture
+            : `https://api.thechildrenworld.com/api${profilePicture}`
+          : null;
+        return (
+          <Space>
+            <Avatar 
+              src={avatarSrc} 
+              icon={<UserOutlined />}
+              size="small"
+            >
+              {!avatarSrc && (
+                <>
+                  {record.child?.firstName?.[0]}
+                  {record.child?.lastName?.[0]}
+                </>
+              )}
+            </Avatar>
+            <div>
+              <div>{record.child?.firstName} {record.child?.lastName}</div>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {t.id}: {record.childId}
+              </Text>
+            </div>
+          </Space>
+        );
+      },
     },
     {
       title: t.date,

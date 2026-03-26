@@ -94,17 +94,26 @@ export const AttendanceObservations: React.FC = () => {
         <Table.Column
           dataIndex="child"
           title={t.child}
-          render={(child: any) => (
-            <Space>
-              <Avatar 
-                src={child?.profilePicture} 
-                size="small"
-              >
-                {child?.firstName?.[0]}{child?.lastName?.[0]}
-              </Avatar>
-              <Text strong>{child?.firstName} {child?.lastName}</Text>
-            </Space>
-          )}
+          render={(_, record: any) => {
+            const childInfo = record.child;
+            const profilePicture = childInfo?.profilePicture;
+            const avatarSrc = profilePicture
+              ? profilePicture.startsWith("http")
+                ? profilePicture
+                : `https://api.thechildrenworld.com/api${profilePicture}`
+              : null;
+            return (
+              <Space>
+                <Avatar 
+                  src={avatarSrc} 
+                  size="small"
+                >
+                  {childInfo?.firstName?.[0]}{childInfo?.lastName?.[0]}
+                </Avatar>
+                <Text strong>{childInfo?.firstName} {childInfo?.lastName}</Text>
+              </Space>
+            );
+          }}
         />
         <Table.Column
           dataIndex="mood"

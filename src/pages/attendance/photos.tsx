@@ -90,30 +90,44 @@ export const AttendancePhotos: React.FC = () => {
         <Table.Column
           dataIndex="child"
           title={t.child}
-          render={(child: any) => (
-            <Space>
-              <Avatar 
-                src={child?.profilePicture} 
-                size="small"
-              >
-                {child?.firstName?.[0]}{child?.lastName?.[0]}
-              </Avatar>
-              <Text strong>{child?.firstName} {child?.lastName}</Text>
-            </Space>
-          )}
+          render={(_, record: any) => {
+            const childInfo = record.child;
+            const profilePicture = childInfo?.profilePicture;
+            const avatarSrc = profilePicture
+              ? profilePicture.startsWith("http")
+                ? profilePicture
+                : `https://api.thechildrenworld.com/api${profilePicture}`
+              : null;
+            return (
+              <Space>
+                <Avatar 
+                  src={avatarSrc} 
+                  size="small"
+                >
+                  {childInfo?.firstName?.[0]}{childInfo?.lastName?.[0]}
+                </Avatar>
+                <Text strong>{childInfo?.firstName} {childInfo?.lastName}</Text>
+              </Space>
+            );
+          }}
         />
         <Table.Column
           dataIndex="filename"
           title={t.photo}
-          render={(filename: string, record: any) => (
-            <Image
-              width={60}
-              height={60}
-              src={getImageUrl(record)}
-              style={{ objectFit: 'cover', borderRadius: 4 }}
-              fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
-            />
-          )}
+          render={(_, record: any) => {
+            const filename = record.filename;
+            const token = localStorage.getItem('refine-auth');
+            const imageUrl = `https://api.thechildrenworld.com/api/uploads/activity-photos/${filename}?token=${token}`;
+            return (
+              <Image
+                width={60}
+                height={60}
+                src={imageUrl}
+                style={{ objectFit: 'cover', borderRadius: 4 }}
+                fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
+              />
+            );
+          }}
         />
         <Table.Column
           dataIndex="caption"

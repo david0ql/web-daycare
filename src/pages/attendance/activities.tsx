@@ -191,6 +191,13 @@ export const AttendanceActivities: React.FC = () => {
           title={t.child}
           dataIndex="child"
           render={(_: any, row: GroupedRow) => {
+            const profilePicture = row.child?.profilePicture;
+            const avatarSrc = profilePicture
+              ? profilePicture.startsWith("http")
+                ? profilePicture
+                : `https://api.thechildrenworld.com/api${profilePicture}`
+              : null;
+            
             const registeredTypes = row.activities.map((a) => a.activityType);
             const missing = MANDATORY_ACTIVITIES.filter(
               (type) => !registeredTypes.includes(type)
@@ -222,7 +229,7 @@ export const AttendanceActivities: React.FC = () => {
                   placement="right"
                 >
                   <Avatar
-                    src={row.child?.profilePicture}
+                    src={avatarSrc}
                     size="small"
                     style={{ cursor: "pointer" }}
                   >

@@ -234,9 +234,20 @@ export const AttendanceActivitiesBulkEdit: React.FC = () => {
         </Title>
         {childInfo && (
           <Space>
-            <Avatar src={childInfo.profilePicture} size="small">
-              {childInfo.firstName?.[0]}
-              {childInfo.lastName?.[0]}
+            <Avatar 
+              src={childInfo.profilePicture ? (
+                childInfo.profilePicture.startsWith("http")
+                ? childInfo.profilePicture
+                : `https://api.thechildrenworld.com/api${childInfo.profilePicture}`
+              ) : null} 
+              size="small"
+            >
+              {!childInfo.profilePicture && (
+                <>
+                  {childInfo.firstName?.[0]}
+                  {childInfo.lastName?.[0]}
+                </>
+              )}
             </Avatar>
             <Text strong>
               {childInfo.firstName} {childInfo.lastName}
