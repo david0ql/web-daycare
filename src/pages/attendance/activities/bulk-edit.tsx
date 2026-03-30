@@ -31,6 +31,7 @@ import {
   ActivityStatusEnum,
   ACTIVITY_TYPE_LABELS_BY_LANGUAGE,
   ACTIVITY_TYPE_ICONS,
+  ACTIVITY_TYPE_DISPLAY_ORDER,
 } from "../../../domains/attendance/types/daily-activities.types";
 import { axiosInstance } from "../../../shared";
 import dayjs from "dayjs";
@@ -284,7 +285,11 @@ export const AttendanceActivitiesBulkEdit: React.FC = () => {
 
       {/* Activity Cards */}
       <Row gutter={[16, 16]}>
-        {visibleActivities.map((act: any) => {
+        {[...visibleActivities].sort((a: any, b: any) => {
+          const ai = ACTIVITY_TYPE_DISPLAY_ORDER.indexOf(a.activityType);
+          const bi = ACTIVITY_TYPE_DISPLAY_ORDER.indexOf(b.activityType);
+          return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+        }).map((act: any) => {
           const state = editState[act.id] ?? {
             completed: 0,
             timeCompleted: null,

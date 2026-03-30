@@ -22,6 +22,7 @@ import {
   ActivityStatusEnum,
   ACTIVITY_TYPE_LABELS_BY_LANGUAGE,
   ACTIVITY_TYPE_ICONS,
+  ACTIVITY_TYPE_DISPLAY_ORDER,
 } from "../../../domains/attendance/types/daily-activities.types";
 import { axiosInstance } from "../../../shared";
 import dayjs from "dayjs";
@@ -294,7 +295,7 @@ export const AttendanceActivitiesCreate: React.FC = () => {
 
   const availableTypes = useMemo(
     () =>
-      Object.values(ActivityTypeEnum).filter(
+      ACTIVITY_TYPE_DISPLAY_ORDER.filter(
         (type) => REPEATABLE_TYPES.includes(type) || !existingTypes.includes(type),
       ),
     [existingTypes],
@@ -302,7 +303,7 @@ export const AttendanceActivitiesCreate: React.FC = () => {
 
   const unavailableTypes = useMemo(
     () =>
-      Object.values(ActivityTypeEnum).filter(
+      ACTIVITY_TYPE_DISPLAY_ORDER.filter(
         (type) => !REPEATABLE_TYPES.includes(type) && existingTypes.includes(type),
       ),
     [existingTypes],

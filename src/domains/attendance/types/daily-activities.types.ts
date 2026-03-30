@@ -81,6 +81,17 @@ export const ACTIVITY_TYPE_LABELS_BY_LANGUAGE: Record<Language, Record<ActivityT
   },
 };
 
+// Display order for activity types (visual only)
+export const ACTIVITY_TYPE_DISPLAY_ORDER: ActivityTypeEnum[] = [
+  ActivityTypeEnum.BREAKFAST,
+  ActivityTypeEnum.SNACK,
+  ActivityTypeEnum.LUNCH,
+  ActivityTypeEnum.CLOTHING_CHANGE,
+  ActivityTypeEnum.DIAPER_CHANGE,
+  ActivityTypeEnum.HYDRATION,
+  ActivityTypeEnum.OTHER,
+];
+
 // Activity type icons
 export const ACTIVITY_TYPE_ICONS = {
   [ActivityTypeEnum.BREAKFAST]: '🍳',

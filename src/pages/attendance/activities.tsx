@@ -27,6 +27,7 @@ import {
   ActivityStatusEnum,
   ACTIVITY_TYPE_LABELS_BY_LANGUAGE,
   ACTIVITY_TYPE_ICONS,
+  ACTIVITY_TYPE_DISPLAY_ORDER,
 } from "../../domains/attendance/types/daily-activities.types";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -260,7 +261,11 @@ export const AttendanceActivities: React.FC = () => {
           title={t.activities}
           render={(_: any, row: GroupedRow) => (
             <Space wrap>
-              {row.activities.map((act) => (
+              {[...row.activities].sort((a, b) => {
+                const ai = ACTIVITY_TYPE_DISPLAY_ORDER.indexOf(a.activityType);
+                const bi = ACTIVITY_TYPE_DISPLAY_ORDER.indexOf(b.activityType);
+                return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+              }).map((act) => (
                 <Tooltip
                   key={act.id}
                   title={
@@ -345,7 +350,11 @@ export const AttendanceActivities: React.FC = () => {
         width={700}
       >
         <Row gutter={[12, 12]} style={{ marginTop: 8 }}>
-          {selectedRow?.activities.map((act) => (
+          {[...(selectedRow?.activities ?? [])].sort((a, b) => {
+            const ai = ACTIVITY_TYPE_DISPLAY_ORDER.indexOf(a.activityType);
+            const bi = ACTIVITY_TYPE_DISPLAY_ORDER.indexOf(b.activityType);
+            return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+          }).map((act) => (
             <Col key={act.id} xs={24} sm={12}>
               <Card
                 size="small"
