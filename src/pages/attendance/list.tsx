@@ -114,55 +114,8 @@ export const AttendanceList: React.FC = () => {
 
   // Combinamos los datos para mostrar niños ausentes HOY
   const combinedDataSource = React.useMemo(() => {
-    if (!tableProps.dataSource || !childrenWithStatus) return tableProps.dataSource;
-
-    const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-    const currentData = [...(tableProps.dataSource || [])];
-
-    // Identificar registros de hoy que ya están en el dataSource
-    const todayRecordsChildIds = new Set(
-      currentData
-        .filter(r => {
-          const rDate = r.attendanceDate ? new Date(r.attendanceDate).toISOString().split('T')[0] : "";
-          return rDate === todayStr;
-        })
-        .map(r => r.childId)
-    );
-
-    // Si estamos en la página 1, inyectamos los niños que faltan por hoy (ausentes)
-    const isFirstPage = (tableProps.pagination as any)?.current === 1 || !(tableProps.pagination as any)?.current;
-
-    let allRecords = currentData;
-
-    if (isFirstPage) {
-      const absentKids = childrenWithStatus.filter(c => !todayRecordsChildIds.has(c.id));
-
-      const virtualRecords = absentKids.map(c => ({
-        id: `virtual-absent-${c.id}`,
-        childId: c.id,
-        child: c,
-        attendanceDate: todayStr,
-        isPresent: false,
-        checkInTime: null,
-        checkOutTime: null,
-        isVirtual: true,
-      }));
-
-      allRecords = [...currentData, ...virtualRecords];
-    }
-
-    // Ordenar: fecha descendente, y dentro de cada fecha por nombre del niño ascendente
-    return allRecords.sort((a, b) => {
-      const dateA = a.attendanceDate ? new Date(a.attendanceDate).toISOString().split('T')[0] : "";
-      const dateB = b.attendanceDate ? new Date(b.attendanceDate).toISOString().split('T')[0] : "";
-
-      if (dateB !== dateA) return dateB.localeCompare(dateA); // Fecha DESC
-
-      const nameA = `${a.child?.firstName ?? ""} ${a.child?.lastName ?? ""}`.trim().toLowerCase();
-      const nameB = `${b.child?.firstName ?? ""} ${b.child?.lastName ?? ""}`.trim().toLowerCase();
-      return nameA.localeCompare(nameB); // Nombre ASC
-    });
-  }, [tableProps.dataSource, childrenWithStatus, tableProps.pagination]);
+    return tableProps.dataSource;
+  }, [tableProps.dataSource]);
 
   const columns = [
     {
