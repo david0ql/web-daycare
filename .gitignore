@@ -1,5 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+#Archivo para que escriba el ajuste en caso de que sea grande
+problema.txt
 # dependencies
 /node_modules
 /.pnp
