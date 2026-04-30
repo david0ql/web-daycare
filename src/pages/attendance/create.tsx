@@ -46,8 +46,7 @@ const ATTENDANCE_CREATE_TRANSLATIONS = {
     pickedUpBy: "Picked up by",
     pickedUpByRequired: "You must specify who picks up the child",
     pickedUpByPlaceholder: "Who picks up the child?",
-    checkOutNotesRequiredLabel: "Check-out Notes (Required)",
-    checkOutNotesRequired: "Check-out notes are required",
+    checkOutNotesOptionalLabel: "Check-out Notes (Optional)",
     checkOutNotesPlaceholder: "Summary of the child's day, behavior, activities performed, meals, etc...",
     registerCheckOut: "Register Check-out",
     checkOutSuccess: "Check-out successful. The child has been registered for departure correctly.",
@@ -76,8 +75,7 @@ const ATTENDANCE_CREATE_TRANSLATIONS = {
     pickedUpBy: "Recogido por",
     pickedUpByRequired: "Debes indicar quién recoge al niño",
     pickedUpByPlaceholder: "¿Quién recoge al niño?",
-    checkOutNotesRequiredLabel: "Notas de salida (Requerido)",
-    checkOutNotesRequired: "Las notas de salida son requeridas",
+    checkOutNotesOptionalLabel: "Notas de salida (Opcional)",
     checkOutNotesPlaceholder: "Resumen del día del niño, comportamiento, actividades realizadas, comidas, etc...",
     registerCheckOut: "Registrar salida",
     checkOutSuccess: "Salida exitosa. El niño ha sido registrado correctamente para su salida.",
@@ -165,10 +163,6 @@ export const AttendanceCreate: React.FC = () => {
   const handleCheckOut = (values: any) => {
     if (!values.pickedUpBy) {
       message.error(t.pickedUpByRequired);
-      return;
-    }
-    if (!values.checkOutNotes) {
-      message.error(t.checkOutNotesRequired);
       return;
     }
     
@@ -383,9 +377,8 @@ export const AttendanceCreate: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            label={t.checkOutNotesRequiredLabel}
+            label={t.checkOutNotesOptionalLabel}
             name="checkOutNotes"
-            rules={[{ required: true, message: t.checkOutNotesRequired }]}
           >
             <TextArea
               rows={4}
