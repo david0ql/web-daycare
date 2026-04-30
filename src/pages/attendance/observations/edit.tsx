@@ -17,6 +17,7 @@ const ATTENDANCE_OBSERVATIONS_EDIT_TRANSLATIONS = {
     selectMoodRequired: "Please select mood",
     selectMood: "Select mood",
     generalObservations: "General Observations",
+    generalObservationsOptional: "General Observations (Optional)",
     generalObservationsRequired: "Please enter observations",
     generalObservationsPlaceholder: "Describe observations about the child",
     updatedSuccess: "Observation updated successfully",
@@ -31,6 +32,7 @@ const ATTENDANCE_OBSERVATIONS_EDIT_TRANSLATIONS = {
     selectMoodRequired: "Por favor selecciona el ánimo",
     selectMood: "Selecciona ánimo",
     generalObservations: "Observaciones generales",
+    generalObservationsOptional: "Observaciones generales (Opcional)",
     generalObservationsRequired: "Por favor ingresa las observaciones",
     generalObservationsPlaceholder: "Describe observaciones sobre el niño",
     updatedSuccess: "Observación actualizada correctamente",
@@ -121,9 +123,8 @@ export const AttendanceObservationsEdit: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label={t.generalObservations}
+              label={t.generalObservationsOptional}
               name="generalObservations"
-              rules={[{ required: true, message: t.generalObservationsRequired }]}
             >
               <TextArea 
                 rows={4}
