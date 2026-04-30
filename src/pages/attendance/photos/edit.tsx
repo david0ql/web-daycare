@@ -103,7 +103,9 @@ export const AttendancePhotosEdit: React.FC = () => {
   useEffect(() => {
     if (formProps.initialValues?.filename) {
       const token = localStorage.getItem('refine-auth');
-      const imageUrl = `https://api.thechildrenworld.com/api/uploads/activity-photos/${formProps.initialValues.filename}?token=${token}`;
+      const imageUrl = formProps.initialValues.filename === 'no-photo.jpg'
+        ? '/no-photo.jpg'
+        : `https://api.thechildrenworld.com/api/uploads/activity-photos/${formProps.initialValues.filename}?token=${token}`;
       
       // Set initial fileList with current image
       setFileList([

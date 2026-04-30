@@ -112,22 +112,13 @@ export const AttendancePhotosCreate: React.FC = () => {
   });
 
   const handleFinish = async (values: any) => {
-    if (fileList.length === 0) {
-      message.error(t.photoRequired);
-      return;
-    }
-
-    const file = fileList[0].originFileObj;
-    if (!file) {
-      message.error(t.invalidFile);
-      return;
-    }
-
     setIsSubmitting(true);
     
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      if (fileList.length > 0 && fileList[0].originFileObj) {
+        formData.append('file', fileList[0].originFileObj);
+      }
       formData.append('childId', parseInt(values.childId).toString());
       formData.append('attendanceId', parseInt(values.attendanceId || (attendanceId ? parseInt(attendanceId) : undefined)).toString());
       if (values.caption) {
@@ -252,7 +243,6 @@ export const AttendancePhotosCreate: React.FC = () => {
 	          <Col span={24}>
 	            <Form.Item
 	              label={t.selectPhoto}
-	              required
 	            >
               <Upload
                 listType="picture-card"

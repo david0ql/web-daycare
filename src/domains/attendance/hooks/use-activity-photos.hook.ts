@@ -30,10 +30,12 @@ export const useActivityPhotos = (attendanceId?: number) => {
     fetchPhotos();
   }, [attendanceId]);
 
-  const createPhoto = async (data: CreateActivityPhotoData, file: File) => {
+  const createPhoto = async (data: CreateActivityPhotoData, file?: File) => {
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      if (file) {
+        formData.append('file', file);
+      }
       formData.append('childId', data.childId.toString());
       formData.append('attendanceId', data.attendanceId.toString());
       if (data.caption) {

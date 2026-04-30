@@ -65,8 +65,11 @@ export const ActivityPhotosList: React.FC<ActivityPhotosListProps> = ({
   };
 
   const getImageUrl = (photo: ActivityPhoto) => {
+    if (photo.filename === 'no-photo.jpg') {
+      return '/no-photo.jpg';
+    }
     // Assuming the API serves images from a static route
-    return `https://api.thechildrenworld.com/uploads/activity-photos/${photo.filename}`;
+    return `https://api.thechildrenworld.com/api/uploads/activity-photos/${photo.filename}`;
   };
 
   if (isLoading) {

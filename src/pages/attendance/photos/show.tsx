@@ -44,6 +44,9 @@ export const AttendancePhotosShow: React.FC = () => {
   const t = ATTENDANCE_PHOTOS_SHOW_TRANSLATIONS[language];
 
   const getImageUrl = (record: any) => {
+    if (record.filename === 'no-photo.jpg') {
+      return '/no-photo.jpg';
+    }
     return `https://api.thechildrenworld.com/api/uploads/activity-photos/${record.filename}`;
   };
 

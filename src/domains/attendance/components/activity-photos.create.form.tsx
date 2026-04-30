@@ -57,11 +57,6 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
   const { createPhoto } = useActivityPhotos();
 
   const handleSubmit = async (values: any) => {
-    if (fileList.length === 0) {
-      message.error(t.selectPhotoError);
-      return;
-    }
-
     setIsSubmitting(true);
     
     try {
@@ -71,7 +66,7 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
         caption: values.caption,
       };
 
-      await createPhoto(photoData, fileList[0].originFileObj);
+      await createPhoto(photoData, fileList.length > 0 ? fileList[0].originFileObj : undefined);
       
       message.success(t.uploadSuccess);
       form.resetFields();
@@ -123,7 +118,6 @@ export const ActivityPhotosCreateForm: React.FC<ActivityPhotosCreateFormProps> =
           <Col span={24}>
             <Form.Item
               label={t.selectPhoto}
-              required
             >
               <Upload
                 listType="picture-card"

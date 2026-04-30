@@ -55,6 +55,9 @@ export const AttendancePhotos: React.FC = () => {
   });
 
   const getImageUrl = (record: any) => {
+    if (record.filename === 'no-photo.jpg') {
+      return '/no-photo.jpg';
+    }
     // Use axiosInstance to get the image with JWT token
     const token = localStorage.getItem('refine-auth');
     return `https://api.thechildrenworld.com/api/uploads/activity-photos/${record.filename}?token=${token}`;
@@ -117,7 +120,9 @@ export const AttendancePhotos: React.FC = () => {
           render={(_, record: any) => {
             const filename = record.filename;
             const token = localStorage.getItem('refine-auth');
-            const imageUrl = `https://api.thechildrenworld.com/api/uploads/activity-photos/${filename}?token=${token}`;
+            const imageUrl = filename === 'no-photo.jpg' 
+              ? '/no-photo.jpg' 
+              : `https://api.thechildrenworld.com/api/uploads/activity-photos/${filename}?token=${token}`;
             return (
               <Image
                 width={60}
