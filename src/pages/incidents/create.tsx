@@ -35,6 +35,7 @@ const INCIDENTS_CREATE_TRANSLATIONS = {
     incidentTitleRequired: "Please enter the incident title",
     incidentTitlePlaceholder: "Incident title",
     incidentDescription: "Incident Description",
+    incidentDescriptionOptional: "Incident Description (Optional)",
     incidentDescriptionRequired: "Please enter the incident description",
     incidentDescriptionPlaceholder: "Detailed incident description",
     incidentDateTime: "Incident Date and Time",
@@ -67,6 +68,7 @@ const INCIDENTS_CREATE_TRANSLATIONS = {
     incidentTitleRequired: "Por favor ingresa el título del incidente",
     incidentTitlePlaceholder: "Título del incidente",
     incidentDescription: "Descripción del incidente",
+    incidentDescriptionOptional: "Descripción del incidente (Opcional)",
     incidentDescriptionRequired: "Por favor ingresa la descripción del incidente",
     incidentDescriptionPlaceholder: "Descripción detallada del incidente",
     incidentDateTime: "Fecha y hora del incidente",
@@ -286,9 +288,8 @@ export const IncidentsCreate: React.FC = () => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              label={t.incidentDescription}
+              label={t.incidentDescriptionOptional}
               name="description"
-              rules={[{ required: true, message: t.incidentDescriptionRequired }]}
             >
               <TextArea
                 rows={4}
